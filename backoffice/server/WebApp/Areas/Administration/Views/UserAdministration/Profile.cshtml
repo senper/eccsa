@@ -1,0 +1,70 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.UserAdministrationViewModel
+@{
+    ViewData["Title"] = "Profile";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Profile</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form data-parsley-validate method="post"
+                                  asp-action="SaveSelfUserProfile" asp-antiforgery="true">
+                                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Full Name
+                                    </label>
+                                    <input type="text" class="form-control col-sm-7 col-md-8" name="FullName" value="@Model.TheModel.FullName" required />
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Mobile
+                                    </label>
+                                    <input type="text" class="form-control col-sm-7 col-md-8" id="userMobileNo" name="MobileNo" value="@Model.TheModel.MobileNo" required />
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        User Name
+                                    </label>
+                                    <input type="text" class="form-control col-sm-7 col-md-8" name="UserName" value="@Model.TheModel.UserName" required />
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Email
+                                    </label>
+                                    <input type="email" class="form-control col-sm-7 col-md-8" id="userEmail" name="Email" value="@Model.TheModel.Email" required />
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-sm-12">
+                                        <input type="submit" value="Update" onclick="return validateForm();"
+                                               class="btn btn-primary">
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+<script src="~/js/confirmation.js"></script>
+<script src="~/js/validation.js"></script>
+
+<script type="text/javascript">
+    function validateForm() {
+        return is_validate_mobile("userMobileNo") && is_validate_email('userEmail');
+    }
+</script>
+}

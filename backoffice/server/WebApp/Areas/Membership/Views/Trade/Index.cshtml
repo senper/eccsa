@@ -1,0 +1,200 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.TradingViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <!-- Content Row -->
+    <!-- Content Row -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Business Information List</h6>
+                    <div class="col-sm-1">
+                        <button data-toggle="modal"
+                                data-target="#editModal"
+                                title="New"
+                                onclick="edit(this);"
+                                class=" float-right btn btn-outline-success btn-sm edit">
+                            <i class="fa fa-plus "></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                   
+                        <form data-parsley-validate novalidate method="get"
+                              asp-action="Index">
+                            <div class="row ">
+                                <label class="col-sm-3 col-md-2 col-form-label">
+                                    End Date After
+                                </label>
+                                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                <input type="date" class="form-control col-sm-6 col-md-4"
+                                       onchange="this.form.submit()"
+                                       id="endDateAfter" name="endDateAfter"
+                                       value="@(Model.EndDateAfter.ToString("yyyy-MM-dd"))" />
+                            </div>
+                        </form>
+                    <br />
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th style="width:40%;" >Title</th>
+                                   
+                                    <th style="width:30%;">Link</th>
+                                    <th >End Date</th>
+                                    <th ></th>
+                                </tr>
+                            </thead>
+                            @if (Model.TheList == null)
+                            {
+                                <tr><td colspan="4">No Data</td></tr>
+                            }
+                            else
+                            {
+                                foreach (var er in Model.TheList)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@Url.Action("Detail",Model.Controller,new { Area =Model.Area, endDateAfter = Model.EndDateAfter, module=Model.CurrentModule, id=@er.Id})"  title="@er.Description"  class="title ">@Html.DisplayFor(modelItem => er.TitleFull)</a>
+                                         </td>
+                                        
+                                        <td><a href="@(er.Link)">@er.Link</a></td>
+                                        <td>@er.EndDate.ToString("yyyy-MM-dd")</td>
+                                        <td>
+                                            <div class="btn-group float-right edit" role="group" aria-label="Basic example">
+                                                <a class=" btn btn-sm  btn-outline-info" href="@Url.Action("Detail",Model.Controller,new { Area =Model.Area, endDateAfter = Model.EndDateAfter, module=Model.CurrentModule, id=@er.Id})">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+                                                <a onclick="return confirmDelete($('#delete@(er.Id)form')[0]);"
+                                           class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="delete@(er.Id)form"
+                                              asp-action="Delete" asp-antiforgery="true" asp-route-id="@er.Id">
+                                                    <input type="hidden" name="id" value="@er.Id" />
+                                                    <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                                    <input type="hidden" name="endDateAfter" value="@(Model.EndDateAfter.ToString("yyyy-MM-dd"))" />
+                                                </form>
+
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Business Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" id="idInput" name="Id" />
+                    <input type="hidden" name="module" value="@Model.CurrentModule" />
+                    <input type="hidden" name="endDateAfter" value="@(Model.EndDateAfter.ToString("yyyy-MM-dd"))" />
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" id="title" placeholder="Title  "name="Title" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" id="titlelocal" placeholder="ርዕስ  " name="TitleLocal" required />
+                    </div>
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea class="form-control col-sm-7 col-md-8" id="description" placeholder="Description  " rows="5"
+                                  name="Description" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <textarea class="form-control col-sm-7 col-md-8" id="descriptionlocal" placeholder="ማብራርያ  " rows="5"
+                                  name="DescriptionLocal" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Link
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" id="link" name="Link" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" class="form-control col-sm-7 col-md-8" id="endDate" name="EndDate" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">Photo</label>
+                        <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" id="submitPayment" class="btn btn-primary">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+
+<script>
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function edit(e) {
+        $("#idInput").val($(e).attr('data-idval'));
+        $("#title").val($(e).attr('data-title'));
+        $("#titlelocal").val($(e).attr('data-titlelocal'));
+        $("#description").val($(e).attr('data-description'));
+        $("#descriptionlocal").val($(e).attr('data-descriptionlocal'));
+        $("#link").val($(e).attr('data-link'));
+        $("#endDate").val($(e).attr('data-endDate'));
+    }
+</script>
+}

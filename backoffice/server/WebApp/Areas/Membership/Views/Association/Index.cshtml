@@ -1,0 +1,139 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.AssociationViewModel
+
+@{
+    ViewData["Title"] = "Associations";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @if (Model.ShowNew)
+        {
+            <button 
+            class="edit d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+            data-toggle="modal"
+            data-target="#AddEditModal"
+            title="Add New Association"
+            data-url="@Url.Action("Edit", new { Id=Guid.Empty })">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+        </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Association Name</th>
+                                    <th>የማኅበሩ ስም</th>
+                                    <th>MemberSince</th>
+                                    <th>Type</th>
+                                    <th>Parent</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Association Name</th>
+                                    <th>የማኅበሩ ስም</th>
+                                    <th>MemberSince</th>
+                                    <th>Type</th>
+
+                                    <th>Parent</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                    var statusClass = (item.Stakeholder == null ? "" : item.Stakeholder.Status == 0 ? "danger" : "");
+
+                                    <tr class="@statusClass">
+                                        <td>
+                                            <a asp-controller="Association" asp-action="Detail" asp-route-id="@item.Id" class="title @statusClass">@Html.DisplayFor(modelItem => item.NameEng)</a>
+                                        </td>
+                                        <td>
+                                            <a class="title @statusClass" asp-controller="Association" asp-action="Detail" asp-route-id="@item.Id">
+                                                @Html.DisplayFor(modelItem => item.NameLocal)
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.MembershipDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.AssociationType) @Html.DisplayFor(modelItem => item.AssociationLevel)
+                                        </td>
+                                        <td>
+                                            @(Model.TheList.FirstOrDefault(s => s.Id == item.ParentId && s.Id != item.Id)?.Name)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                               
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="Association" asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+@section script {
+    <script>
+        $('.edit').on('click', function () {
+
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+          
+    </script>
+}

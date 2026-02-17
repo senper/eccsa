@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/20/2009 23:03:47" ReportInfo.Modified="10/15/2021 13:53:28" ReportInfo.CreatorVersion="2019.3.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="MembersReport" ReferenceName="MembersReport" DataType="null" Enabled="true">
+      <Column Name="Assocation" DataType="System.String"/>
+      <BusinessObjectDataSource Name="Members" DataType="null" Enabled="true">
+        <Column Name="Position" DataType="System.String"/>
+        <Column Name="MemberName" DataType="System.String"/>
+      </BusinessObjectDataSource>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" Landscape="true" PaperWidth="297" PaperHeight="210" TopMargin="2" RightMargin="2" BottomMargin="2" Watermark.Enabled="true" Watermark.Font="Arial, 60pt, style=Bold" Watermark.ShowTextOnTop="false">
+    <ReportTitleBand Name="ReportTitle1" Width="1077.3" Height="66.15">
+      <TextObject Name="Text2" Width="1077.3" Height="28.35" Border.Lines="Top, Bottom" Border.TopLine.Style="Double" Border.TopLine.Width="3" Text="Members Report" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text15" Left="9.45" Top="37.8" Width="94.5" Height="18.9" Font="Arial, 10pt"/>
+      <TextObject Name="Text1" Left="113.4" Top="37.8" Width="614.25" Height="18.9" Border.Lines="Bottom" Text="[MembersReport.Assocation]" Font="Arial, 10pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="70.15" Width="1077.3"/>
+    <GroupHeaderBand Name="GroupHeader1" Top="74.15" Width="1077.3" Height="85.05" Condition="[MembersReport.Members.Position]" SortOrder="None">
+      <TextObject Name="Text8" Left="170.1" Top="66.15" Width="255.15" Height="18.9" Text="Name" Font="Arial, 10pt"/>
+      <LineObject Name="Line1" Top="37.8" Width="1077.3" Border.Width="3"/>
+      <TextObject Name="Text72" Left="9.45" Top="9.45" Width="94.5" Height="18.9" Text="Position" Font="Arial, 10pt"/>
+      <TextObject Name="Text70" Left="113.4" Top="9.45" Width="226.8" Height="18.9" Text="[MembersReport.Members.Position]" Font="Arial, 9.75pt, style=Underline"/>
+      <LineObject Name="Line6" Width="1077.3"/>
+      <DataBand Name="Data2" Top="163.2" Width="1077.3" Height="56.7" DataSource="Members">
+        <TextObject Name="Text5" Left="170.1" Top="9.45" Width="255.15" Height="37.8" Text="[MembersReport.Members.MemberName]" Font="Arial, 10pt"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="223.9" Width="1077.3"/>
+    </GroupHeaderBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="227.9" Width="1077.3" Height="85.05">
+      <TextObject Name="Text24" Top="9.45" Width="94.5" Height="18.9" Text="Prepared By:-" Font="Arial, 10pt"/>
+      <TextObject Name="Text25" Left="94.5" Top="9.45" Width="141.75" Height="28.35" Border.Lines="Bottom" Font="Arial, 10pt"/>
+      <TextObject Name="Text26" Left="245.7" Top="9.45" Width="103.95" Height="18.9" Text="Approved By:-" Font="Arial, 10pt"/>
+      <TextObject Name="Text28" Left="349.65" Top="9.45" Width="94.5" Height="18.9" Border.Lines="Bottom" Font="Arial, 10pt"/>
+      <TextObject Name="Text30" Top="47.25" Width="94.5" Height="18.9" Text="Signature:-" Font="Arial, 10pt"/>
+      <TextObject Name="Text33" Left="94.5" Top="47.25" Width="94.5" Height="18.9" Border.Lines="Bottom" Font="Arial, 10pt"/>
+      <TextObject Name="Text36" Left="245.7" Top="47.25" Width="94.5" Height="18.9" Text="Signature:-" Font="Arial, 10pt"/>
+      <TextObject Name="Text39" Left="349.65" Top="47.25" Width="94.5" Height="18.9" Border.Lines="Bottom" Font="Arial, 10pt"/>
+      <LineObject Name="Line3" Top="75.6" Width="1077.3"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="316.95" Width="1077.3" Height="37.8">
+      <TextObject Name="Text22" Left="756" Top="9.45" Width="28.35" Height="18.9" Text="of" Font="Arial, 10pt"/>
+      <TextObject Name="Text23" Left="207.9" Top="9.45" Width="245.7" Height="18.9" Text="[Date]" Format="Custom" Format.Format="dddd, MMMM dd, yyyy" Font="Arial, 10pt"/>
+      <TextObject Name="Text64" Left="689.85" Top="9.45" Width="66.15" Height="18.9" Text="[PageN]" Font="Arial, 10pt"/>
+      <TextObject Name="Text65" Left="784.35" Top="9.45" Width="47.25" Height="18.9" Text="[TotalPages#]" Font="Arial, 10pt"/>
+    </PageFooterBand>
+    <OverlayBand Name="Overlay1" Top="358.75" Width="1077.3" Height="963.9">
+      <TextObject Name="Text63" Left="207.9" Top="378" Width="718.2" Height="585.9" GrowToBottom="true" Text="Test" HorzAlign="Center" VertAlign="Center" Angle="315" Font="Arial, 40pt, style=Bold" TextFill.Color="91, 0, 128, 128"/>
+    </OverlayBand>
+  </ReportPage>
+</Report>

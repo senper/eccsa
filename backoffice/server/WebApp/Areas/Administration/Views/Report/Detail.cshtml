@@ -1,0 +1,535 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.ReportViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Report",new { Area ="Administration", module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-10">
+
+                            <h4>  @Model.TheModel.Title </h4>
+                        </div>
+                        <div class="col-sm-2">
+                            <a data-toggle="modal" data-target="#editModal" title="Edit Report"
+                               class=" btn btn-sm btn-outline-primary float-right">
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    SubTitle
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.SubTitle
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Source Name
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.SourceName
+                                </div>
+                            </div>
+                            @* More hear *@
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Group Name
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.GroupName
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Sort Order
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.SortOrder
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Is Active
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.IsActive
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <button data-toggle="modal" data-target="#AddSubsystemModal"
+                                            class="addSubSystem d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                                        <i class="fas fa-plus fa-sm "></i> Show Report In
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-bordered table-striped" id="userMembers" style="margin-top: 5px; margin-left: 5px;">
+                                <thead>
+                                    <tr>
+                                        <th>Sub system</th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr>
+                                        <td>
+                                            @Model.TheModel.ReportOwner
+                                        </td>
+
+                                    </tr>
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Columns</h4>
+
+
+                </div>
+                <div class="card-body">
+
+
+                    <div class="row">
+
+                        <div class="col-md-12 ">
+
+                            <br />
+                            <table class="table table-bordered table-striped" id="datatablesurvey" style="margin-top: 5px; margin-left: 5px;">
+                                <thead>
+                                    <tr>
+                                        <th>Caption</th>
+                                        <th title="Viewable Groupby Percentage Numeric Filter">Properties (VGPNF)</th>
+                                        <th>Field Type</th>
+                                        <th>Drop Down Source</th>
+
+                                        <th>Filter Field Name</th>
+
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var s in Model.TheModel.ReportFields)
+                                    {
+                                        <tr>
+                                            <td>@s.Caption</td>
+                                            <td>
+                                                @(s.IsViewable ? "V" : "_")@(s.IsGroupField ? "G" : "_")@(s.IsPercent ? "P" : "_")@(s.IsNumeric ? "N" : "_")@(s.IsFilterField ? "F" : "_")
+                                            </td>
+                                            <td>@s.FieldTypeId</td>
+                                            <td>@s.DropDownSource</td>
+                                            <td>@s.FilterFieldName</td>
+
+                                            <td>
+                                                <div class="btn-group" role="group" aria-label="Basic example">
+
+
+                                                    <button data-toggle="modal" data-target="#AddReportFieldModal"
+                                                            data-id="@s.Id"
+                                                            data-isgroup="@s.IsGroupField"
+                                                            data-isview="@s.IsViewable"
+                                                            data-ispercent="@s.IsPercent"
+                                                            data-isnum="@s.IsNumeric"
+                                                            data-isfilter="@s.IsFilterField"
+                                                            data-dropdown="@s.DropDownSource"
+                                                            data-fieldtype="@((int)s.FieldTypeId)"
+                                                            data-filterfieldname="@s.FilterFieldName"
+                                                            data-caption="@s.Caption"
+                                                            onclick="editReport(this);"
+                                                            class="addSubSystem d-none d-sm-inline-block btn btn-sm btn-outline-info shadow-sm">
+                                                        <i class="fa fa-pen" aria-hidden="true"></i>
+                                                        @*<i class="fa fa-pencil" aria-hidden="true"></i>*@
+                                                    </button>
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editInfoTypeModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Info Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" asp-for="TheModel.Title" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Schema
+                        </label>
+                        <input type="text" maxlength="100" asp-for="TheModel.SubTitle" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Table Name
+                        </label>
+                        <input type="text" maxlength="100" asp-for="TheModel.SourceName" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddSubsystemModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Show Report In </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="SaveReportSubsystems" asp-antiforgery="true">
+                    <input type="hidden" name="reportId" value="@Model.TheModel.Id" />
+
+                    <div class="row form-group">
+                        <div class="col-12">
+                            <label class="col-form-label">
+                                Show Report In
+                            </label>
+                            <div class="row">
+                                @foreach (var ss in Model.AllModules.OrderBy(s => s.Name))
+                                {
+                                    var module = (ECCSAModuleFlag)ss.Id;
+                                    <div class="col-6">
+                                        <input type="checkbox" name="subsystems" value="@(ss.Id)"
+                                        @(Model.TheModel.ReportOwner.HasFlag(module) ? "Checked" : "") /> @(ss.Name)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddReportFieldModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Edit Column </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="SaveReportField" asp-antiforgery="true">
+                    <input type="hidden" name="ReportId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Id" id="fieldId" />
+
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-sm-2 col-form-label">Caption</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="captionField" name="Caption">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="viewFieldId" name="IsViewable" value="true">
+                                <label class="form-check-label">
+                                    Is View Field
+                                </label>
+                            </div> <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="groupFieldId" name="IsGroupField" value="true">
+                                <label class="form-check-label">
+                                    Is Group Field
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="percentFieldId" value="true" name="IsPercent">
+                                <label class="form-check-label">
+                                    Is Percent Field
+                                </label>
+                            </div><div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="numericFieldId" value="true" name="IsNumeric">
+                                <label class="form-check-label">
+                                    Is Numeric Field
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        Is Filter Field: <input type="checkbox" name="IsFilterField" id="filterFieldId" onchange="filterFieldChanged()">
+                    </div>
+                    <div id="dropdowns" style="display:none;">
+                        <div class="row" style="padding-bottom: 5px;">
+                            <div class="col-sm-12">
+                                Field Type
+                                <select class="custom-select col-sm-8 col-md-9" id="fieldTypeId" onchange="showDropdownOptions()" name="FieldTypeId"
+                                        asp-items="@(Html.GetEnumSelectList<FilterFieldType>())"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="additionalDropdownOptions" style="display:none;">
+                        <div class="row" style="padding-bottom: 5px;">
+                            <div class="col-sm-12">
+                                Source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <select class="custom-select col-sm-8 col-md-9" id="dropDownFieldId" onchange="" name="DropDownSource">
+                                    @foreach (var l in Model.LookupTypes)
+                                    {
+                                        <option value="@l.Name">@l.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-bottom: 5px;">
+                            <div class="col-sm-12">
+                                Join With
+                                <select class="custom-select col-sm-8 col-md-9" id="filterFieldNameId" onchange="" name="FilterFieldName">
+                                    <option value=""></option>
+                                    @foreach (var s in Model.TheModel.ReportFields)
+                                    {
+                                        <option value="@s.FieldName">@s.Caption</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Edit Report</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveEditReport" asp-antiforgery="true">
+                    <input type="hidden" value="@Model.TheModel.Id" name="Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" name="Title" value="@Model.TheModel.Title" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sub Title
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" name="SubTitle" value="@Model.TheModel.SubTitle" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sort Order
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" id="SortOrder" name="SortOrder" value="@Model.TheModel.SortOrder" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Is Active
+                        </label>
+                        <input class="form-check-input col-sm-7 col-md-8" type="checkbox" id="isVisible" name="isVisible" value="@(Model.TheModel.IsActive ?? false)">
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" onclick="return validateForm();"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+
+
+    @*$("#datatblquestion").treetable({ expandable: false });*@
+    <script>
+
+        function showDropdownOptions() {
+            var fieldType = document.getElementById("fieldTypeId").value;
+           
+            var additionalDropdownOptions = document.getElementById("additionalDropdownOptions");
+
+            if (fieldType == "1" || fieldType == "2" || fieldType == "6") {
+                additionalDropdownOptions.style.display = "block";
+            } else {
+                additionalDropdownOptions.style.display = "none";
+            }
+        }
+
+        function filterFieldChanged() {
+            var checkbox = document.getElementById('filterFieldId');
+            var dropdowns = document.getElementById('dropdowns');
+            var checked = checkbox.checked;
+            dropdowns.style.display = checked? 'block' : 'none';
+            if (!checked) {
+                $('#fieldTypeId').val("0").change();
+                $('#dropDownFieldId').val("").change();
+                $('#filterFieldNameId').val("").change();
+                document.getElementById("additionalDropdownOptions").style.display = "none";
+            } else {
+                showDropdownOptions();
+            }
+            
+        }
+
+
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function editReport(e) {
+            const groupField = $('#groupFieldId');
+            const viewField = $('#viewFieldId');
+            const percentField = $('#percentFieldId');
+            const numericField = $('#numericFieldId');
+            const fieldId = document.getElementById('fieldId');
+            const isFilterField = document.getElementById('filterFieldId');
+
+            const groupVal = $(e).attr('data-isgroup');
+            const viewVal = $(e).attr('data-isview');
+            const percentVal = $(e).attr('data-ispercent');
+            const numericVal = $(e).attr('data-isnum');
+            const dropDownVal = $(e).attr('data-dropdown');
+            const fieldTypeVal = $(e).attr('data-fieldtype');
+            const isFilterFieldVal = $(e).attr('data-isfilter');
+            const filterFieldNameVal = $(e).attr('data-filterfieldname');
+            const captionVal = $(e).attr('data-caption');
+
+            const idVal = $(e).attr('data-id');
+
+
+
+            groupField.prop('checked', groupVal === "True" ? true : false);
+            viewField.prop('checked', viewVal === "True" ? true : false);
+            percentField.prop('checked', percentVal === "True" ? true : false);
+            numericField.prop('checked', numericVal === "True" ? true : false);
+
+            isFilterField.checked = isFilterFieldVal === "True";
+
+            $('#fieldTypeId').val(fieldTypeVal).change();
+            $('#dropDownFieldId').val(dropDownVal).change();
+          
+            $('#filterFieldNameId').val(filterFieldNameVal).change();
+          
+            document.getElementById('captionField').value = captionVal;
+            fieldId.value = idVal;
+            filterFieldChanged();
+        }
+
+
+    </script>
+}

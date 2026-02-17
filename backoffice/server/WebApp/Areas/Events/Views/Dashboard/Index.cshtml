@@ -1,0 +1,240 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Events.Model.TradeDashboardViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<link rel="stylesheet" type="text/css" href="~/css/nv-d3/nv.d3.css" />
+
+<style>
+    #piechartdiv {
+        width: 100%;
+        height: 250px;
+    }
+
+    #chartdiv {
+        width: 100%;
+        height: 500px;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+    </div>
+
+    <!-- Content Row -->
+
+
+    <div class="row">
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Earnings (Monthly)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model.MonthlyEarnings.ToString("N"))</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Earnings (Annual)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model.AnnualEarnings.ToString("N"))</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Service Requests (Monthly)
+                            </div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@(Model.MonthlyNoOfProvidedServices)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Requests Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Service Requests (Annual)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model.AnnualNoOfProvidedServices)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-1">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary"> @Model.Summary.L1Label</h6>
+                    @*<div class="dropdown no-arrow">
+                            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                 aria-labelledby="dropdownMenuLink">
+                                <div class="dropdown-header">Dropdown Header:</div>
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </div>*@
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="card-body d-none" id="empPiechartdiv">
+
+                    </div>
+                    <div class="card-body" id="pieChart">
+                        <svg></svg>
+                    </div>
+                    <div class=" panel-footer">
+                        <strong><label id="pieChartNav"></label></strong>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-0">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary"> @Model.Summary2.L1Label</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="card-body d-none" id="empPiechartdiv2">
+
+                    </div>
+                    <div class="card-body" id="pieChart2">
+                        <svg></svg>
+                    </div>
+                    <div class=" panel-footer">
+                        <strong><label id="pieChartNav2"></label></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="summaryJson" value="@Model.SummaryJson" />
+        <input type="hidden" id="summaryJson2" value="@Model.SummaryJson2" />
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Performance</h6>
+                </div>
+                <div class="card-body">
+
+                    @foreach (var s in Model.ServiceTypes)
+                    {
+                        var value = "40";
+                        var color = "warning";
+                        if (s.NameEng == "packing list")
+                        {
+                            value = "60";
+                            color = "info";
+                        }
+                        <h4 class="small font-weight-bold">
+                            No of @(s.NameEng) Services <span class="float-right">@(value)%</span>
+                        </h4>
+                        <div class="progress mb-4">
+                            <div class="progress-bar bg-@(color)" role="progressbar" style="width: @(value)%"
+                                 aria-valuenow="@(value)" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section script {
+    <script src="~/vendor/nv-d3/d3.v3.js"></script>
+    <script src="~/vendor/nv-d3/nv.d3.js"></script>
+    <script src="~/js/chartConfig.js"></script>
+
+    <script>
+
+        var data = copyJson(JSON.parse($('#summaryJson').val()));
+
+        defaultPieChart("pieChart", data, "", false, true);
+
+        var data = copyJson(JSON.parse($('#summaryJson2').val()));
+
+        defaultPieChart("pieChart2", data, "", false);
+
+        function copyJson(data, key) {
+            var innArr = [];
+            for (var i = 0; i < data.length; i++) {
+                var keyValue = data[i].L1;
+                if (key == "L2") {
+                    keyValue = data[i].L2;
+                } else if (key == "L3") {
+                    keyValue = data[i].L3;
+                }
+                innArr.push({
+                    "key": keyValue,
+                    "y": data[i].No
+                });
+            }
+
+            return innArr;
+        }
+    </script>
+
+}

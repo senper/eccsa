@@ -1,0 +1,46 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Support.Model.SupportDashboardViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_SupportLayout.cshtml";
+}
+
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+    </div>
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+        <!-- Pie Chart -->
+        <div class="col-xl-11 col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary"> @Model.CurrentPeriodName Performance </h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var p in @Model.Performances)
+                    {
+                        <h4 class="small font-weight-bold">
+                            @p.Name <span class="float-right">@p.Value%</span>
+                        </h4>
+                        <div class="progress mb-4">
+                            <div class="progress-bar" role="progressbar" style="width: @p.BarWidth%; background-color: @p.Color"
+                             aria-valuenow="@p.Value" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section script {
+
+}

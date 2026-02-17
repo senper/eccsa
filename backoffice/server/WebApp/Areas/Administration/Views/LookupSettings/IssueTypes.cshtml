@@ -1,0 +1,175 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.IssueTypeViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Issue Types";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @* @if (Model.IsUserOrAdmin)
+            {*@
+        <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Issue Types"
+                data-id="@Guid.Empty"
+                data-status="@((int)StatusEnum.Active)"
+                onclick="edit('@Guid.Empty', '', '', '')">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+        </button>
+        @*}*@
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                   <th>Code</th>
+                                    <th>Name</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+                                    <tr>
+                                        <td>@i.Code</td>
+                                        <td>@Html.DisplayFor(modelItem => i.Name)</td>
+                                        
+                                        <td>
+                                             <a 
+                                             class=" btn btn-sm  btn-outline-info" 
+                                             
+                                              data-toggle="modal"
+                                                data-target="#theModal"
+                                                title="Edit Issue Types"
+                                                data-id="@Guid.Empty"
+                                                data-status="@((int)StatusEnum.Active)"
+                                             
+                                             onclick="edit('@i.Id', '@i.Code', '@i.NameEng',  '@i.NameLocal')">
+                                                        <i class="fa fa-pen" aria-hidden="true"></i>
+                                                    </a>
+                                            @if (i.Issues.Count == 0)
+                                            {
+                                                <div class="btn-group" role="group" aria-label="Basic example">
+                                                    <a onclick="return confirmDelete($('#deleteIssueType@(i.Id)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    </a>
+                                                    <form data-parsley-validate novalidate method="post" id="deleteIssueType@(i.Id)"
+                                                  asp-action="DeleteIssueType" asp-antiforgery="true" asp-route-id="@i.Id">
+                                                        <input type="hidden" name="id" value="@i.Id" />
+                                                    </form>
+                                                </div>
+                                            }
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*@if (Model.IsUserOrAdmin)
+    {*@
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Issue Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" 
+                      asp-action="SaveIssueType" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="issueTypeId" value="@Guid.Empty" />
+                   <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Code
+                        </label>
+                        <input type="text" id="codeId" name="Code" maxlength="10" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+                   
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" id="issueNameEng" name="NameEng" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            ስም
+                        </label>
+                        <input type="text" name="NameLocal" id="issueNameLocal" maxlength="100" class="form-control col-sm-9 col-md-8" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@*}*@
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+      function edit(idVal, codeVal, nameEngVal, nameLocalVal){
+
+        const id = document.getElementById('issueTypeId');
+        const code = document.getElementById('codeId');
+        const nameEng = document.getElementById('issueNameEng');
+        const nameLocal = document.getElementById('issueNameLocal');
+
+        id.value = idVal;
+        code.value = codeVal;
+        nameEng.value = nameEngVal;
+         nameLocal.value = nameLocalVal;
+       
+    }
+
+</script>
+}

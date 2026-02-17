@@ -1,0 +1,7 @@
+REACT_APP_API_URL=http://ethiopianchamber.org.et
+REACT_APP_TELEAPI_URL=http://196.188.123.108:7531
+REACT_APP_BASE_URL=http://ethiopianchamber.et
+
+REACT_APP_API_URL=http://192.168.80.10 
+REACT_APP_TELEAPI_URL=http://192.168.80.16
+REACT_APP_BASE_URL=http://192.168.80.11

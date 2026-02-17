@@ -1,0 +1,91 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.CertificateViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Index">
+                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                <div class="btn-group pull-left" role="group" aria-label="Basic example">
+                    Import Date &nbsp;&nbsp;<select name="ImportDate"
+                    asp-for="@Model.ImportDate" required>
+                    <option></option>
+                        @foreach(var dt in @Model.EswRequests.OrderByDescending(e=> e.RequestDate) )
+                        {
+                            <option value="@dt.RequestDate.Date.ToString("yyyy-MM-dd")">@dt.RequestDate.Date.ToString("yyyy-MM-dd")  @dt.Status </option>
+                        }
+                    </select>
+                    <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+       
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>LPCO No</th>
+                                     <th>TIN</th>
+                                     <th>Consignee Name</th>
+                                      <th>Consignor Name</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>LPCO No</th>
+                                     <th>TIN</th>
+                                     <th>Consignee Name</th>
+                                      <th>Consignor Name</th>
+
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var dr in Model.TheList)
+                                {
+
+                                    <tr>
+                                        <td>@dr.LPCONo</td>
+                                        <td>@dr.TraderTIN</td>
+                                        <td>@dr.ConsigneeName</td>
+                                        <td>@dr.ConsignorCompany</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+@section script {
+
+
+    <script>
+
+       
+
+       
+    </script>
+}

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/14/2022 21:22:18" ReportInfo.Modified="10/13/2023 17:19:20" ReportInfo.CreatorVersion="2023.3.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="FreeSale" ReferenceName="FreeSale" DataType="System.Int32" Enabled="true">
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="Logo" DataType="System.String"/>
+      <Column Name="Laws" DataType="System.String"/>
+      <Column Name="CompanyAddress" DataType="System.String"/>
+      <Column Name="CompanyProduct" DataType="System.String"/>
+      <Column Name="DestinationCountries" DataType="System.String"/>
+      <Column Name="PositionOfUndersigned" DataType="System.String"/>
+      <Column Name="RequestorTitle" DataType="System.String"/>
+      <Column Name="RequestorName" DataType="System.String"/>
+      <Column Name="AuthorizedBy" DataType="System.String"/>
+      <Column Name="AuthorizerTitle" DataType="System.String"/>
+      <Column Name="AuthorizationDate" DataType="System.String"/>
+      <Column Name="ApproverName" DataType="System.String"/>
+      <Column Name="ApproverTitle" DataType="System.String"/>
+      <Column Name="ApproveredDate" DataType="System.String"/>
+      <Column Name="Day" DataType="System.String"/>
+      <Column Name="Signature" DataType="System.String"/>
+      <BusinessObjectDataSource Name="Details" DataType="System.Int32" Enabled="true">
+        <Column Name="ProductName" DataType="System.String"/>
+      </BusinessObjectDataSource>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="321.3">
+      <TextObject Name="Text3" Left="18.9" Top="75.6" Width="302.4" Height="18.9" Text="I, the undersigned being duly sworn, depose and say:" HorzAlign="Center" Font="Arial, 9pt"/>
+      <TextObject Name="Text4" Left="9.45" Top="103.95" Width="699.3" Height="47.25" Text="I am the [FreeSale.PositionOfUndersigned] at Ethiopian Chamber of Commerce and Sectoral Associations (ECCSA) the office of which is located at house number 553, PO.BOX.  517, Tel   015514005, Addis Ababa, Ethiopia" HorzAlign="Justify" Font="Arial, 9pt"/>
+      <TextObject Name="Text5" Left="9.45" Top="160.65" Width="699.3" Height="37.8" Text="1.To the best of my knowledge and belief, [FreeSale.CompanyName] is a corporation organized and existing under the laws  [FreeSale.Laws], with its principal place of business at Address [FreeSale.CompanyAddress]" HorzAlign="Justify" Font="Arial, 9pt"/>
+      <TextObject Name="Text6" Left="9.45" Top="207.9" Width="699.3" Height="47.25" Text="2.To the best of my knowledge and belief, [FreeSale.CompanyName] is engaged in [FreeSale.CompanyProduct] which are manufactured and sold in Ethiopia exported to [FreeSale.DestinationCountries]." HorzAlign="Justify" Font="Arial, 9pt"/>
+      <TextObject Name="Text7" Left="9.45" Top="274.05" Width="699.3" Height="37.8" Text="3.The [FreeSale.CompanyName] products listed below are sold in the country of origin under the same name and composition, in compliance with Federal, State and Local regulations." HorzAlign="Justify" Font="Arial, 9pt"/>
+      <TextObject Name="Text2" Left="47.25" Top="37.8" Width="226.8" Height="18.9" Text="TO WHOM IT MAY CONERN:" HorzAlign="Center" Font="Arial, 11pt"/>
+      <TextObject Name="Text11" Left="85.05" Width="434.7" Height="28.35" Text="CERTIFICATE OF FREE SALE" HorzAlign="Center" Font="Arial, 14pt"/>
+      <PictureObject Name="Picture1" Left="567" Top="9.45" Width="75.6" Height="75.6" DataColumn="FreeSale.Logo"/>
+    </ReportTitleBand>
+    <DataBand Name="Data1" Top="325.3" Width="718.2" Height="18.9" DataSource="Details">
+      <TextObject Name="Text10" Left="18.9" Width="689.85" Height="18.9" Text="• [FreeSale.Details.ProductName]" Font="Arial, 10pt"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary1" Top="348.2" Width="718.2" Height="280">
+      <TextObject Name="Text8" Left="9.45" Top="9.45" Width="699.3" Height="94.5" Text="4.The above statements are based solely upon information supplied by [FreeSale.RequestorName],  [FreeSale.RequestorTitle] for [FreeSale.CompanyName], [FreeSale.CompanyAddress]&#13;&#10;&#13;&#10;5. Dated this [FreeSale.Day] &#13;&#10;" HorzAlign="Justify" Font="Arial, 9pt"/>
+      <TextObject Name="Text9" Left="9.45" Top="113.4" Width="623.7" Height="160.65" Text="Authorized Signature:&#13;&#10; Name: [FreeSale.AuthorizedBy]&#13;&#10; Title: [FreeSale.AuthorizerTitle]&#13;&#10; Date: [FreeSale.AuthorizationDate]&#13;&#10;&#13;&#10;Ethiopian Chamber of Commerce &amp; Sectoral Associations&#13;&#10;&#13;&#10; &#13;&#10; Approver Name: [FreeSale.ApproverName]&#13;&#10; Title: [FreeSale.ApproverTitle]&#13;&#10; Date: [FreeSale.ApproveredDate]&#13;&#10; &#13;&#10;&#13;&#10;Visit http://ethiopianchamber.et/verifyCertificate/&#13;&#10;" HorzAlign="Justify" Font="Arial, 9pt"/>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="632.2" Width="718.2" Height="91">
+      <TextObject Name="Text1" Left="-18.9" Top="9.45" Width="321.3" Height="28.35" Text="CERTIFICATE OF FREE SALE" HorzAlign="Center" Font="Arial, 14pt"/>
+      <TextObject Name="Text106" Left="66.15" Top="66.15" Width="349.65" Height="18.9" Text="https://ethiopianchamber.com/verifyCertificate" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text107" Left="425.25" Top="66.15" Width="151.2" Height="18.9" Text="Page [Page#] of [TotalPages#]" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text95" Left="311.85" Top="47.25" Width="75.6" Height="18.9" Text="Signature:" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text97" Left="396.9" Top="47.25" Width="207.9" Height="18.9" Text="[FreeSale.Signature]" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <BarcodeObject Name="Barcode1" Left="633.15" Width="82" Height="91" Text="https://ethiopianchamber.com/verifyCertificate/[FreeSale.Signature]" Zoom="0.5" AllowExpressions="true" Barcode="QR Code" Barcode.Font="Arial, 11pt" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,83 @@
+import React from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@material-ui/core";
+import { Link } from "react-router-dom";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+
+const subSectorUlA = {
+  margin: "0px",
+  padding: "5px",
+  display: "block",
+  borderBottom: "solid 1px #eee",
+  textDecoration: "none",
+  color: "#000000",
+  fontSize: "14px",
+};
+const subSectorUlAS = {
+  ...subSectorUlA,
+  color: "blue",
+};
+export default function MMSectorsList({
+  sectors,
+  loadDirectory,
+  selectedSector,
+  counts,
+  sectorId,
+}) {
+  
+  function getStyle(selected) {
+    const st = selected ? subSectorUlAS : subSectorUlA;
+    return st;
+  }
+  return (
+    <>
+      <h3 align="center">Business sectors</h3>
+      {sectors
+        ? sectors
+            .filter((s) => !s.parentId)
+            .map((so) => (
+              <>
+                <Accordion
+                    defaultExpanded={so.id === sectorId}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon></ExpandMoreIcon>}
+                    style={{ backgroundColor: "#f5f5f5" }}
+                  >
+                    <div className="icon"></div>
+                    <br />
+                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                      <span style={{ color: "black", fontSize: "14px" }}>
+                        {so.name}
+                      </span>
+                    </div>
+                  </AccordionSummary>
+                  <AccordionDetails style={{ display: "block" }}>
+                    {sectors
+                      .filter((s) => s.parentId == so.id)
+                      .map((ass) => (
+                        <Link
+                          role="list"
+                          title={ass.nameEng}
+                          style={getStyle(
+                            selectedSector && selectedSector.id == ass.id
+                          )}
+                          onClick={() => loadDirectory(ass)}
+                        >
+                          {ass.name} (
+                          {counts.find((c) => c.sectorId == ass.id)
+                            ? counts.find((c) => c.sectorId == ass.id).count
+                            : 0}
+                          )
+                        </Link>
+                      ))}
+                  </AccordionDetails>
+                </Accordion>
+              </>
+            ))
+        : null}
+    </>
+  );
+}

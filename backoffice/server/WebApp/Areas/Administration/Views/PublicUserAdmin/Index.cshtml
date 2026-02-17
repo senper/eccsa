@@ -1,0 +1,101 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.PublicUserAdministrationViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+     <form data-parsley-validate method="get" 
+          asp-action="Index" asp-antiforgery="true">
+      
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+           <label class="col-sm-4 col-md-3 col-form-label">
+                Filter :
+            </label>
+            <select class="custom-select col-sm-7 col-md-8" asp-for="Filter" id="filterSelect" onchange="this.form.submit()"
+                    asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.PublicUserFilter>())" required></select>
+        </div>
+        <div class="col-md-6 btn-group pull-left" role="group" aria-label="Basic example">
+          
+        </div>
+    </div>
+    </form>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Public Users</h6>
+                    </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>User Name</th>
+                                    <th>Full Name </th>
+                                    <th>TIN</th>
+                                    <th>Fails</th>
+                                    
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>User Name</th>
+                                    <th>Full Name </th>
+                                    <th>TIN</th>
+                                    <th>Fails</th>
+                                    
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach(var u in Model.TheList)
+                                {
+                                    <tr>
+                                        <td>
+                                             <a asp-controller="PublicUserAdmin" asp-action="Detail" asp-route-id="@u.Id" class="title ">
+                                                @u.UserName
+                                            </a>
+                                            </td>
+                                        <td>@u.FullName</td>
+                                        <td>@u.TIN</td>
+                                        <td>@u.AccessFailedCount</td>
+                                        <td>
+                                             <div class="btn-group" role="group" aria-label="Basic example">
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="PublicUserAdmin" asp-action="Detail" asp-route-id="@u.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+
+@section script {
+
+    <script src="~/js/confirmation.js"></script>
+    <script src="~/js/validation.js"></script>
+    <script>
+
+   
+
+    </script>
+}

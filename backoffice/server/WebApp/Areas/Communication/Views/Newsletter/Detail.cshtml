@@ -1,0 +1,302 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.NewsletterViewModel
+
+@{
+    ViewData["Title"] = "Newsletter Issue";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area, topicId = @Model.TheModel.TopicId})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Title  @Model.TheModel.TitleLocal </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                        data-target="#theModal"
+                                        title="Edit"
+                                        class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-sm-7">
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Issue. Date
+                                </div>
+                                <div class="col-sm-9">
+                                    @Model.TheModel.IssueDate.ToLongDateString()
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Brief
+                                </div>
+                                <div class="col-sm-9">
+                                    @Model.TheModel.Brief
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    አጭር መግለጫ
+                                </div>
+                                <div class="col-sm-9">
+                                    @Model.TheModel.BriefLocal
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Attachment:
+                                </div>
+                                <div class="col-sm-9">
+                                    @if (!string.IsNullOrEmpty(Model.TheModel.Extension))
+                                    {
+                                        <a id="filename" asp-action="DownLoadFile" asp-route-id="@Model.TheModel.Id" asp-route-type="topic-attachment"
+                                           asp-route-fileName="@(Model.TheModel.Title + "Attachment" + Model.TheModel.Extension)">
+                                            Download Attachment
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link @Model.Tab0Active" data-toggle="tab" href="#representatives" role="tab" aria-controls="representatives">Subscribers</a></li>
+
+
+                        </ul>
+                        <div class="tab-content">
+
+                            <div class="tab-pane @Model.Tab0Active" id="representatives" role="tabpanel">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">&nbsp;</div>
+
+                                    @if (Model.TheModel.DissiminationStatus != DissiminationStatusEnum.Closed && Model.TheModel.Subscribers.Count > 0)
+                                    {
+                                        <div class="col-md-4">
+                                            <a onclick="return confirmation($('#sendNewsletter'), 'Send the Newsletter');"
+                                               class=" btn btn-sm btn-outline-warning " title="Send Newsletter to subscribers">
+                                                Send
+                                            </a>
+                                            <form data-parsley-validate novalidate
+                                                  method="post"
+                                                  id="sendNewsletter"
+                                                  asp-action="Send" asp-antiforgery="true" asp-route-id="@Model.TheModel.Id">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            </form>
+
+                                        </div>
+                                    }
+
+                                    @if (Model.TheModel.DissiminationStatus != DissiminationStatusEnum.Closed)
+                                    {
+                                        <div class="col-md-4">
+                                            <a onclick="return confirmation($('#closeNewsletter'), 'Close the Newsletter');"
+                                               class=" btn btn-sm btn-outline-danger col-md-2">
+                                                Close
+                                            </a>
+                                            <form data-parsley-validate novalidate
+                                                  method="post"
+                                                  id="closeNewsletter"
+                                                  asp-action="Close" asp-antiforgery="true" asp-route-id="@Model.TheModel.Id">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            </form>
+                                        </div>
+                                    }
+
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-md-11 ">
+
+                                        <table class="table table-bordered table-striped" id="datatblprofile" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Full Name</th>
+                                                    <th>Company</th>
+                                                    <th>Status</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var a in Model.TheModel.Subscribers)
+                                                {
+                                                    <tr>
+                                                        <td> @a.FullName </td>
+                                                        <td> @a.CompanyName</td>
+                                                        <td> @(Model.TheModel.GetStatus(a)) </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Newsletter</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                          asp-action="Save" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" asp-for="TheModel.Title" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                ርዕስ
+                            </label>
+                            <input type="text" name="TitleLocal" maxlength="100" asp-for="TheModel.TitleLocal" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Date
+                            </label>
+                            <input type="date" name="IssueDate" asp-for="TheModel.IssueDate" class="form-control col-sm-9 col-md-8" id="startDateId" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Brief
+                            </label>
+                            <textarea rows="4" name="Brief" id="Brief" asp-for="TheModel.Brief" maxlength="800" class="form-control col-sm-9 col-md-8" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                አጭር መግለጫ
+                            </label>
+                            <textarea rows="4" name="BriefLocal" id="BriefLocal" asp-for="TheModel.BriefLocal" maxlength="800" class="form-control col-sm-9 col-md-8" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">Document</label>
+                            <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" />
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                       class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section script {
+    <script src="~/vendor/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('resProfile', {
+            height: 260,
+            width: '100%',
+        });
+
+        function editProfile() {
+            document.getElementById('res_profile_info_editor').classList.remove('d-none');
+            document.getElementById('res_profile_info_text').classList.add('d-none');
+        }
+
+        function profileCancel() {
+            document.getElementById('res_profile_info_editor').classList.add('d-none');
+            document.getElementById('res_profile_info_text').classList.remove('d-none');
+        }
+
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function confirmation(form, text) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to ' + text + ' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+
+    </script>
+    }
+
+

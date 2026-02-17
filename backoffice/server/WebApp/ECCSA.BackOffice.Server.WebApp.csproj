@@ -1,0 +1,307 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <UserSecretsId>aspnet-WebApp-658641F3-C008-4F35-A8F7-F76D3E18426C</UserSecretsId>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <Authors>idfEth</Authors>
+    <Company>idfEth</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\MandE\Views\PlanSetting\**" />
+    <Compile Remove="wwwroot\img\NewFolder\**" />
+    <Content Remove="Areas\MandE\Views\PlanSetting\**" />
+    <Content Remove="wwwroot\img\NewFolder\**" />
+    <EmbeddedResource Remove="Areas\MandE\Views\PlanSetting\**" />
+    <EmbeddedResource Remove="wwwroot\img\NewFolder\**" />
+    <None Remove="Areas\MandE\Views\PlanSetting\**" />
+    <None Remove="wwwroot\img\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\MandE\Controllers\PlanSettingController.cs" />
+    <Compile Remove="Controllers\MembershipController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Areas\Administration\Views\PublicUserAdmin\UserExportAgreementDetail.cshtml" />
+    <Content Remove="Areas\BusinessDirectory\Views\BusinessSector\PhotoAlbums.cshtml" />
+    <Content Remove="Areas\Communication\Views\Resource - Copy (2)\Detail.cshtml" />
+    <Content Remove="Areas\Communication\Views\Resource - Copy (2)\Index.cshtml" />
+    <Content Remove="Areas\Communication\Views\Resource - Copy (3)\Detail.cshtml" />
+    <Content Remove="Areas\Communication\Views\Resource - Copy (3)\Index.cshtml" />
+    <Content Remove="Areas\Communication\Views\Resource - Copy (4)\Detail.cshtml" />
+    <Content Remove="Areas\Communication\Views\Resource - Copy (4)\Index.cshtml" />
+    <Content Remove="Areas\Membership\Views\Applicant\EditLegalDocument.cshtml" />
+    <Content Remove="Areas\Membership\Views\Individual\EditDocumentStatus.cshtml" />
+    <Content Remove="Areas\Membership\Views\Individual\EditLegalDocument.cshtml" />
+    <Content Remove="Areas\Membership\Views\Individual\StaffDetail.cshtml" />
+    <Content Remove="Areas\Support\Views\Index.cshtml" />
+    <Content Remove="Areas\Surveying\Views\Setting\EditLegalDocument.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Areas\Academy\Views\AcademySettings\SettingVariableEdit.cshtml" />
+    <None Include="Areas\Academy\Views\AcademySettings\SettingVariablesList.cshtml" />
+    <None Include="Areas\Academy\Views\AcademySettings\SponsorEdit.cshtml" />
+    <None Include="Areas\Academy\Views\AcademySettings\SponsorsList.cshtml" />
+    <None Include="Areas\Academy\Views\Category\Detail.cshtml" />
+    <None Include="Areas\Academy\Views\Category\Edit.cshtml" />
+    <None Include="Areas\Academy\Views\Category\Index.cshtml" />
+    <None Include="Areas\Academy\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\Academy\Views\Topic\Detail.cshtml" />
+    <None Include="Areas\Academy\Views\Topic\Edit.cshtml" />
+    <None Include="Areas\Academy\Views\Topic\EditResource.cshtml" />
+    <None Include="Areas\Academy\Views\Topic\EditSetting.cshtml" />
+    <None Include="Areas\Academy\Views\Topic\Index.cshtml" />
+    <None Include="Areas\Academy\Views\Training\Detail.cshtml" />
+    <None Include="Areas\Academy\Views\Training\Edit.cshtml" />
+    <None Include="Areas\Academy\Views\Training\EditAssessment.cshtml" />
+    <None Include="Areas\Academy\Views\Training\EditAttendance.cshtml" />
+    <None Include="Areas\Academy\Views\Training\EditDelivery.cshtml" />
+    <None Include="Areas\Academy\Views\Training\EditRegistration.cshtml" />
+    <None Include="Areas\Academy\Views\Training\EditRegistrationFeedback.cshtml" />
+    <None Include="Areas\Academy\Views\Training\EditSponsor.cshtml" />
+    <None Include="Areas\Academy\Views\Training\Index.cshtml" />
+    <None Include="Areas\Academy\Views\Training\RegistrationDetail.cshtml" />
+    <None Include="Areas\Administration\Views\PublicUserAdmin\UserExportAgreementDetail.cshtml" />
+    <None Include="Areas\Advocacy\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\Advocacy\Views\Project\Detail.cshtml" />
+    <None Include="Areas\Advocacy\Views\Project\Index.cshtml" />
+    <None Include="Areas\Advocacy\Views\Publication\Detail.cshtml" />
+    <None Include="Areas\Advocacy\Views\Publication\Index.cshtml" />
+    <None Include="Areas\Advocacy\Views\Research\Detail.cshtml" />
+    <None Include="Areas\Advocacy\Views\Research\Index.cshtml" />
+    <None Include="Areas\Communication\Views\Advertisments\Index.cshtml" />
+    <None Include="Areas\Communication\Views\Campaign\Detail.cshtml" />
+    <None Include="Areas\Communication\Views\Campaign\Index.cshtml" />
+    <None Include="Areas\Communication\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\Communication\Views\Gallery\PhotoAlbums.cshtml" />
+    <None Include="Areas\Communication\Views\Gallery\VideoGalleries.cshtml" />
+    <None Include="Areas\Communication\Views\Laws\Index.cshtml" />
+    <None Include="Areas\Communication\Views\MediaAgency\Detail.cshtml" />
+    <None Include="Areas\Communication\Views\MediaAgency\Index.cshtml" />
+    <None Include="Areas\Communication\Views\MediaCoverage\Detail.cshtml" />
+    <None Include="Areas\Communication\Views\MediaCoverage\Index.cshtml" />
+    <None Include="Areas\Communication\Views\WebsiteContent\Detail.cshtml" />
+    <None Include="Areas\Communication\Views\WebsiteContent\Index.cshtml" />
+    <None Include="Areas\Communication\Views\Resource\Detail.cshtml" />
+    <None Include="Areas\Communication\Views\Resource\Index.cshtml" />
+    <None Include="Areas\Events\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\Events\Views\EventType\Detail.cshtml" />
+    <None Include="Areas\Events\Views\EventType\Index.cshtml" />
+    <None Include="Areas\Events\Views\Event\Detail.cshtml" />
+    <None Include="Areas\Events\Views\Event\Edit.cshtml" />
+    <None Include="Areas\Events\Views\Event\Index.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\AccessDenied.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\Login.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\Manage\ChangePassword.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\Manage\_Layout.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\Manage\_StatusMessage.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\Manage\_ViewImports.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\Register.cshtml" />
+    <None Include="Areas\Identity\Pages\Account\_ViewImports.cshtml" />
+    <None Include="Areas\Identity\Pages\_ViewImports.cshtml" />
+    <None Include="Areas\Identity\Pages\_ViewStart.cshtml" />
+    <None Include="Areas\Investment\Views\Index\Detail.cshtml" />
+    <None Include="Areas\Investment\Views\Index\Index.cshtml" />
+    <None Include="Areas\MandE\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\MandE\Views\Financial\Index.cshtml" />
+    <None Include="Areas\MandE\Views\Financial\Items.cshtml" />
+    <None Include="Areas\MandE\Views\Financial\Progress.cshtml" />
+    <None Include="Areas\MandE\Views\Planning\Detail.cshtml" />
+    <None Include="Areas\MandE\Views\Planning\EditPlan.cshtml" />
+    <None Include="Areas\MandE\Views\Planning\Index.cshtml" />
+    <None Include="Areas\MandE\Views\Progress\Index.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\Detail.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\Edit.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\EditContact.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\EditProfile.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\EditTradeInfo.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\Index.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\Payment.cshtml" />
+    <None Include="Areas\Membership\Views\Applicant\RenewMembership.cshtml" />
+    <None Include="Areas\Membership\Views\Association\Detail.cshtml" />
+    <None Include="Areas\Membership\Views\Association\DocumentDetail.cshtml" />
+    <None Include="Areas\Membership\Views\Association\Edit.cshtml" />
+    <None Include="Areas\Membership\Views\Association\EditContact.cshtml" />
+    <None Include="Areas\Membership\Views\Association\EditDocument.cshtml" />
+    <None Include="Areas\Membership\Views\Association\EditPositionType.cshtml" />
+    <None Include="Areas\Membership\Views\Association\EditSetting.cshtml" />
+    <None Include="Areas\Membership\Views\Association\EditStaff.cshtml" />
+    <None Include="Areas\Membership\Views\Association\Index.cshtml" />
+    <None Include="Areas\Membership\Views\Association\SettingDetail.cshtml" />
+    <None Include="Areas\Membership\Views\Association\StaffDetail.cshtml" />
+    <None Include="Areas\Membership\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\Detail.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\Edit.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\EditContact.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\EditProfile.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\EditTradeInfo.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\Index.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\Payment.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\RenewMembership.cshtml" />
+    <None Include="Areas\Membership\Views\Individual\StaffDetail.cshtml" />
+    <None Include="Areas\Membership\Views\Meeting\Detail.cshtml" />
+    <None Include="Areas\Membership\Views\Meeting\Index.cshtml" />
+    <None Include="Areas\Membership\Views\Trade\Index.cshtml" />
+    <None Include="Areas\Notification\Views\EmailTemplate\Detail.cshtml" />
+    <None Include="Areas\Notification\Views\EmailTemplate\Index.cshtml" />
+    <None Include="Areas\Notification\Views\Email\Detail.cshtml" />
+    <None Include="Areas\Notification\Views\Email\Index.cshtml" />
+    <None Include="Areas\Notification\Views\Recipient\Detail.cshtml" />
+    <None Include="Areas\Notification\Views\Recipient\Index.cshtml" />
+    <None Include="Areas\Notification\Views\SMS\Detail.cshtml" />
+    <None Include="Areas\Notification\Views\SMS\Index.cshtml" />
+    <None Include="Areas\Reports\Views\Report\Index.cshtml" />
+    <None Include="Areas\Service\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\Service\Views\ServiceRequest\Detail.cshtml" />
+    <None Include="Areas\Service\Views\ServiceRequest\Edit.cshtml" />
+    <None Include="Areas\Service\Views\ServiceRequest\Index.cshtml" />
+    <None Include="Areas\Service\Views\ServiceType\Detail.cshtml" />
+    <None Include="Areas\Service\Views\ServiceType\Index.cshtml" />
+    <None Include="Areas\Support\Views\Dashboard\Index.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\Detail.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\Edit.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\EditContact.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\EditProfile.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\EditTradeInfo.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\Index.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\Payment.cshtml" />
+    <None Include="Areas\Surveying\Views\Setting\RenewMembership.cshtml" />
+    <None Include="Areas\Surveying\Views\Survey\Detail.cshtml" />
+    <None Include="Areas\Surveying\Views\Survey\Index.cshtml" />
+    <None Include="Areas\_ViewImports.cshtml" />
+    <None Include="wwwroot\js\site.js" />
+    <None Include="wwwroot\vendor\combotree\comboTreePlugin.js" />
+    <None Include="wwwroot\vendor\combotree\LICENSE" />
+    <None Include="wwwroot\vendor\combotree\README.md" />
+    <None Include="wwwroot\vendor\nv-d3\bootstrap.min.js" />
+    <None Include="wwwroot\vendor\nv-d3\colorbrewer.js" />
+    <None Include="wwwroot\vendor\nv-d3\core.js" />
+    <None Include="wwwroot\vendor\nv-d3\d3.v3.js" />
+    <None Include="wwwroot\vendor\nv-d3\dom.js" />
+    <None Include="wwwroot\vendor\nv-d3\fisheye.js" />
+    <None Include="wwwroot\vendor\nv-d3\GruntFile.js" />
+    <None Include="wwwroot\vendor\nv-d3\interactiveLayer.js" />
+    <None Include="wwwroot\vendor\nv-d3\jquery-2.0.0.min.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\axis.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\boxPlot.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\boxPlotChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\bullet.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\bulletChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\candlestickBar.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\cumulativeLineChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\discreteBar.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\discreteBarChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\distribution.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\focus.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\forceDirectedGraph.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\furiousLegend.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\historicalBar.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\historicalBarChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\legend.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\line.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\lineChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\linePlusBarChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\multiBar.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\multiBarChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\multiBarHorizontal.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\multiBarHorizontalChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\multiChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\ohlcBar.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\parallelCoordinates.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\parallelCoordinatesChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\pie.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\pieChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\scatter.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\scatterChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\sparkline.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\sparklinePlus.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\stackedArea.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\stackedAreaChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\sunburst.js" />
+    <None Include="wwwroot\vendor\nv-d3\models\sunburstChart.js" />
+    <None Include="wwwroot\vendor\nv-d3\nv.d3.js" />
+    <None Include="wwwroot\vendor\nv-d3\nv.d3.min.js" />
+    <None Include="wwwroot\vendor\nv-d3\package.js" />
+    <None Include="wwwroot\vendor\nv-d3\stream_layers.js" />
+    <None Include="wwwroot\vendor\nv-d3\tooltip.js" />
+    <None Include="wwwroot\vendor\nv-d3\utils.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.95.4" />
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
+    <PackageReference Include="DotNetCore.NPOI" Version="1.2.3" />
+    <PackageReference Include="EPPlus" Version="6.2.8" />
+    <PackageReference Include="FastReport.OpenSource" Version="2023.3.0" />
+    <PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2023.3.0" />
+    <PackageReference Include="FastReport.OpenSource.Web" Version="2023.3.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.0.1" />
+	<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Include="FluentValidation" Version="10.3.4" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.4" />
+    <PackageReference Include="JavaScriptEngineSwitcher.Extensions.MsDependencyInjection" Version="3.3.0" />
+    <PackageReference Include="JavaScriptEngineSwitcher.V8" Version="3.13.3" />
+    <PackageReference Include="JavaScriptEngineSwitcher.V8.Native.win-x64" Version="3.13.3" />
+    <PackageReference Include="MailKit" Version="2.15.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.13.3" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.32.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
+    <PackageReference Include="MimeKit" Version="2.15.1" />
+    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
+    <PackageReference Include="React.AspNet" Version="5.2.11" />
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="7.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="7.0.0" />
+    <PackageReference Include="Telegram.Bot" Version="16.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Model\ECCSA.BackOffice.Server.Model.csproj" />
+    <ProjectReference Include="..\Persistence\ECCSA.BackOffice.Server.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Arbitration\Controller\" />
+    <Folder Include="Areas\Arbitration\Model\" />
+    <Folder Include="Areas\Arbitration\Views\" />
+    <Folder Include="Areas\Notification\Controllers\" />
+    <Folder Include="Areas\TradePromotion\Controllers\" />
+    <Folder Include="Areas\TradePromotion\Model\" />
+    <Folder Include="Areas\TradePromotion\Views\" />
+    <Folder Include="Models\Arbitration\" />
+    <Folder Include="Validations\Common\EventManagement\" />
+    <Folder Include="Validations\Common\Surveying\" />
+    <Folder Include="Validations\Common\Servicing\" />
+    <Folder Include="Validations\Membership\" />
+    <Folder Include="Validations\Services\" />
+    <Folder Include="wwwroot\Academy\documents\" />
+    <Folder Include="wwwroot\certificates\" />
+    <Folder Include="wwwroot\directory\img\" />
+    <Folder Include="wwwroot\EmailAttachments\" />
+    <Folder Include="wwwroot\members\documents\" />
+    <Folder Include="wwwroot\pr\news\" />
+    <Folder Include="wwwroot\SponsorImages\" />
+    <Folder Include="wwwroot\website\news\" />
+  </ItemGroup>
+
+</Project>

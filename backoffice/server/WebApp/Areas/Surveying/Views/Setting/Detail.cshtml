@@ -1,0 +1,792 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Surveying.Model.SurveySettingViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Setting",new { Area ="Surveying", module = Model.TheModel.ResponsibleUnit})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <input type="hidden" value="@Model.ChoiceJson" id="settingAllChoices" />
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Title </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button data-toggle="modal"
+                                        data-target="#editSurveySettingModal"
+                                        title="Edit"
+                                        class=" float-right edit btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                                @if (Model.TheModel.Questions?.Any() != true && !Model.HasSurvey)
+                                {
+                                    <a onclick="return confirmDelete($('#deleteSurveySetting')[0]);"
+                                   class=" btn btn-sm btn-outline-danger">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                    <form data-parsley-validate novalidate method="post" id="deleteSurveySetting"
+                                      asp-action="DeleteSetting" asp-antiforgery="true" asp-route-id="@Model.TheModel.Id">
+                                        <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                        <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Description
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Description
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Recurrence
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Recurrence
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Open for
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.OpenDays Days
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Publish Through
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.PublishThrough
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Is Public
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.IsPublic ? "Yes" : "No")
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link @Model.Tab0Active" data-toggle="tab" href="#questionsTab" role="tab" aria-controls="representatives">Questions</a></li>
+
+                            <li class="nav-item"><a class="nav-link @Model.Tab1Active" data-toggle="tab" href="#surveyTab" role="tab" aria-controls="members">Surveys</a></li>
+
+                        </ul>
+                        <div class="tab-content">
+
+                            <div class="tab-pane @Model.Tab0Active" id="questionsTab" role="tabpanel">
+                                <div class="row">
+
+                                    <div class="col-md-11 ">
+                                        <table class="table table-bordered table-striped" id="datatblquestion" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Question / Choice Code</th>
+                                                    <th>Type / Choice</th>
+
+                                                    <th>
+                                                        @if (!@Model.HasSurvey)
+                                                        {
+                                                            <button class="card-header-action btn btn-outline-success btn-sm float-right"
+                                                                id="newbtn"
+                                                                data-toggle="modal"
+                                                                data-target="#editQuestionModal"
+                                                                title="Edit Question"
+                                                                data-id="@Guid.Empty"
+                                                                data-orderno=""
+                                                                data-question=" "
+                                                                data-title="Create Question"
+                                                                data-type="0"
+                                                                data-cascade="False"
+                                                                data-min=""
+                                                                data-max=""
+                                                                data-parent=""
+                                                                onclick="editQuestion(this)">
+                                                                New
+                                                            </button>
+                                                        }
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var q in Model.TheModel.Questions.OrderBy(o => o.OrderNo))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @if (@q.QuestionType == QuestionType.SingleChoice || @q.QuestionType == QuestionType.MultipleChoice)
+                                                            {
+                                                                <a data-tt="@q.OrderNo" onclick="showHideAnswers(this);" class="title"> <i class="fas fa-angle-right"></i>&nbsp;@q.OrderNo </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                @q.OrderNo
+                                                            }
+
+                                                        </td>
+                                                        <td> @q.Question <small><strong> @q.ParentText</strong></small> </td>
+                                                        <td>@q.QuestionType</td>
+                                                        <td>
+
+                                                            @if (!@Model.HasSurvey)
+                                                            {
+
+                                                                <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                                    <button data-toggle="modal"
+                                                                    data-target="#editQuestionModal"
+                                                                    title="Edit Question"
+                                                                    data-id="@q.Id"
+                                                                    data-orderno="@q.OrderNo"
+                                                                    data-question="@q.Question"
+                                                                    data-title="Edit @q.OrderNo"
+                                                                    data-type="@((int)q.QuestionType)"
+                                                                    data-cascade="@q.Cascaded"
+                                                                    data-min="@q.MinRange"
+                                                                    data-max="@q.MaxRange"
+                                                                    data-parent="@q.ParentChoiceId"
+                                                                    onclick="editQuestion(this)"
+                                                                    class=" float-right btn btn-outline-success btn-sm">
+                                                                        <i class="fa fa-pen "></i>
+                                                                    </button>
+                                                                    @if (@q.QuestionType == QuestionType.SingleChoice || @q.QuestionType == QuestionType.MultipleChoice)
+                                                                    {
+                                                                        <button data-toggle="modal"
+                                                                    data-target="#editChoiceModal"
+                                                                    data-qid="@q.Id"
+                                                                    data-title="@q.Question"
+                                                                    data-orderno=""
+                                                                    data-choice=""
+                                                                    data-id="@Guid.Empty"
+                                                                    title="Choices"
+                                                                    onclick="editChoice(this);"
+                                                                    class=" float-right btn btn-outline-success btn-sm">
+                                                                            <i class="fab fa-amilia"></i>
+                                                                        </button>
+                                                                    }@if (@q.Choices.Count == 0)
+                                                                    {
+                                                                        <a onclick="return confirmDelete($('#deleteQuestion@(Model.Guid2String(q.Id))')[0]);"
+                                                               class=" btn btn-sm btn-outline-danger float-right">
+                                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                        </a>
+                                                                        <form data-parsley-validate novalidate method="post" id="deleteQuestion@(Model.Guid2String(q.Id))"
+                                                                  asp-action="DeleteQuestion" asp-antiforgery="true">
+                                                                            <input type="hidden" name="id" value="@q.Id" />
+                                                                            <input type="hidden" name="settingId" value="@q.SurveySettingId" />
+                                                                        </form>
+                                                                    }
+                                                                </div>
+                                                            }
+
+
+                                                        </td>
+                                                    </tr>
+                                                    @foreach (var a in q.Choices.OrderBy(c => c.OrderNo))
+                                                    {
+                                                        <tr class="@q.OrderNo" style="display: none;">
+                                                            <td></td>
+                                                            <td> @a.OrderNo </td>
+                                                            <td> @a.ChoiceText</td>
+
+                                                            <td>
+
+
+                                                                @if (!Model.HasSurvey)
+                                                                {
+                                                                    if (!a.Referenced)
+                                                                    {
+                                                                        <a onclick="return confirmDelete($('#deleteChoice@(Model.Guid2String(a.Id))')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger float-right">
+                                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                        </a>
+                                                                        <form data-parsley-validate novalidate method="post" id="deleteChoice@(Model.Guid2String(a.Id))"
+                                                              asp-action="DeleteChoice" asp-antiforgery="true">
+                                                                            <input type="hidden" name="id" value="@a.Id" />
+                                                                            <input type="hidden" name="settingId" value="@a.SurveySettingId" />
+                                                                        </form>
+
+                                                                        <button data-toggle="modal"
+                                                                data-target="#editChoiceModal"
+                                                                data-qid="@q.Id"
+                                                                data-title="@q.Question"
+                                                                data-orderno="@a.OrderNo"
+                                                                data-choice="@a.ChoiceText"
+                                                                data-id="@a.Id"
+                                                                title="Choices"
+                                                                onclick="editChoice(this);"
+                                                                class=" float-right btn btn-outline-success btn-sm">
+                                                                            <i class="fa fa-pen"></i>
+                                                                        </button>
+                                                                    }
+                                                                }
+
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane @Model.Tab1Active" id="surveyTab" role="tabpanel">
+                                <div class="row">
+
+                                    <div class="col-md-12 ">
+                                        <table class="table table-bordered table-striped" id="datatablesurvey" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>
+                                                        @if (Model.TheModel.IsPublic)
+                                                        {
+                                                            <button class="card-header-action btn btn-outline-success btn-sm float-right"
+                                                                id="newbtn"
+                                                                data-toggle="modal"
+                                                                data-target="#editSurveyModal"
+                                                                title="Create Survey">
+                                                                New
+                                                            </button>
+                                                        }
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var s in Model.TheModel.Surveys)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <a class="title" asp-controller="Survey" asp-action="Detail" asp-route-id="@s.Id">@s.Title </a>
+                                                        </td>
+                                                        <td>@s.StartDate.ToString("yyyy-MM-dd")</td>
+                                                        <td>@s.EndDate.ToString("yyyy-MM-dd")</td>
+                                                        <td>
+                                                            <a class=" btn btn-sm  btn-outline-info" asp-controller="Survey" asp-action="Detail" asp-route-id="@s.Id">
+                                                                <i class="fa fa-info" aria-hidden="true"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editQuestionModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionTitle">  Survey Question</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveQuestion" asp-antiforgery="true">
+                    <input type="hidden" name="SurveySettingId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Id" id="questionId" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            #
+                        </label>
+                        <input type="text" placeholder="0x.0y" title="Order No for the question max length 10 characters" maxlength="10" name="OrderNo" id="questionOrderNo" class="form-control col-sm-4 col-md-3" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Question
+                        </label>
+                        <input type="text" placeholder="question" title="text of the question max length 200 characters" maxlength="200" name="Question" id="settingQuestion" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Type
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" name="QuestionType" id="questionType" onchange="questionTypeChanged(this);"
+                                asp-items="@(Html.GetEnumSelectList<QuestionType>().Where(s => Model.TheModel.PublishThrough != MediaOutletFlag.Telegram || (s.Value == "1" || s.Value == "2")))"
+                                title="Question Type select one" required></select>
+                    </div>
+                    <div class="row form-group" style="display: none" id="rangeDiv">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Min - Max Value
+                        </label>
+                        <input type="text" title="min value" placeholder="min value" maxlength="10" name="MinRange" id="questionMinRange" class="form-control col-sm-4 col-md-3" />
+                        <input type="text" maxlength="10" title="max value" placeholder="max value" name="MaxRange" id="questionMaxRange" class="form-control col-sm-4 col-md-3" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Cascaded
+                        </label>
+                        <input type="hidden" name="Cascaded" id="cascadedQuestionValue" />
+                        <input type="checkbox" title="Check if the question depends on response of other question" id="cascadedQuestion" onchange="showParent(this)" />
+                    </div>
+                    <div class="row form-group" id="parentChoiceDiv" style="display: none">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Parent Answer
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" name="ParentChoiceId" id="parentChoice">
+                        </select>
+                    </div>
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editChoiceModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="choiceTitle">  Survey Choices</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveChoice" asp-antiforgery="true">
+                    <input type="hidden" name="SurveySettingId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="QuestionId" id="choiceQuestionId" />
+                    <input type="hidden" name="Id" id="choiceId" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            #
+                        </label>
+                        <input type="text" maxlength="10" name="OrderNo" id="choiceOrderNo" class="form-control col-sm-4 col-md-4" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Choice
+                        </label>
+                        <input type="text" maxlength="100" name="ChoiceText" id="choiceText" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editSurveySettingModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty? "Create " :"Edit ") Survey Setting</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveSetting" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="settingId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="ResponsibleUnit" id="settingResponsibleUnit" value="@Model.TheModel.ResponsibleUnit" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="200" name="Title" id="settingTitle" value="@Model.TheModel.Title" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" maxlength="800" name="Description" id="settingDescription" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.Description </textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Recurrence
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" name="Recurrence" asp-for="TheModel.Recurrence" id="settingRecurrence" onchange="adjustOpenDays(this);"
+                                asp-items="@(Html.GetEnumSelectList<FrequencyEnum>())" required></select>
+                    </div>
+                    @*<input type="hidden" name="PublishThrough" value="8" />*@
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Publish Through
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" name="PublishThrough" asp-for="TheModel.PublishThrough" id="settingPublishThrough"
+                                required>
+                            <option value="0"></option>
+                            @*<option value="1">SMS</option>*@
+                            <option value="2">Telegram</option>
+                            @*<option value="4">Email</option>*@
+                            <option value="8">Website</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Keep Open
+                        </label>
+                        <input type="number" min="1" max="366" name="OpenDays" asp-for="TheModel.OpenDays" id="settingOpenDays" class="form-control col-sm-4 col-md-4" required /> Days
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" id="settingStatus">
+                            <option value="1">Active</option>
+                            <option value="2">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editSurveyModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="surveyTitle">  Survey </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveSurvey" asp-antiforgery="true">
+                    <input type="hidden" name="SettingId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" name="Title" id="surveyTitle" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input type="date" name="StartDate" value="@DateTime.Today" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" name="EndDate" value="@DateTime.Today.AddDays(30)" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" maxlength="800" name="Description" class="form-control col-sm-8 col-md-9" required> </textarea>
+                    </div>
+                    @if (Model.TheModel.PublishThrough == MediaOutletFlag.Telegram)
+                    {
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Telegram Group Id
+                            </label>
+                            <input type="text" maxlength="100" name="GroupId" class="form-control col-sm-8 col-md-9"  />
+                        </div>
+                    }
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+
+
+    $("#datatblquestion").treetable({ expandable: false });
+<script>
+
+    function showHideAnswers(e) {
+        const ank = $(e);
+        let show = true;
+        for (let i = 0; i < ank[0].children.length; i++) {
+            const child = ank[0].children[i];
+            if (child.localName == 'i') {
+                if (child.classList.contains('fa-angle-right')) {
+                    show = true;
+                    child.classList.remove('fa-angle-right');
+                    child.classList.add('fa-angle-down');
+                } else {
+                    show = false;
+                    child.classList.add('fa-angle-right');
+                    child.classList.remove('fa-angle-down');
+                }
+            }
+        }
+        const className = ank.attr('data-tt');
+
+        const rows = document.getElementsByClassName(className);
+        for (let i = 0; i < rows.length; i++) {
+            if (show) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+
+    }
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function confirmation(form, text) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to ' + text + ' ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function adjustOpenDays(e) {
+        const frequency = Number($(e).children("option:selected").val());
+        $('#settingOpenDays').attr('max', 366);
+        if (frequency === 1) {
+            $('#settingOpenDays').attr('max', 6);
+        } else if (frequency === 2) {
+            $('#settingOpenDays').attr('max', 20);
+        } else if (frequency === 3) {
+            $('#settingOpenDays').attr('max', 80);
+        } else if (frequency === 4) {
+            $('#settingOpenDays').attr('max', 366);
+        }
+        const max = Number($('#settingOpenDays').attr('max'));
+        const value = Number($('#settingOpenDays').val());
+        if (max < value) {
+            $('#settingOpenDays').val(max);
+        }
+    }
+
+    function editChoice(e) {
+        const id = document.getElementById('choiceId');
+        const title = document.getElementById('choiceTitle');
+        const qid = document.getElementById('choiceQuestionId');
+        const orderNo = document.getElementById('choiceOrderNo');
+        const choiceText = document.getElementById('choiceText');
+
+        const idVal = $(e).attr('data-id');
+        const qidVal = $(e).attr('data-qid');
+        const orderVal = $(e).attr('data-orderno');
+        const choiceVal = $(e).attr('data-choice');
+        const titleVal = $(e).attr('data-title');
+
+        id.value = idVal;
+        qid.value = qidVal;
+        orderNo.value = orderVal;
+        choiceText.value = choiceVal;
+        title.innerHTML = titleVal;
+
+
+    }
+
+    function questionTypeChanged(e) {
+        const val = Number(e.value);
+
+        const rangeDiv = document.getElementById('rangeDiv');
+        if (val === 3) {
+            rangeDiv.style.display = '';
+        } else {
+            rangeDiv.style.display = 'none';
+        }
+    }
+
+    function showParent(e) {
+        const checked = Boolean(e.checked);
+        document.getElementById('cascadedQuestionValue').value = checked;
+        showHideParent(checked);
+
+    }
+
+    function showHideParent(checked) {
+        const parentChoiceDiv = document.getElementById('parentChoiceDiv');
+        if (checked) {
+            parentChoiceDiv.style.display = '';
+        } else {
+            parentChoiceDiv.style.display = 'none';
+        }
+        const parentOpt = document.getElementById('parentChoice');
+        const qId = document.getElementById('questionId').value;
+        const val = document.getElementById('settingAllChoices').value;
+
+        const choices = JSON.parse(val);
+        console.log(choices);
+        $("#parentChoice").empty();
+        for (let i = 0; i < choices.length; i++) {
+            let item = choices[i];
+
+            if (item != null && item.SimpleChoices != null && item.Id != qId) {
+                var optGrp = document.createElement("optgroup");
+                optGrp.label = `${item.OrderNo} ${item.Question}`
+                for (let j = 0; j < item.SimpleChoices.length; j++) {
+                    let itm = item.SimpleChoices[j];
+                    var opt = document.createElement("option");
+                    opt.value = itm.Id;
+                    opt.innerHTML = itm.ChoiceText;
+                    optGrp.appendChild(opt);
+                }
+                parentOpt.appendChild(optGrp);
+            }
+
+        }
+
+    }
+
+    function editQuestion(e) {
+        const id = document.getElementById('questionId');
+        const title = document.getElementById('questionTitle');
+        const orderNo = document.getElementById('questionOrderNo');
+        const questionText = document.getElementById('settingQuestion');
+        const minRange = document.getElementById('questionMinRange');
+        const maxRange = document.getElementById('questionMaxRange');
+        const cascade = document.getElementById('cascadedQuestion');
+
+        const idVal = $(e).attr('data-id');
+        const orderVal = $(e).attr('data-orderno');
+        const questionVal = $(e).attr('data-question');
+        const titleVal = $(e).attr('data-title');
+
+        const typeVal = Number($(e).attr('data-type'));
+        const minVal = $(e).attr('data-min');
+        const maxVal = $(e).attr('data-max');
+        const cascadeVal = Boolean($(e).attr('data-cascade') == 'True');
+        const parentVal = $(e).attr('data-parent');
+
+        id.value = idVal;
+        orderNo.value = orderVal;
+        questionText.value = questionVal;
+        title.innerHTML = titleVal;
+        cascade.checked = cascadeVal;
+        showHideParent(cascadeVal);
+        if (cascadeVal) {
+            $('#parentChoice').val(parentVal).change();
+        }
+        $('#questionType').val(typeVal).change();
+
+        const rangeDiv = document.getElementById('rangeDiv');
+        if (typeVal === 3) {
+            rangeDiv.style.display = '';
+            minRange.value = minVal;
+            maxRange.value = maxVal;
+        } else {
+            rangeDiv.style.display = 'none';
+        }
+
+    }
+</script>
+}

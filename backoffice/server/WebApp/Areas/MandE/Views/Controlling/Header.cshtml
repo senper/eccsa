@@ -1,0 +1,472 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Common.Planning
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.PlanHeaderViewModel
+
+@{
+    ViewData["Title"] = "Planning";// = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+@{
+    async Task Template(Plan parent, string parentCode, List<Plan> subPlans, string padding)
+    {
+        if (!parent.IsLabel) return;
+        await BuildRow(parent,  parentCode,subPlans, padding);
+        
+        
+        padding += "&nbsp;&nbsp;&nbsp;";
+        foreach (var ind in subPlans)
+        {
+            var plans = Model.TheList.Where(p => p.ParentId == ind.Id ).OrderBy(p=> p.Code).ToList();
+            await Template(ind, parent.InternalCode,plans, padding);
+        }
+    }
+
+    async Task BuildRow(Plan ind, string parentCode, List<Plan> subPlans, string padding)
+    {
+        
+        var isGenericLabel = ind.ResponsibleUnit == ECCSAModuleEnum.None;
+        var allPlanning = Model.PlanPhase == PlanningPhaseEnum.Planning || Model.PlanPhase == PlanningPhaseEnum.PrePlanning;
+        var hasChildren = Model.HasChildren(ind.Id);
+        var parentTt = !ind.ParentId.HasValue ? "root" : $"child";
+        <tr class=" @parentTt @parentCode" id="@ind.InternalCode">
+            <td>
+                @Html.Raw(@padding)
+                @if (hasChildren)
+                {
+                    <a data-tt="@ind.InternalCode" onclick="showHideChildren(this);" class="title"><i class="fas fa-angle-right"></i>@ind.NameWithCode </a>
+                }
+                else
+                {
+                    @ind.NameWithCode
+                }
+            </td>
+
+            <td>@ind.ResponsibleUnit.GetDisplayName()</td>
+            <td>
+                @if (Model.IsAdmin && isGenericLabel && allPlanning)
+                {
+                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                        <button data-toggle="modal"
+                                data-target="#editRootModal"
+                                title="Edit"
+                                data-id="@ind.Id"
+                                data-code="@ind.Code"
+                                data-name="@ind.Name"
+                                onclick="editName(this);"
+                                class=" float-right edit btn btn-outline-success btn-sm">
+                            <i class="fa fa-pen "></i>
+                        </button>
+
+                        @if (ind.IsLabel && subPlans.Count == 0)
+                        {
+
+                            <a onclick="return confirmDelete($('#deleteLabel@(Model.Guid2String(ind.Id))')[0]);"
+                               class=" btn btn-sm btn-outline-danger">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                            <form data-parsley-validate novalidate method="post" id="deleteLabel@(Model.Guid2String(ind.Id))"
+                  asp-action="deletePlan" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@ind.Id" />
+                                <input type="hidden" name="planYear" value="@ind.PlanYear" />
+                                <input type="hidden" name="subsystem" value="@Model.CurrentSubsystem" />
+                            </form>
+                        }
+                        @if (ind.IsLabel && !ind.IsLeaf)
+                        {
+                            <button data-toggle="modal"
+                                    data-target="#createHeaderModal"
+                                    title="Create Child Plan"
+                                    data-parent="@ind.Id"
+                                    data-parentname="@ind.Name"
+                                    onclick="createChildName(this);"
+                                    class=" float-right edit btn btn-outline-primary btn-sm">
+                                <i class="fa fa-plus "></i>
+                            </button>
+                        }
+                    </div>
+                }
+            </td>
+        </tr>
+    }
+}
+<div class="container-fluid">
+    @if (Model.RoleLevel == RoleLevelEnum.Admin && true)
+    {
+        <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+            <div class=" btn-group" role="group" aria-label="Basic example">
+               
+            </div>
+        </div>
+    }
+
+
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header row d-md-flex align-items-md-center justify-content-md-around">
+                     
+                    
+                    <label class="col-md-4 col-form-label">Planning for the Year: @Model.PlanYear (@Model.PlanPhase.GetDisplayName())</label>
+                    <button class="col-md-2 d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                            data-toggle="modal"
+                            data-target="#createRootModal"
+                            title="Create Plan Headers">
+                        <i class="fas fa-plus fa-sm text-white-50"></i> Create Root Headers
+                    </button>
+                </div>
+                <div class="card-body">
+                   
+                    <hr />
+                    <div class="form-group row">
+                        <div class="col-sm-12 table-responsive">
+
+                            <table id="example1" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        
+                                        <th style="width:400px;">Name</th>
+                                        <th style="width:100px;">Resp. Unit</th>
+
+                                        <th style="width: 50px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableDetail">
+                                @{
+                                    @foreach (var root in Model.RootPlans)
+                                    {
+                                        var subPlans = Model.TheList.Where(p => p.ParentId == root.Id).OrderBy(p => p.Code).ToList();
+                                        await Template(root, "",subPlans, "");
+                                    }
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+    
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editRootModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Plan Header</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="UpdateLabel" asp-antiforgery="true">
+                        <input type="hidden" name="Id" id="planId" />
+                        <input type="hidden" name="header" value="true" />
+                        <input type="hidden" name="subSystem" value="@Model.CurrentSubsystem" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="20" name="Code" id="codeId" class="form-control col-sm-5 col-md-5" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="250" name="Name" id="nameId" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="createRootModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Root Indicator</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="CreateRoot" asp-antiforgery="true">
+                        <input type="hidden" name="Id" />
+                        <input type="hidden" name="PlanYear" value="@Model.PlanYear" />
+                        <input type="hidden" name="subSystem" value="@Model.CurrentSubsystem" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="20" name="Code" class="form-control col-sm-5 col-md-5" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="250" name="Name" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                    
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="createHeaderModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Child Plan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="CreateLabel" asp-antiforgery="true">
+                        <input type="hidden" name="Id" />
+                        <input type="hidden" name="PlanYear" value="@Model.PlanYear" />
+                        <input type="hidden" name="subSystem" value="@Model.CurrentSubsystem" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="20" name="Code" class="form-control col-sm-5 col-md-5" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="250" name="Name" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Parent
+                            </label>
+                            <span id="parentHeader" class='col-sm-8 col-md-9'></span>
+                            <input type="hidden" name="ParentId" id="parentId"/>
+                           
+
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Resp. Unit Specific
+                            </label>
+                            <input type="hidden" name="IsLeaf" id="hdnIsLeaf"/>
+                            <input type="checkbox" onclick="IsLeafeChanged()" class="form-check col-sm-1 col-md-1" id="isLeafId"   />
+
+                            <select name="ResponsibleUnitFilter" disabled="disabled" class="form-select-sm col-sm-7 col-md-8" title="Responsible Unit" id="responsibleUnitFilterId"
+                                    asp-for="@Model.ResponsibleUnitFilter">
+                                @foreach (var u in Enum.GetValues(typeof(ECCSAModuleEnum)).Cast<ECCSAModuleEnum>())
+                                {
+                                    if (u == ECCSAModuleEnum.Bmo)
+                                    {
+                                        continue;
+                                    }
+                                    else if (u == ECCSAModuleEnum.None)
+                                    {
+                                        <option value="0_0"> </option>
+                                    }
+                                    else if (u == ECCSAModuleEnum.Support)
+                                    {
+                                        foreach (var su in Model.SupportingUnits)
+                                        {
+                                            if (!string.IsNullOrWhiteSpace(su.Name))
+                                            {
+                                                <option value="@((int)@u)_@(su.Value)">@su.Name</option>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)@u)_0">@u.GetDisplayName()</option>
+                                    }
+                                }
+                            </select>
+
+                           
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+
+
+    <script>
+        function IsLeafeChanged() {
+            const respUnit = document.getElementById("responsibleUnitFilterId");
+            const chkBox = document.getElementById("isLeafId");
+           
+            if (!chkBox.checked) {
+                $('#responsibleUnitFilterId').val("0_0").change();
+            }
+            respUnit.disabled = !chkBox.checked;
+            document.getElementById("hdnIsLeaf").value = chkBox.checked;
+        }
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+        
+        function editName(e){
+            const id = document.getElementById('planId');
+            const code = document.getElementById('codeId');
+            const name = document.getElementById('nameId');
+
+            const idVal = $(e).attr('data-id');
+            const codeVal = $(e).attr('data-code');
+            const nameVal = $(e).attr('data-name');
+            id.value = idVal;
+            code.value = codeVal;
+            name.value = nameVal;
+            // $('#inputMethodRequirement').val(typeVal).change();
+        }
+
+        function createChildName(e){
+            const parentInput = document.getElementById('parentId');
+            const parentNameInput = $('#parentHeader');
+
+            const parent = $(e).attr('data-parent');
+            const parentName = $(e).attr('data-parentname');
+            parentInput.value = parent;
+            parentNameInput.html(parentName);
+        }
+        
+        function editPlan(editMode){
+            document.getElementById('editbtn').hidden = editMode;
+            document.getElementById('savebtn').hidden = !editMode;
+            document.getElementById('cancelbtn').hidden = !editMode;
+            var spans = document.getElementsByClassName('targetlbl');
+            var inputs = document.getElementsByClassName('baselinetxt');
+            var i;
+            for (i = 0; i < spans.length; i++) {
+                spans[i].hidden = editMode;
+            }
+            for (i = 0; i < inputs.length; i++) {
+                inputs[i].hidden = !editMode;
+            }
+        }
+        
+        function cancelPlan() {
+
+            document.getElementById('editbtn').hidden = false;
+            document.getElementById('savebtn').hidden = true;
+            document.getElementById('cancelbtn').hidden = true;
+        }
+
+        function hideChildren(){
+            const children = document.getElementsByClassName('child');
+            for(var i = 0; i < children.length; i++){
+                children[i].style.display='none';
+            }
+        }
+        hideChildren();
+        function hideDescendant(e){
+            console.log(e);
+            const parent = $(e).attr('data-tt');
+            const children = document.getElementsByClassName(parent);
+            for(var i = 0; i < children.length; i++){
+                const child = children[i];
+                child.style.display='none';
+                //console.log(child.id, child, document.getElementsByClassName(child.id).length);
+                if(document.getElementsByClassName(child.id).length > 0){
+                    $(child).find('i').removeClass('fa-angle-down');
+                    $(child).find('i').addClass('fa-angle-right');
+                    hideDescendant($(child).find('a')[0]);
+                }
+
+            }
+        }
+
+        function showHideChildren(e) {
+            const ank = $(e);
+            let show = true;
+
+            for (let i = 0; i < ank[0].children.length; i++)
+            {
+                const child = ank[0].children[i];
+                if (child.localName == 'i') {
+                    if (child.classList.contains('fa-angle-right')) {
+                        show = true;
+                        child.classList.remove('fa-angle-right');
+                        child.classList.add('fa-angle-down');
+                    } else {
+                        show = false;
+                        child.classList.add('fa-angle-right');
+                        child.classList.remove('fa-angle-down');
+                    }
+                }
+            }
+
+            if(show)
+            {
+                const parent = $(e).attr('data-tt');
+                const children = document.getElementsByClassName(parent);
+                for(var i = 0; i < children.length; i++)
+                {
+                    children[i].style.display='';
+                }
+            }
+            else
+            {
+                hideDescendant(e);
+            }
+        }
+
+
+    </script>
+}

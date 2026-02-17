@@ -1,0 +1,498 @@
+﻿@using System.Data
+@using ECCSA.BackOffice.Server.Model.Common
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model ECCSA.BackOffice.Server.WebApp.Areas.Report.Model.CustomReportViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <!-- Main Report -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="panel panel-default">
+                                <div class="panel-header">
+                                    <h3 class="panel-title"></h3>
+                                </div><!-- /.box-header -->
+                                <div class="panel-body">
+                                    <div class="panel panel-default">
+                                        <div class="panel-header" >
+                                            <div class="row">
+                                                <div class="col-sm-2">
+                                            <h5> <strong><a href="#reportCustom" data-toggle="collapse" class=""
+                                                aria-expanded="false" role="button">
+                                                Build Report:</a></strong></h5></div>
+                                                <div class="col-sm-3">
+                                            <form data-parsley-validate method="get"
+                                                  asp-action="LoadReport" asp-antiforgery="true">
+                                                <input type="hidden" value="@Model.CurrentModule" name="module" />
+                                                <select required class="form-control" asp-for="ReportId" id="reportselect"
+                                                        asp-items="@(new SelectList(Model.Reports, "Id", "Title", Model.ReportId, "GroupName"))"></select>
+
+                                            </form></div>
+                                                <div class="col-sm-3">
+                                                    @if (Model.Report != null)
+                                                    {
+                                                        @("For Aggregate:")
+                                                    <input type="checkbox" asp-for="ForAggregate" id="setForAggregate" />
+                                                    }</div>
+                                            </div>
+                                        </div>
+
+                                        <div id="reportCustom" class="panel-body collapse   ">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    @if (Model.Report != null)
+                                                    {
+                                                            <form data-parsley-validate method="post" id="getReportfrm"
+                                                          asp-action="LoadReportCustom" asp-antiforgery="true">
+                                                                <div class="row">
+
+                                                                    <input type="hidden" value="@Model.CurrentModule" name="module" />
+                                                                    <input type="hidden" asp-for="ForAggregate" id="setForAggregateVal" />
+                                                                    <input type="hidden" asp-for="ReportId" />
+                                                                    <div class="col-md-12">
+                                                                        Fields:
+                                                                        <div class="table-responsive" style="height: 250px; overflow-y: scroll;">
+                                                                            <table class="table table-bordered">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>
+                                                                                            <input type="checkbox" id="selectAllfields" />
+                                                                                            Show Field
+                                                                                        </th>
+                                                                                        <th>Filter Value</th>
+                                                                                        <th>Pivot by</th>
+                                                                                        <th class="tdforaggregate @(Model.ForAggregate ? "" : "d-none")">Aggregate</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                            @foreach (var rf in Model.Report.ReportFields)
+                                                                            {
+
+                                                                                if (!rf.IsViewable)
+                                                                                {
+                                                                                    continue;
+                                                                                }
+                                                                                        <tr>
+                                                                                            <td class="small-col">
+
+                                                                                        @{
+                                                                                            var checkedstr = "";
+                                                                                            if (((Model.Customs == null || Model.Customs.Keys.Count <= 0) && rf.IsDefault > 0) || Model.Customs.ContainsKey(rf.FieldName))
+                                                                                            {
+                                                                                                checkedstr = "checked='checked'";
+                                                                                            }
+                                                                                                        <input type="checkbox" class="viewUnViewFieldchk" id="@("chkv" + rf.FieldName)" name="@rf.FieldName" value="@rf.Id" @checkedstr />
+                                                                                        }
+                                                                                        @rf.DisplayCaption
+                                                                                            </td>
+                                                                                            <td class="small-col">
+                                                                                        @if (rf.IsFilterField)
+                                                                                        {
+
+                                                                                            var fval = "";
+                                                                                            var fval1 = "";
+                                                                                            var fAO = "";
+                                                                                            if (Model.Customs != null && Model.Customs.ContainsKey(rf.HtmlFilterFieldName))
+                                                                                            {
+                                                                                                fval = Model.Customs[rf.HtmlFilterFieldName];
+                                                                                                if (Model.Customs.ContainsKey(rf.HtmlFilterFieldName1))
+                                                                                                {
+                                                                                                    fval1 = Model.Customs[rf.HtmlFilterFieldName1];
+                                                                                                }
+                                                                                                fAO = Model.Customs[rf.HtmlFilterFieldAndOr];
+                                                                                            }
+
+                                                                                            if (rf.FieldTypeId == FilterFieldType.DropDownListNumeric || rf.FieldTypeId == FilterFieldType.DropDownListText)
+                                                                                            {
+                                                                                                @Html.DropDownList(rf.HtmlFilterFieldName, Model.DropDownLists[rf.Id], new { value = fval })
+                                                                                            }
+                                                                                            if (rf.FieldTypeId == FilterFieldType.DropDownListNumericFromTo)
+                                                                                            {
+                                                                                                <text>From</text>
+
+                                                                                                @Html.DropDownList(rf.HtmlFilterFieldName, Model.DropDownLists[rf.Id], new { value = fval })
+                                                                                                @*                                                                                                @Html.DropDownList(rf.HtmlFilterFieldName,
+                                                                                                    Model.GroupDropDownLists[rf.Id].Select(l => new SelectListItem { Text = l.Text, Value = l.Value, /*Group = l.Group,*/ Selected = (l.Value == fval) }))
+                                                                                                *@                                                                                                <text>To</text>
+
+                                                                                                @Html.DropDownList(rf.HtmlFilterFieldName, Model.DropDownLists[rf.Id], new { value = fval1 })
+                                                                                                @*                                                                                                @Html.DropDownList(rf.HtmlFilterFieldName1,
+                                                                                                    Model.GroupDropDownLists[rf.Id].Select(l => new SelectListItem { Text = l.Text, Value = l.Value, /*Group = l.Group,*/ Selected = (l.Value == fval1) }))
+                                                                                                *@                                                                                            }
+                                                                                            if (rf.FieldTypeId == FilterFieldType.TextNumericFromTo)
+                                                                                            {
+                                                                                                <text>From</text>
+                                                                                                                <input type="text" id="@rf.HtmlFilterFieldName" name="@rf.HtmlFilterFieldName" value="@fval" />
+                                                                                                <text>To</text>
+                                                                                                                <input type="text" id="@rf.HtmlFilterFieldName1" name="@rf.HtmlFilterFieldName1" value="@fval1" />
+                                                                                            }
+                                                                                            if (rf.FieldTypeId == FilterFieldType.TextNumeric || rf.FieldTypeId == FilterFieldType.TextString ||
+                                                                                            rf.FieldTypeId == FilterFieldType.TextStringLike)
+                                                                                            {
+                                                                                                                <input type="text" id="@rf.HtmlFilterFieldName" name="@rf.HtmlFilterFieldName" value="@fval" />
+
+                                                                                            }
+                                                                                                        <select name="@rf.HtmlFilterFieldAndOr">
+                                                                                                @if (fAO == "And")
+                                                                                                {
+                                                                                                                    <option selected="selected" value="AND">AND</option>
+                                                                                                                    <option value="OR">OR</option>
+                                                                                                }
+                                                                                                else if (fAO == "OR")
+                                                                                                {
+                                                                                                                    <option value="AND">AND</option>
+                                                                                                                    <option selected="selected" value="OR">OR</option>
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                                    <option value="AND">AND</option>
+                                                                                                                    <option value="OR">OR</option>
+                                                                                                }
+                                                                                                        </select>
+                                                                                        }
+                                                                                            </td>
+                                                                                            <td class="small-col tdforpivot">
+                                                                                        @if (rf.IsViewable && rf.IsGroupField)
+                                                                                        {
+                                                                                            var pivFname = rf.HtmlFieldPivot;
+                                                                                            var fagg = "";
+                                                                                            if (Model.Customs != null && Model.Customs.ContainsKey(pivFname))
+                                                                                            {
+                                                                                                fagg = Model.Customs[pivFname];
+                                                                                            }
+                                                                                            var unshowstr = "";
+                                                                                            if (Model.Customs != null && Model.Customs.Keys.Any() && (Model.Customs == null || !Model.Customs.ContainsKey(rf.FieldName)))
+                                                                                            {
+                                                                                                unshowstr = "d-none";
+                                                                                            }
+                                                                                                        <select name="@pivFname" id="@("chkv" + rf.HtmlFieldPivot)" class="chkvfpiv @unshowstr inputhideUnhide">
+                                                                                                            <option value="0"></option>
+                                                                                                @if (fagg == "1")
+                                                                                                {
+                                                                                                                    <option selected="selected" value="1">1</option>
+                                                                                                                    <option value="2">2</option>
+                                                                                                }
+                                                                                                else if (fagg == "2")
+                                                                                                {
+                                                                                                                    <option value="1">1</option>
+                                                                                                                    <option selected="selected" value="2">2</option>
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                                    <option value="1">1</option>
+                                                                                                                    <option value="2">2</option>
+                                                                                                }
+                                                                                                        </select>
+                                                                                        }
+                                                                                            </td>
+                                                                                            <td class="small-col tdforaggregate @(Model.ForAggregate ? "" : "d-none")">
+                                                                                        @if (rf.IsViewable)
+                                                                                        {
+                                                                                            var aggFname = rf.HtmlFieldAggregate;
+                                                                                            var fagg = "";
+                                                                                            if (Model.Customs != null && Model.Customs.ContainsKey(aggFname))
+                                                                                            {
+                                                                                                fagg = Model.Customs[aggFname];
+                                                                                            }
+                                                                                            var unshowstr = "";
+                                                                                            if (Model.Customs != null && Model.Customs.Keys.Any() && (Model.Customs == null || !Model.Customs.ContainsKey(rf.FieldName)))
+                                                                                            {
+                                                                                                unshowstr = "d-none";
+                                                                                            }
+                                                                                                        <select name="@aggFname" id="@("chkv" + rf.HtmlFieldAggregate)" class="@unshowstr inputhideUnhide">
+                                                                                                @if (rf.IsGroupField)
+                                                                                                {
+                                                                                                    if (fagg == "GROUPBY" || fagg == "")
+                                                                                                    {
+                                                                                                                            <option selected="selected" value="GROUPBY">Group By</option>
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                                            <option value="GROUPBY">Group By</option>
+                                                                                                    }
+                                                                                                }
+                                                                                                @if (fagg == "COUNT" || ((Model.Customs == null || !Model.Customs.ContainsKey(rf.FieldName)) && rf.IsDefault == 2))
+                                                                                                {
+                                                                                                                    <option selected="selected" value="COUNT">Count</option>
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                                    <option value="COUNT">Count</option>
+                                                                                                }
+
+                                                                                                @if (rf.IsNumeric)
+                                                                                                {
+                                                                                                    if (fagg == "AVG" || ((Model.Customs == null || !Model.Customs.ContainsKey(rf.FieldName)) && rf.IsDefault == 4))
+                                                                                                    {
+                                                                                                                            <option selected="selected" value="AVG">Average</option>
+                                                                                                                            <option value="SUM">Sum</option>
+                                                                                                    }
+                                                                                                    else if (fagg == "SUM" || ((Model.Customs == null || !Model.Customs.ContainsKey(rf.FieldName)) && rf.IsDefault == 3))
+                                                                                                    {
+                                                                                                                            <option value="AVG">Average</option>
+                                                                                                        <option selected="selected" value="SUM">Sum</option>
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                         <option value="AVG">Average</option>
+                                                                                                        <option value="SUM">Sum</option>
+                                                                                                    }
+
+                                                                                                }
+                                                                                                        </select>
+                                                                                        }
+                                                                                            </td>
+                                                                                        </tr>
+                                                                            }
+                                                                            </table>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                                <br />
+
+                                                            </form>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div><!-- /.box-body -->
+                                    </div>
+                                    <strong>
+                                        <span style="font-size: small;color: orange">Display Note: </span>
+                                        <small style="color: orange">Results that contains more than 500 records will be downloaded as CSV instead of displaying!</small>
+                                    </strong><br/>
+                                     <div class="row">
+                                                                <div class="col-md-2">
+                                                                    <button type="submit" onclick="$('#getReportfrm')[0].submit()" class="btn btn-primary btn-sm">Show Report</button>
+                                                                </div>
+                                                            </div> <br/>
+                                    @if (Model.Report != null && Model.ReportResult != null && Model.ReportResult.Columns.Count > 0)
+                                    {
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p class="float-left">
+                                                        <a href="#" onclick="tableToExcel('example1', 'Custom Report', 'CustomReport.xls')"><img src="~/img/excel-new.png" alt="Download Excel"></a>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="table-responsive clearfix" style="overflow-x: scroll;">
+                                            @if (Model.PivotedData == null)
+                                            {
+                                                        <table id="example1" class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                            @foreach (DataColumn col in Model.ReportResult.Columns)
+                                                            {
+                                                                            <th>@col.ColumnName</th>
+                                                            }
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                        @foreach (DataRow r in Model.ReportResult.Rows)
+                                                        {
+                                                                        <tr>
+                                                                @foreach (DataColumn col in Model.ReportResult.Columns)
+                                                                {
+                                                                    if (col.ColumnName == "Value" &&
+                                                                    (col.DataType == typeof(int)
+                                                                    || col.DataType == typeof(long)
+                                                                    || col.DataType == typeof(double)
+                                                                    || col.DataType == typeof(float)
+                                                                    || col.DataType == typeof(decimal)))
+                                                                    {
+                                                                                            <td>@($"{r[col.ColumnName]:N}")</td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                                            <td>@r[col.ColumnName]</td>
+                                                                    }
+                                                                }
+                                                                        </tr>
+                                                        }
+                                                            </tbody>
+                                                        </table>
+                                            }
+                                            else
+                                            {
+                                                        <table id="example1" class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                            @foreach (string xc in Model.PivotedData.XColumns)
+                                                            {
+                                                                            <th rowspan="@Model.PivotedData.PivotColumns.Count">@xc</th>
+                                                            }
+                                                            @foreach (var dc in Model.PivotedData.YColumns)
+                                                            {
+                                                                            <th colspan="@(dc.ChildrenColumns.Count )">@dc.Caption</th>
+                                                            }
+                                                                </tr>
+                                                        @if (Model.PivotedData.PivotColumns.Count > 1)
+                                                        {
+                                                                        <tr>
+                                                                @foreach (var dc in Model.PivotedData.YColumns)
+                                                                {
+                                                                    foreach (var c in dc.ChildrenColumns)
+                                                                    {
+                                                                                            <th>@c.Caption</th>
+                                                                    }
+                                                                }
+                                                                        </tr>
+                                                        }
+                                                            </thead>
+                                                            <tbody>
+                                                        @foreach (DataRow dr in Model.ReportResult.Rows)
+                                                        {
+                                                                        <tr>
+                                                                @foreach (string xc in Model.PivotedData.XColumns)
+                                                                {
+                                                                                    <td> @dr[xc] </td>
+                                                                }
+                                                                @foreach (var dc in Model.PivotedData.YColumns)
+                                                                {
+                                                                    foreach (var c in dc.ChildrenColumns)
+                                                                    {
+                                                                                            <td>@dr[c.Name]</td>
+                                                                    }
+                                                                }
+                                                                        </tr>
+                                                        }
+                                                            </tbody>
+
+                                                        </table>
+                                            }
+                                            @if (Model.ResultCriteria.Split('|').Length > 1 &&
+                                          (Model.ResultCriteria.Split('|')[0].Trim().Length > 0 || Model.ResultCriteria.Split('|')[1].Trim().Length > 0))
+                                            {
+                                                        <strong>
+                                                            <span style="font-size: medium">Result Note: </span>
+                                                            <small>@Model.ResultCriteria.Split('|')[0]</small><br />
+                                                            <small>@Model.ResultCriteria.Split('|')[1]</small>
+                                                            <br />
+                                                            <span style="font-size: medium">Pivot Note: </span>
+                                                            <small>For Pivot total of fields between 2 & 5, and 1 value field is required</small>
+                                                        </strong>
+                                            }
+                                            </div>
+                                    }
+                                </div><!-- /.box-body -->
+                            </div>
+                            <!-- /.box -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script{
+
+<script src="~/js/excellib.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#example1').dataTable({
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": true,
+            "bAutoWidth": true
+        });
+
+        var setForAggre = function () {
+            if ($('input#setForAggregate').prop("checked") == true) {
+                $('.tdforaggregate').removeClass('d-none');
+                $('#setForAggregateVal').val(true);
+
+            } else {
+                $('.tdforaggregate').addClass('d-none');
+                $('#setForAggregateVal').val(false);
+            }
+        };
+
+        setForAggre();
+        $('input#setForAggregate').on('click', setForAggre);
+
+        var pivotList = [];
+        $('.viewUnViewFieldchk').on('click', function () {
+            if ($(this).prop("checked") == true) {
+                $("#" + this.id + "fagg").removeClass('d-none');
+                $("#" + this.id + "fpiv").removeClass('d-none');
+            } else {
+                $("#" + this.id + "fagg").addClass('d-none');
+                $("#" + this.id + "fpiv").addClass('d-none');
+                $("#" + this.id + "fpiv").val(0);
+                if (pivotList.indexOf(this.id + "fpiv") == 0) {
+                    pivotList.shift();
+                } else {
+                    pivotList.pop();
+                }
+                //console.log(this.id + "fpiv" + " " + pivotList.indexOf(this.id + "fpiv"));
+                //console.log(pivotList);
+            }
+        });
+        $('select#reportselect').on('change', function () {
+            this.form.submit();
+        });
+
+
+        $('select.chkvfpiv').each(function (item, index) {
+            if ($(this).val() == 2) {
+                pivotList.push($(this).attr('id'));
+            } else if ($(this).val() == 1) {
+                pivotList.unshift($(this).attr('id'));
+            }
+            //console.log($(this).attr('id'));
+            //console.log(pivotList);
+        });
+        $('select.chkvfpiv').on('change', function () {
+            if ($(this).val() == '0') {
+                if (pivotList.indexOf($(this).attr('id')) == 0) {
+                    pivotList.shift();
+                } else {
+                    pivotList.pop();
+                }
+            } else {
+                if (pivotList.indexOf($(this).attr('id')) < 0) {
+                    pivotList.push($(this).attr('id'));
+                    if (pivotList.length > 2) {
+                        var oldf = pivotList.shift();
+                        $('#' + oldf).val('0');
+                    }
+                }
+                if (pivotList.length == 2) {
+                    var thisval = $(this).val();
+                    var otherIndex = pivotList.indexOf($(this).attr('id')) == 0 ? 1 : 0;
+                    var nfval = pivotList[otherIndex];
+                    if (thisval == '1') {
+                        $('#' + nfval).val('2');
+                    } else if (thisval == '2') {
+                        $('#' + nfval).val('1');
+                    }
+                }
+            }
+            //console.log(pivotList);
+        });
+
+
+        $('#selectAllfields').on('click', function () {
+            if ($(this).prop("checked") == true) {
+                $('.viewUnViewFieldchk').prop("checked", "checked");
+                $('.inputhideUnhide').removeClass('d-none');
+            } else {
+                $('.viewUnViewFieldchk').prop("checked", false);
+                $('.inputhideUnhide').addClass('d-none');
+            }
+        });
+    });
+</script>
+}

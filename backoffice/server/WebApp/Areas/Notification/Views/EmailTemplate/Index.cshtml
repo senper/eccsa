@@ -1,0 +1,91 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Notification.Model.EmailTemplateViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class=" btn-group" role="group" aria-label="Basic example">
+            <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#editEventTypeModal"
+                    data-id="@Guid.Empty"
+                    title="Create Event Type">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+               
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Name </th>
+                                 
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name </th>
+                                    
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                   
+
+                                    <tr>
+                                        <td>
+                                            <a asp-controller= Model.Controller asp-action="Detail" asp-route-id="@item.Id" class="title ">
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </a>
+                                        </td>
+
+                                       
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                              
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller= Model.Controller asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+@section script {
+
+    <script>
+
+    </script>
+}

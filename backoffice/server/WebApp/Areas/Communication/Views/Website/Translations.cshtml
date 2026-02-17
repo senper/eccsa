@@ -1,0 +1,179 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.WebsiteTranslationViewModel
+@{
+    ViewData["Title"] = "Website Management";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @if (Model.IsUserOrAdmin)
+        {
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="New Translation"
+                onclick="editTranslation(this)"
+                data-key=""
+                data-default=""
+                data-local="">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Default</th>
+                                    <th>Local</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Default</th>
+                                    <th>Local</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var r in Model.TheList.OrderBy(m => m.Key))
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => r.Key)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => r.Default)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => r.Local)
+                                        </td>
+                                        <td>
+                                            <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                <a onclick="return confirmDelete($('#deleteTranslation@(r.Key)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteTranslation@(r.Key)"
+                                                  asp-action="DeleteTranslation" asp-antiforgery="true">
+                                                    <input type="hidden" name="key" value="@r.Key" />
+                                                </form>
+                                            </div>
+
+                                            <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                <button class="btn btn-sm btn-outline-success"
+                                                    data-toggle="modal"
+                                                    data-target="#theModal"
+                                                    title="Edit Translation"
+                                                    onclick="editTranslation(this)"
+                                                    data-key="@r.Key"
+                                                    data-local="@r.Local"
+                                                    data-default="@r.Default">
+                                                    <i class="fa fa-pen" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1"
+     role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Translation </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SaveTranslation" asp-antiforgery="true">
+                        <input type="hidden" name="Id" id="id" />
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Key
+                            </label>
+                            <input type="text" name="Key" maxlength="100" id="key" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Default
+                            </label>
+                            <input type="text" name="Default" id="default" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>                        
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Local
+                            </label>
+                            <input type="text" name="Local" id="local" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="አማርኛ" />
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+<script>
+    function editTranslation(e) {
+
+        const key = document.getElementById('key');
+        const defaultInput = document.getElementById('default');
+        const local = document.getElementById('local');
+
+        const keyVal = $(e).attr('data-key');
+        const defaultVal = $(e).attr('data-default');
+        const localVal = $(e).attr('data-local');
+
+        key.value = keyVal;
+        defaultInput.value = defaultVal;
+        local.value = localVal;
+    }
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

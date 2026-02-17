@@ -1,0 +1,42 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.AssessmentViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Add" : "Edit") Assessment</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate method="post" enctype="multipart/form-data"
+          asp-action="@(Model.TheModel.Id == Guid.Empty ? "CreateAssessment" : "UpdateAssessment")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <input type="hidden" asp-for="TheModel.RegistrationId" />
+        <input type="hidden" asp-for="TheModel.TrainingId" />
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Date
+            </label>
+            <input type="date" max="@(DateTime.Today.ToString("yyyy-MM-dd"))" class="form-control col-sm-7 col-md-8" asp-for="TheModel.Date" required />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Score
+            </label>
+            <input type="number" class="form-control col-sm-7 col-md-8" asp-for="TheModel.ResultScore" required />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Pass
+            </label>
+            <input type="number" class="form-control col-sm-7 col-md-8" asp-for="TheModel.ResultPass" required />
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+

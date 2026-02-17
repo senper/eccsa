@@ -1,0 +1,205 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.ReportViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+        </div>
+        <div class="col-md-6" role="group" aria-label="Basic example">
+           @if (Model.RoleLevel == RoleLevelEnum.Admin)
+            {
+            <div class="btn-group  float-right" role="group" aria-label="Basic example">
+                <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                        data-toggle="modal"
+                        data-target="#createReportModal"
+                        title="Create Backoffice Report">
+                    <i class="fas fa-plus fa-sm "></i> Create Report
+                </button>
+            </div>
+         }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>SubTitle </th>
+                                    <th>Source Name</th>
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>SubTitle </th>
+                                    <th>Source Name</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+
+                                    <tr>
+                                        <td>
+                                            <a asp-controller="Report" asp-action="Detail" asp-route-id="@item.Id" class="title">
+                                                @Html.DisplayFor(modelItem => item.Title)
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.SubTitle)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.SourceName)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="Report" asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="createReportModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Create Report</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" asp-action="Save" asp-antiforgery="true" onsubmit="">
+                   
+                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" maxlength="50" name="Title"  class="form-control col-sm-8 col-md-9" required />
+                        </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sub Title
+                        </label>
+                        <input type="text" maxlength="150" id="subTitleId" name="SubTitle" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                  
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Source Name
+                        </label>
+                        <select class="form-control col-sm-8 col-md-9" name="SourceName" id="sourceNameId" asp-items="@(new SelectList(Model.Sources, "SourceName", "SourceName"))">
+                            <option value="">Select Source Name</option>
+                            </select>
+                    </div>
+                   
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editEventTypeModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Info Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" name="Caption" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Schema
+                        </label>
+                        <input type="text" maxlength="50" name="SchemaName" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Source Name
+                        </label>
+                        <input type="text" maxlength="50" name="SourceName" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+
+
+    <script>
+
+
+
+
+
+    </script>
+}

@@ -1,0 +1,272 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Surveying.Model.SurveySettingViewModel
+
+@{
+      ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class=" btn-group" role="group" aria-label="Basic example">
+            @*<button class="edit d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                        data-toggle="modal"
+                        data-target="#AddEditModal"
+                        title="Add New Association"
+                        data-url="@Url.Action("Edit", new { Id=Guid.Empty })">
+                    <i class="fa fa-file-excel-o"></i> Import From Excel
+                </button>*@
+
+
+            <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#editSurveySettingModal"
+                    title="Create Setting"
+                    >
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>Recurrence</th>
+                                    <th>Open (Days)</th>
+                                    <th>Is Public</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>Recurrence</th>
+                                    <th>Open (Days)</th>
+                                    <th>Is Public</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                    var statusClass = (item.Status == ECCSA.BackOffice.Server.Model.Common.StatusEnum.Inactive ? "danger" :  "");
+
+                                    <tr class="@statusClass">
+                                        <td>
+                                            <a asp-controller="Setting" asp-action="Detail" asp-route-id="@item.Id" class="title @statusClass">
+                                                @Html.DisplayFor(modelItem => item.Title)
+                                            </a>
+                                        </td>
+                                      
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Recurrence)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.OpenDays)
+                                        </td>
+                                        <td>
+                                            @(item.IsPublic ? "Yes":"No")
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                               
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="Setting" asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editSurveySettingModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty? "Create " :"Edit ") Survey Setting</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveSetting" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="settingId" />
+                    <input type="hidden" name="ResponsibleUnit" id="settingResponsibleUnit" value="@Model.TheModel.ResponsibleUnit" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="200" name="Title" id="settingTitle" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" maxlength="800" name="Description" id="settingDescription" class="form-control col-sm-8 col-md-9" required> </textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Recurrence
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" name="Recurrence" asp-for="TheModel.Recurrence" id="settingRecurrence" onchange="adjustOpenDays(this);"
+                                asp-items="@(Html.GetEnumSelectList<FrequencyEnum>())" required></select>
+                    </div>
+                    @*<input type="hidden" name="PublishThrough" value="8"/>*@
+                    <div class="row form-group" >
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Publish Through
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" name="PublishThrough" asp-for="TheModel.PublishThrough" id="settingPublishThrough"
+                                required>
+                            <option value="0"></option>
+                            @*<option value="1">SMS</option>*@
+                            <option value="2">Telegram</option>
+                            @*<option value="4">Email</option>*@
+                            <option value="8">Website</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Keep Open 
+                        </label>
+                        <input type="number" min="1" name="OpenDays" id="settingOpenDays" class="form-control col-sm-4 col-md-4" required /> Days
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            
+                        </label>
+                        <input type="hidden" name="IsPublic" id="IsPublicIdHdn" />
+                        <input type="checkbox" asp-for="TheModel.IsPublic" onchange="isPublicChanged();"  id="IsPublicId" /> Is Public 
+                       
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" id="settingStatus">
+                            <option value="1">Active</option>
+                            <option value="2">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+
+   
+    <script>
+
+       function isPublicChanged() {
+           document.getElementById('IsPublicIdHdn').value =document.getElementById('IsPublicId').checked;
+       }
+        
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function editSetting(e) {
+            const id = document.getElementById('settingId');
+            const title = document.getElementById('settingTitle');
+            const descr = document.getElementById('settingDescription');
+
+           
+
+            const openDays = document.getElementById('settingOpenDays');
+
+
+            const idVal = $(e).attr('data-id');
+            const titleVal = $(e).attr('data-title');
+            const descrVal = $(e).attr('data-descr');
+
+
+           
+            const recurVal = $(e).attr('data-recur');
+            const publishVal = $(e).attr('data-publish');
+
+            const openDaysVal = $(e).attr('data-days');
+            const statusVal = $(e).attr('data-status');
+
+
+            id.value = idVal;
+            title.value = titleVal;
+            descr.innerText = descrVal;
+            $('#settingRecurrence').val(recurVal).change();
+            $('#settingPublishThrough').val( publishVal).change();
+            openDays.value = openDaysVal;
+            $('#settingStatus').val( statusVal).change();
+
+          
+
+        }
+
+        function adjustOpenDays(e) {
+            const frequency = Number($(e).children("option:selected").val());
+            $('#settingOpenDays').attr('max', 366);
+            if (frequency === 1) {
+                $('#settingOpenDays').attr('max', 6);
+            } else if (frequency === 2) {
+                $('#settingOpenDays').attr('max', 20);
+            } else if (frequency === 3) {
+                $('#settingOpenDays').attr('max', 80);
+            } else if (frequency === 4) {
+                $('#settingOpenDays').attr('max', 366);
+            }
+            const max = Number($('#settingOpenDays').attr('max'));
+            const value = Number($('#settingOpenDays').val());
+            if (max < value) {
+                $('#settingOpenDays').val(max);
+            }
+        }
+    </script>
+}

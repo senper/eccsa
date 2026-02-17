@@ -1,0 +1,134 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.IssueLocationViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:10px;">
+        <div class="col-md-6 float-left" role="group" aria-label="Basic example">
+
+            <form data-parsley-validate novalidate method="get"
+                  asp-action="IssueLocations" asp-antiforgery="true">
+                <div class="row form-group">
+                    <label class="col-sm-4 col-md-3 col-form-label">Country:</label>
+
+                    <select name="countryRegion"
+                            onchange="this.form.submit();"
+                            class="form-control col-sm-8 col-md-9"
+                            asp-for="@Model.SelectedCountry"
+                            asp-items="@(new SelectList(Model.Countries,"Name","DisplayName"))"
+                            required></select>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Name</th>
+                                    <th>Location Type</th>
+                                    <th> </th>
+                                </tr>
+                                <form data-parsley-validate novalidate method="post"
+                                      asp-action="SaveLocation" asp-antiforgery="true">
+                                    <input type="hidden" name="Id" id="locationId" value="@Guid.Empty" />
+                                    <input type="hidden" name="countryRegion" value="@Model.SelectedCountry" />
+                                <tr>
+                                    <th>
+
+
+                                    </th>
+                                    <th>
+                                        <input type="text" maxlength="50" name="name" id="name" required />
+                                    </th>
+                                    <th>
+                                        <select name="TypeOfLocationId"
+                                                id="locationType"
+                                                class="form-control col-sm-7 col-md-8"
+                                                asp-items="@(new SelectList(Model.LocationTypes,"Id","Name"))"
+                                                required></select>
+                                    </th>
+                                    <th> <input type="submit" value="save" class="btn btn-sm btn-outline-primary" /> </th>
+                                </tr>
+                                </form>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Name</th>
+                                    <th>Location Type</th>
+                                    <th> </th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList.Where(l => l.Id != Guid.Empty))
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CountryRegion)
+                                        </td>
+                                        <td>@item.Name</td>
+                                        <td>@item.LocationType</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                @if (item.Issues == null)
+                                                {
+                                                    <a class=" btn btn-sm  btn-outline-info" onclick="editLocation('@item.Id', '@item.Name',  '@item.TypeOfLocationId')">
+                                                        <i class="fa fa-pen" aria-hidden="true"></i>
+                                                    </a>
+                                                    <a onclick="return confirmDelete($('#deleteIssue@(Model.Guid2String(item.Id))')[0]);"
+                                                        class=" btn btn-sm btn-outline-danger">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    </a>
+                                                    <form data-parsley-validate novalidate method="post" id="deleteIssue@(Model.Guid2String(item.Id))"
+                                                        asp-action="deleteIssueLocation" asp-antiforgery="true">
+                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+@section script {
+
+
+<script>
+    function editLocation(idVal, nameVal,  typeVal){
+
+        const id = document.getElementById('locationId');
+        const name = document.getElementById('name');
+
+        id.value = idVal;
+        name.value = nameVal;
+        $('#locationType').val(typeVal).change();
+    }
+
+
+
+</script>
+}

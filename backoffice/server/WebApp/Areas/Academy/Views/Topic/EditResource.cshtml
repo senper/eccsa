@@ -1,0 +1,92 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.ResourceViewModel
+@using ECCSA.BackOffice.Server.Model.Academy
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Add" : "Edit") Resource</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate method="post" enctype="multipart/form-data"
+          asp-action="@(Model.TheModel.Id == Guid.Empty ? "CreateResource" : "UpdateResource")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <input type="hidden" asp-for="TheModel.TopicId" />
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" class="form-control col-sm-7 col-md-8" asp-for="TheModel.Name" required placeholder="Name  " />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Description
+            </label>
+            <textarea class="form-control col-sm-7 col-md-8" asp-for="TheModel.Description" required placeholder="Decription  "></textarea>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Type
+            </label>
+            <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.ResourceType" id="resourceType"
+                    asp-items="@(Html.GetEnumSelectList<ResourceType>())" required></select>
+        </div>
+        <div class="row form-group" id="resourceContentdiv">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Resource
+            </label>
+            <div class="col-sm-7 col-md-8 p-0" >
+                <input type="text" id="resourceContext" class="form-control " asp-for="TheModel.ResourceContent" readonly />
+                <input type="button" onclick="$('#selectfile').click()" id="selectFilebtn" class="btn btn-outline-primary btn-sm" name="Select file" value="Select file" />
+                <input type="file" name="attachment" id="selectfile" hidden onchange="fileChange(this)">
+            </div>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Status
+            </label>
+            <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.Status" required>
+                <option value="1">Active</option>
+                <option value="2">Inactive</option>
+            </select>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    function fileChange(input) {
+        if (input.files.length > 0) {
+            $('#resourceContext').val(input.files[0].name);
+        } else {
+            $('#resourceContext').val("");
+        }
+    }
+
+    function resoueceTypeChange() {
+        var value = $("#resourceType").val();
+        console.log(value);
+        if (value == @((int)ResourceType.Link)) {
+            $("#resourceContentdiv").removeClass("d-none");
+            $("#resourceContext").removeAttr("readonly");
+            $("#selectFilebtn").addClass("d-none");
+        } else if (value == @((int)ResourceType.Attachment)) {
+            $("#resourceContentdiv").removeClass("d-none");
+            $("#resourceContext").attr("readonly", "readonly");
+            $("#selectFilebtn").removeClass("d-none");
+        } else if (value == @((int)ResourceType.HardCopy)) {
+            $("#resourceContentdiv").addClass("d-none");
+            $("#resourceContext").attr("readonly", "readonly");
+            $("#selectFilebtn").addClass("d-none");
+        }
+    }
+    $('#resourceType').on('change', resoueceTypeChange);
+    resoueceTypeChange();
+</script>

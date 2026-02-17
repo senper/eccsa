@@ -1,0 +1,16 @@
+.three-dtbl thead {
+    border: 3px;
+    border-radius: 3px;
+    background-color: lightgray;
+    box-shadow:
+      3px 1px 1px -2px rgba(0,0,0, 0.42), 0 3px 20px 0px rgba(0,0,0, 0.12), 0 8px 10px -5px rgba(0,0,0, 0.2);
+  }
+  
+.three-dtbl th {
+    box-shadow:
+    3px 5px 10px -6px rgba(0,0,0, 0.42), 0 3px 20px 0px rgba(0,0,0, 0.12), 0 8px 10px -5px rgba(0,0,0, 0.2)!important;
+  }
+  .three-dtbl {
+    box-shadow:
+      7px 1px 1px -2px rgba(0,0,0, 0.42),11px 3px 20px 0px rgba(0,0,0, 0.12), 0 8px 10px -5px rgba(0,0,0, 0.2);
+  }

@@ -1,0 +1,149 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IssueReportViewModel
+@{
+    ViewData["Title"] = "Issue Report";
+    Layout = Model.LayoutPage;
+}
+
+
+<link rel="stylesheet" type="text/css" href="~/css/nv-d3/nv.d3.css" />
+<div class="container-fluid">
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Report">
+                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                <div class="btn-group pull-left col-md-8" role="group" aria-label="Basic example">
+                    For issues from Date 
+                    
+                </div>
+                 <div class="btn-group pull-left col-md-8" role="group" aria-label="Basic example">
+                    
+                    <input type="date" name="issueDate" class="form-control" value="@(DateTime.Today.AddYears(-1).ToString("yyyy-MM-dd"))" />
+
+                    <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+
+
+                <div class="card-body" id="chartDiv" >
+                    <svg  style="height:500px; width: 100%; display: block; margin: 0px; padding: 0px;"></svg>
+                </div>
+
+            </div>
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h4>The Data</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered"  width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Issue Type
+                                    </th>
+                                    <th>Resolved</th>
+                                    <th>Current</th>
+                                    <th>30+ Days</th>
+                                    <th>60+ Days</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var i in @Model.TheList)
+                                {
+                                    <tr>
+                                        <td>@i.IssueType</td>
+                                        <td>@i.Resolved</td>
+                                        <td>@i.UnresolvedCurrent</td>
+                                        <td>@i.Unresolved30Days</td>
+                                        <td>@i.Unresolved60Days</td>
+                                        <td>@i.TotalCases</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="nvData2" value='@Model.ReportModel' />
+
+
+@section script {
+<script src="~/vendor/nv-d3/d3.v3.js"></script>
+<script src="~/vendor/nv-d3/nv.d3.js"></script>
+
+<script>
+    
+    var chart;
+    nv.addGraph(function() {
+            chart = nv.models.multiBarHorizontalChart()
+                .x(function(d) { return d.label })
+                .y(function(d) { return d.value })
+                //.yErr(function(d) { return [-Math.abs(d.value * Math.random() * 0.3), Math.abs(d.value * Math.random() * 0.3)] })
+                //.barColor(d3.scale.category20().range())
+                .duration(250)
+                .showValues(true)  
+                .showControls(false)
+                .showLegend(true)
+                //.legendPosition("bottom")
+                //.controlsPosition("bottom")
+                .margin({left: 100})
+                .stacked(true);
+
+            chart.yAxis.tickFormat(d3.format(',.2f'));
+
+            chart.yAxis.axisLabel('# of Cases');
+            //chart.xAxis.axisLabel('Issue Types').axisLabelDistance(20);
+
+            d3.select('#chartDiv svg')
+                .datum(JSON.parse($('#nvData2').val()))
+                .call(chart);
+
+            nv.utils.windowResize(chart.update);
+
+            //chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+            //chart.state.dispatch.on('change', function(state){
+            //    nv.log('state', JSON.stringify(state));
+            //});
+            return chart;
+        });
+
+      //   nv.addGraph(function() {
+      //       // JSON.parse(document.getElementById('nvData').value);
+      //  var chart = nv.models.multiBarHorizontalChart()
+      //      .x(function(d) { return d.label })
+      //      .y(function(d) { return d.value })
+      //      .margin({top: 30, right: 20, bottom: 50, left: 175})
+      //      .showValues(true)           //Show bar value next to each bar.
+      //      .tooltips(true)             //Show tooltips on hover.
+      //      .transitionDuration(350)
+      //      .showControls(true);        //Allow user to switch between "Grouped" and "Stacked" mode.
+
+      //  chart.yAxis
+      //      .tickFormat(d3.format(',.2f'));
+
+      //  d3.select('#chart1 svg')
+      //      .datum(data)
+      //      .call(chart);
+
+      //  nv.utils.windowResize(chart.update);
+
+      //  return chart;
+      //});
+
+
+</script>
+}

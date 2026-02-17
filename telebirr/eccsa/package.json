@@ -1,0 +1,25 @@
+{
+  "name": "eccsa",
+  "version": "1.0.0",
+  "description": "telebirr interface to eccsa",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "debug": "nodemon -e js,ts --watch src --exec \"npm start\"",
+    "start": "node src/index.js"
+  },
+  "author": "idf",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.26.0",
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "node-rsa": "^1.1.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.15"
+  }
+}

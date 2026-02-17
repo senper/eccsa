@@ -1,0 +1,184 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.CategoryViewModel
+
+@{
+    ViewData["Title"] = "Topic Category Detail";
+    Layout = "~/Views/Shared/_AcademyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Category",new { Area ="Academy"})" class="btn btn-sm btn-outline-info">
+            <i class="fa fa-angle-double-left "></i> back
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="m-0 font-weight-bold">@Model.TheModel.Code - @Model.TheModel.NameEng</h6>
+                        </div>
+                        <div class="col-6">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button 
+                                    data-toggle="modal" 
+                                    data-target="#AddEditModal" 
+                                    data-url="@Url.Action("Edit", new { Id=Model.TheModel.Id })"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Code: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Code)</strong><br />
+                            Name: <strong>@Html.DisplayFor(modelItem => Model.TheModel.NameEng)</strong><br />
+                            Status: <strong>@Model.GetStatusText(Model.TheModel.Status)</strong><br />
+                        </div>
+                        <div class="col-sm-6">
+                            Parent: <strong>
+                                @(Model.TheModel.ParentCategory != null && Model.TheModel.Id != Model.TheModel.ParentId ?
+     Model.TheModel.ParentCategory.Code + " - " + Model.TheModel.ParentCategory.NameEng : "-")</strong><br />
+                        </div>
+                    </div>
+                    <hr style="margin-top: 1px" />
+                    @if (Model.TheModel.ChildrenCategories?.Count <= 0)
+                    {
+                        <div class="row">
+                            <div class="col-6">
+                                <h6 class="m-0 font-weight-bold">
+                                    Topics
+                                </h6>
+                            </div>
+                            <div class="col-6 ">
+                                @*<a asp-action="Create" class="float-right d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                        <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                    </a>*@
+                            </div>
+                        </div><br />
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheModel.Topics)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a asp-controller="Topic" asp-action="Detail" title="Detail" asp-route-id="@item.Id">
+                                                @Html.DisplayFor(modelItem => item.Code)
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.NameEng)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-6">
+                                <h6 class="m-0 font-weight-bold">
+                                    Children
+                                </h6>
+                            </div>
+                            <div class="col-6 ">
+                                @*<a asp-action="Create" class="float-right d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                        <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                    </a>*@
+                            </div>
+                        </div><br />
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheModel.ChildrenCategories)
+                                {
+                                    if(item.Id == Model.TheModel.Id) { continue;  }
+                                <tr>
+                                    <td>
+                                        <a asp-controller="Category" asp-action="Detail" title="Detail" asp-route-id="@item.Id">
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.NameEng)
+                                    </td>
+                                    <td>
+                                        @Model.GetStatusText(item.Status)
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            <a class=" btn btn-sm  btn-outline-info" asp-action="Detail" asp-route-id="@item.Id">
+                                                <i class="fa fa-info" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+@section script {
+    <script>
+        $('.edit').on('click', function () {
+
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+    </script>
+}

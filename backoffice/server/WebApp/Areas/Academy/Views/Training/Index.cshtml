@@ -1,0 +1,161 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.TrainingViewModel
+@using ECCSA.BackOffice.Server.Model.Academy;
+
+@{
+    ViewData["Title"] = "Trainings";
+    Layout = "~/Views/Shared/_AcademyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <form method="get" asp-action="Index" asp-controller="Training" asp-area="Academy">
+                <div class="row form-group">
+                    <label class="col-sm-3 col-md-2 col-form-label">
+                        Filter Status:
+                    </label>
+                    <select class="custom-select col-sm-5 col-md-4" name="Status" asp-for="@Model.Status"
+                            onchange="this.form.submit()"
+                            asp-items="@(Html.GetEnumSelectList<TrainingStatus>())" required></select>
+                </div>
+            </form>
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Topic</th>
+                                    <th>Status</th>
+                                    <th>Instructor</th>
+                                    <th>Instruction Media</th>
+                                    <th>Member Fee</th>
+                                    <th>Non-Member Fee</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Topic</th>
+                                    <th>Status</th>
+                                    <th>Instructor</th>
+                                    <th>Instruction Media</th>
+                                    <th>Member Fee</th>
+                                    <th>Non-Member Fee</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                <tr>
+                                    <td>
+                                        <a asp-controller="Training" asp-action="Detail" title="Detail" asp-route-id="@item.Id">
+                                            @(item.StartDate.ToString("yyyy-MM-dd"))
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @(item.EndDate.ToString("yyyy-MM-dd"))
+                                    </td>
+                                    <td>
+                                        @($"{item.Topic.Code} - {item.Topic.NameEng}")
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Status)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Instructor)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.InstructionMedia)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.MemberFee)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.NonMemberFee)
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+
+                                            @if (item.Registrations?.Count <= 0)
+                                            {
+                                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("Edit", new { Id = @item.Id })"
+                                                        class="edit btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pen "></i>
+                                                </button>}
+                                            <a class=" btn btn-sm  btn-outline-info" asp-action="Detail" asp-route-id="@item.Id">
+                                                <i class="fa fa-info" aria-hidden="true"></i>
+                                            </a>
+
+                                            @if (item.Registrations?.Count <= 0)
+                                            {
+                                                <a onclick="return confirmDelete($('#deleteTraining@(item.Id)')[0]);"
+                                                   class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteTraining@(item.Id)"
+                                                      asp-action="DeleteTraining" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+@section script {
+    <script>
+        $('.edit').on('click', function () {
+
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

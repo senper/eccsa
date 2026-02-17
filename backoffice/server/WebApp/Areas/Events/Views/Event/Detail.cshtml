@@ -1,0 +1,614 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Events.Model.EventViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Event",new { Area ="Events", module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>
+
+                                @Model.TheModel.TitleFull
+
+
+                            </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-5">
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Event Type
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.EventType.Title
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Start Date
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.StartDate.ToLongDateString()
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    End Date
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.EndDate.ToLongDateString()
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            @if (Model.TheModel.BannerSetted)
+                            {
+                                @("Banner: 50% height") <br />
+                                <img  height="50%;" src="/@Model.TheModel.BannerUrlRelative" title="@Model.TheModel.Title" alt="@Model.TheModel.Title Banner" />
+                            }
+                            else
+                            {
+                                @("Banner: Not Set")
+                            }
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <h4> Event Details</h4>
+
+                        <div class="tab-content">
+
+                            <div class="tab-pane active" id="questionsTab" role="tabpanel">
+                                <div class="row">
+                                    @*<input id="btnShow4" type="button" value="Show PDF" />*@
+
+
+                                    <div class="col-md-11 ">
+                                        <table class="table table-bordered table-striped" id="datatblquestion" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>From </th>
+                                                    <th>To</th>
+                                                    <th>
+                                                        <button data-toggle="modal"
+                                                                data-target="#detailModal"
+                                                                title="Edit Event Detail"
+                                                                data-id="@Guid.Empty"
+                                                                data-title=""
+                                                                data-titlelocal=""
+                                                                data-start=""
+                                                                data-end=""
+                                                                onclick="editFollowup(this)"
+                                                                class=" float-right btn btn-outline-success btn-sm">
+                                                            <i class="fa fa-plus "></i> Add Detail
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var q in Model.TheModel.Details.OrderBy(o => o.EndDate).ThenBy(o => o.StartDate))
+                                                {
+                                                    <tr>
+                                                        <td>@q.TitleFull</td>
+                                                        <td>@q.StartDate.ToShortDateString()</td>
+                                                        <td>@q.EndDate.ToShortDateString()</td>
+                                                        <td>
+                                                            <button data-toggle="modal"
+                                                                data-target="#detailModal"
+                                                                title="Edit Event Detail"
+                                                                data-id="@q.DetailId"
+                                                                data-title="@q.Title"
+                                                                data-titlelocal="@q.TitleLocal"
+                                                                data-start="@(q.StartDate.ToString("yyyy-MM-dd"))"
+                                                                data-end="@(q.EndDate.ToString("yyyy-MM-dd"))"
+                                                                onclick="editFollowup(this)"
+                                                                class=" float-right btn btn-outline-success btn-sm">
+                                                                <i class="fa fa-pen "></i>
+                                                            </button>
+                                                            @if (q.PublishAsService)
+                                                            {
+                                                                var title = $"{@q.Event.TitleFull} {@q.TitleFull}";
+                                                                <a href="@Url.Action("Detail","ServiceType",new { Area ="Service", id=q.ServiceTypeId})">
+                                                                    Service
+                                                                </a>
+                                                                <span>&nbsp;&nbsp;</span>
+                                                                <a href="@Url.Action("ByServiceType","ServiceRequest"
+                                                                ,new { Area ="Service",module= @q.Event.EventOwner
+                                                                , serviceTypeId=q.ServiceTypeId, title=@title })">
+                                                                    Requests
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button data-toggle="modal"
+                                                                data-target="#editServiceTypeModal"
+                                                                title="Associate Service Type"
+                                                                data-id="@q.DetailId"
+                                                                onclick="editServiceType(this)"
+                                                                class=" float-right btn btn-outline-success btn-sm">
+                                                                    Service
+                                                                </button>
+                                                            }
+
+
+
+                                                        </td>
+
+
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle">Edit Event    </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="EventTypeId" asp-for="TheModel.EventTypeId" />
+                    <input type="hidden" name="EventOwner" asp-for="TheModel.EventOwner" />
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input required type="text" name="title" asp-for="TheModel.Title" class="form-control col-sm-8 col-md-8" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                        
+                        </label>
+                        <input type="text" name="titleLocal" class="form-control col-sm-8 col-md-8" placeholder="ርዕስ  " asp-for="TheModel.TitleLocal" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea required rows="5" name="description" asp-for="TheModel.Description" placeholder="Description  " class="form-control col-sm-8 col-md-9"></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            
+                        </label>
+                        <textarea rows="5" class="form-control col-sm-8 col-md-9" placeholder="መግለጫ  " name="descriptionLocal" asp-for="TheModel.DescriptionLocal"></textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input required type="date" name="startDate" asp-for="TheModel.StartDate" class="form-control col-sm-4 col-md-4" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input required type="date" name="endDate" asp-for="TheModel.EndDate" class="form-control col-sm-4 col-md-4" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">Banner</label>
+                        <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8"
+                               accept=".jpg" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select required class="custom-select col-sm-7 col-md-8" id="statusId" asp-for="TheModel.Status"
+                                asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.Model.Common.EventStatus>())"
+                                name="Status">
+                        </select>
+
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="detailModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionTitle">Event Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveDetail" asp-antiforgery="true">
+                    <input type="hidden" name="EventId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="DetailId" id="detailId" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" id="detailTitle" name="Title" placeholder="Title  " class="col-sm-8 col-md-9" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                        </label>
+                        <input type="text" id="detailTitleLocal" name="titleLocal" placeholder="ርዕስ  " class="form-control col-sm-8 col-md-9" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input type="date" id="detailStart" name="StartDate" class="col-sm-8 col-md-9" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" id="detailEnd" name="EndDate" class="col-sm-8 col-md-9" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="width:920px !important;">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewTitle">Preview Document</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <iframe id="frame" style="width:900px; height:600px;"></iframe>
+                </div>
+                <br />
+                <div class="row">
+                    <form data-parsley-validate method="post" class="col-md-12"
+                          asp-action="ReviewResponse" asp-antiforgery="true">
+                        <input type="hidden" name="ResponseId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="previewResponseId" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-4 col-form-label">
+                                Review Outcome
+                            </label>
+                            <select name="Status" id="previewResponseStatus" class="form-control col-sm-6 col-md-6" required>
+                                <option value="0"></option>
+                                <option value="2">Accepted</option>
+                                <option value="3">Rejected</option>
+                                <option value="4">Not Applicable</option>
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-4 col-form-label">
+                                Remark
+                            </label>
+                            <textarea maxlength="250" id="idPreviewResponseRemark" rows="5" name="Remark" class="col-sm-8 col-md-8 col-form-control"></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12 ">
+                                <input type="submit" value="Submit" class="btn btn-primary float-right">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editServiceTypeModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Associate Service Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveServiceType" asp-antiforgery="true">
+                    <input type="hidden" name="DetailId" id="idDetail" />
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Rate Basis
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" name="RateBasis" id="rateBasis" onchange="onRateChanged();" required>
+                            <option value="0"> </option>
+                            <option value="5">Flat</option>
+                            <option value="4">Membership</option>
+                        </select>
+                    </div>
+                    <div class="row form-group" id="memberRate" style="display:none;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Members
+                        </label>
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                            <input type="number" min="0" name="MemberServiceCharge" id="memberRateId" class="form-control col-sm-4 col-md-4" required />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group member flat " id="otherRate" style="display:none;">
+                        <label class="col-sm-4 col-md-3 col-form-label" id="otherLabel" style="display:none;">
+                            Others
+                        </label>
+                        <label class="col-sm-4 col-md-3 col-form-label" id="flatRate" style="display:none;">
+                            Rate
+                        </label>
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                            <input type="number" min="0" name="NonMemberServiceCharge" id="otherRateId" class="form-control col-sm-4 col-md-4" required />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+
+
+
+
+
+    <script type="text/javascript">
+
+        onRateChanged();
+
+        function previewPdf(e) {
+            const id = document.getElementById('previewResponseId');
+            const title = document.getElementById('previewTitle');
+
+            const idVal = $(e).attr('data-id');
+            const srcVal = $(e).attr('data-src');
+            const textVal = $(e).attr('data-text');
+            const titleVal = $(e).attr('data-title');
+
+
+            id.value = idVal;
+            title.innerHTML = titleVal;
+            $("#frame").attr("src", srcVal);
+        }
+
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function confirmation(form, text) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to ' + text + ' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function editServiceType(e) {
+            const id = document.getElementById('idDetail');
+
+            const idVal = $(e).attr('data-id');
+            id.value = idVal;
+
+        }
+
+
+        function onRateChanged() {
+
+
+            const rateBasis = document.getElementById('rateBasis');
+            const val = Number(rateBasis.value);
+
+            const memberId = document.getElementById('memberRate');
+            const otherId = document.getElementById('otherRate');
+
+            const flatLabelId = document.getElementById('flatRate');
+            const otherLabelId = document.getElementById('otherLabel');
+            memberId.style.display = 'none';
+            otherId.style.display = 'none';
+            flatLabelId.style.display = 'none';
+            otherLabelId.style.display = 'none';
+            $("#memberRateId").prop("required", false);
+            $("#otherRateId").prop("required", false);
+            if (val === 5) {
+                otherId.style.display = '';
+                flatLabelId.style.display = '';
+                $("#otherRateId").prop("required", true);
+            } else if (val === 4) {
+                memberId.style.display = '';
+                otherId.style.display = '';
+                otherLabelId.style.display = '';
+                $("#memberRateId").prop("required", true);
+                $("#otherRateId").prop("required", true);
+            }
+        }
+
+
+
+        function editFollowup(e) {
+            const id = document.getElementById('detailId');
+            const title = document.getElementById('detailTitle');
+            const titleLocal = document.getElementById('detailTitleLocal');
+            const StartDate = document.getElementById('detailStart');
+            const EndDate = document.getElementById('detailEnd');
+
+
+            const idVal = $(e).attr('data-id');
+            const titleVal = $(e).attr('data-title');
+            const titleLocalVal = $(e).attr('data-titlelocal');
+            const sDateVal = $(e).attr('data-start');
+            const eDateVal = $(e).attr('data-end');
+
+
+            id.value = idVal;
+            title.value = titleVal;
+            titleLocal.value = titleLocalVal
+            StartDate.value = sDateVal;
+            EndDate.value = eDateVal;
+        }
+
+        function editRateBasis(e) {
+            const rateBasis = document.getElementById('rateBasis');
+            const otherRate = document.getElementById('otherRateId');
+            const memberRate = document.getElementById('memberRateId');
+
+
+            const idVal = $(e).attr('data-id');
+            const titleVal = $(e).attr('data-title');
+            const sDateVal = $(e).attr('data-start');
+            const eDateVal = $(e).attr('data-end');
+
+
+            id.value = idVal;
+            title.value = titleVal;
+            StartDate.value = sDateVal;
+            EndDate.value = eDateVal;
+        }
+    </script>
+}

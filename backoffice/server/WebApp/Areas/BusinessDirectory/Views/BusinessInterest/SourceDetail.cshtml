@@ -1,0 +1,384 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.BusinessDirectory.Model.BusinessInterestViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@using System.Linq
+@{
+    ViewData["Title"] = "Business Interest Source Detail";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","BusinessInterest",new { Area = "BusinessDirectory", ownerModule = @Model.CurrentModule,
+        sectorId = Model.TheModel.Sectors.FirstOrDefault()?.BusinessSector?.ParentId})" class="btn btn-sm btn-outline-info">
+            <i class="fa fa-angle-double-left "></i> back
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-10">
+                            <h6 class="m-0 font-weight-bold">@Model.TheModel.Name </h6>
+                        </div>
+                        <div class="col-2 btn-group " role="group">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                if (Model.TheModel.Matches.Count == 0 && Model.TheModel.Sectors.Count == 0 && Model.TheModel.Details.Count == 0)
+                                {
+                                    <a onclick="return confirmDelete($('#deleteBusinessInterest')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger float-right">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                    <form data-parsley-validate novalidate method="post" id="deleteBusinessInterest"
+
+                                                              asp-action="DeleteSource" asp-antiforgery="true" asp-route-id="@Model.TheModel.Id">
+                                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                                        <input type="hidden" name="ownerModule" value="@Model.CurrentModule"/>
+                                    </form>
+                                }
+                                <button class="float-right btn btn-outline-success btn-sm"
+                                    data-toggle="modal"
+                                    data-target="#theModal"
+                                    onclick="addEdit(this)">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Name: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Name)</strong><br />
+                            Email: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Email)</strong><br />
+                            Address: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Address)</strong><br />
+                        </div>
+                        <div class="col-sm-6">
+                            Telephone: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Telephone)</strong><br />
+                            Matches Count: <strong>
+                                @(Model.TheModel.Matches.Count(m => m.Status == StatusEnum.Active)) Active,
+                                @(Model.TheModel.Matches.Count(m => m.Status == StatusEnum.Inactive)) Inactive
+                            </strong><br />
+                        </div>
+                        <div class="col-sm-12">
+                            Description: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Description)</strong><br />
+                        </div>
+                        @if (Model.TheModel.Matches.Any(m => !string.IsNullOrWhiteSpace(m.Remark)))
+                        {
+                            <div class="col-sm-12">
+                                Match Remarks: <strong>@(Model.TheModel.Matches.Where(s => !string.IsNullOrWhiteSpace(s.Remark)).Select(s => s.Remark).Aggregate((a, b) => a + "; " + b))</strong><br />
+                            </div>
+                        }
+                    </div>
+                    <hr style="margin-top: 1px" />
+                    <div class="row">
+                        <div class="col-12">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab0Active" id="sectors-tab" data-toggle="tab" href="#sectors" role="tab" aria-controls="sectors" aria-selected="true">Sectors</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab1Active" id="products-tab" data-toggle="tab" href="#products" role="tab" aria-controls="products" aria-selected="false">Products</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane    @Model.Tab0Active" id="sectors" role="tabpanel" aria-labelledby="sectors-tab">
+                                    <br />
+                                    @{
+                                        var root = Model.SectorId == null;
+                                        var sectors = Model.Sectors.Where(s => !Model.TheModel.Sectors.Any(t => t.SectorId == s.Id)).ToList();
+                                    }
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <form data-parsley-validate method="@(root ? "get" : "post")"
+                                                  asp-action="@(root ? "SourceDetail" : "AddSourceSector")" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <input type="hidden" name="parentSectorId" value="@Model.SectorId" />
+                                                <input type="hidden" name="ownerModule" value="@Model.CurrentModule"/>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">Sector</span>
+                                                    <select class="custom-select col-sm-8 col-md-7" asp-for="SectorId" required
+                                                            asp-items="@(new SelectList(sectors,"Id", "Name", Model.SectorId))"></select>
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-primary" type="submit">@(root ? "Go To Childes" : "Add")</button>
+                                                    </div>
+                                                    @if (!root)
+                                                    {
+                                                        <div class="input-group-append">
+                                                            <a class="btn btn-outline-warning"
+                                                           asp-controller="BusinessInterest" asp-action="SourceDetail" asp-route-id="@Model.TheModel.Id">Go To Parents</a>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Sector Name</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Sector Name</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.Sectors)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.BusinessSector.Name)
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                                            @if (Model.IsUserOrAdmin)
+                                                            {
+                                                                <a onclick="return confirmDelete($('#deleteSourceSector@(item.Id)')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+                                                                <form data-parsley-validate novalidate method="post" id="deleteSourceSector@(item.Id)"
+
+                                                              asp-action="RemoveSourceSector" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                              <input type="hidden" name="ownerModule" value="@Model.CurrentModule"/>
+                                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                                    <input type="hidden" name="sourceId" value="@Model.TheModel.Id" />
+                                                                    <input type="hidden" name="parentSectorId" value="@Model.SectorId" />
+                                                                    <input type="hidden" name="ownerModule" value="@Model.CurrentModule"/>
+                                                                </form>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane   @Model.Tab1Active" id="products" role="tabpanel" aria-labelledby="products-tab">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            @if (Model.IsUserOrAdmin)
+                                            {
+                                                <button data-toggle="modal" data-target="#addEditProduct"
+                                                    class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                                    <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Product Type</th>
+                                                <th>Business Type</th>
+                                                <th>Description</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Product Type</th>
+                                                <th>Business Type</th>
+                                                <th>Description</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.Details)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ProductType.Name)
+                                                    </td>
+                                                    <td>
+                                                        @(Model.BusinessTypes.Any(s => s.Id == item.BusinessType) ?
+                                                    Model.BusinessTypes.FirstOrDefault(s => s.Id == item.BusinessType).Name : "")
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Description)
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                                            @if (Model.IsUserOrAdmin)
+                                                            {
+                                                                <button data-toggle="modal" data-target="#addEditProduct"
+                                                                data-idvalue="@item.Id" data-productTypeId="@item.ProductTypeId" data-businessType="@item.BusinessType" data-productDescription="@item.Description"
+                                                                class="edit btn btn-outline-success btn-sm">
+                                                                    <i class="fa fa-pen "></i>
+                                                                </button>
+                                                                <a onclick="return confirmDelete($('#deleteProductType@(item.Id)')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+                                                                <form data-parsley-validate novalidate method="post" id="deleteProductType@(item.Id)"
+                                                              asp-action="DeleteSourceProductType" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                                    <input type="hidden" name="sourceId" value="@Model.TheModel.Id" />
+                                                                    <input type="hidden" name="parentSectorId" value="@Model.SectorId" />
+                                                                    <input type="hidden" name="ownerModule" value="@Model.CurrentModule"/>
+                                                                </form>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Business Interest Source</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SaveSource" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" name="OwnerModule" value="@Model.CurrentModule" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" asp-for="TheModel.Name" maxlength="50" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Telephone
+                        </label>
+                        <input type="text" asp-for="TheModel.Telephone" maxlength="50" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" asp-for="TheModel.Email" maxlength="50" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" asp-for="TheModel.Description" id="descriptionId" maxlength="800" class="form-control col-sm-9 col-md-8" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Address
+                        </label>
+                        <textarea rows="4" asp-for="TheModel.Address" id="addressId" maxlength="800" class="form-control col-sm-9 col-md-8" ></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="addEditProduct">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add/Edit Product Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SaveSourceProductType" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="productModelId" />
+                    <input type="hidden" name="BusinessInterestSourceId" id="businessInterestSourceId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="parentSectorId" value="@Model.SectorId" />
+                    <input type="hidden" name="ownerModule" value="@Model.CurrentModule"/>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Product Type
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" name="ProductTypeId" id="productTypeId" required
+                                asp-items="@(new SelectList(Model.Products,"Id", "Name", Model.SectorId))"></select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Business Type
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" name="BusinessType" id="businessType" required
+                                asp-items="@(new SelectList(Model.BusinessTypes,"Id", "Name", Model.SectorId))"></select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" id="productDescription" maxlength="800" class="form-control col-sm-9 col-md-8" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+<script>
+    $('.edit').on('click', function () {
+        $("#productModelId").val($(this).attr('data-idvalue'));
+        $("#productTypeId").val($(this).attr('data-productTypeId'));
+        $("#businessType").val($(this).attr('data-businessType'));
+        $("#productDescription").val($(this).attr('data-productDescription'));
+    });
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

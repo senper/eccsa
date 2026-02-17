@@ -1,0 +1,95 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Service.Model.ServiceRequestViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "New " : "Edit ")@Model.TheModel.ServiceType.Name  </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body" id="serviceRequestBody">
+    <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+          asp-action="Save" asp-antiforgery="true" onsubmit="return validateService()">
+        <input type="hidden" name="Id" asp-for="TheModel.Id" />
+        <input type="hidden" name="ServiceTypeId" asp-for="TheModel.ServiceTypeId" />
+
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Service Type
+            </label>
+            <label class="col-sm-8 col-md-8 col-form-label">
+                @Model.TheModel.ServiceType.Name
+            </label>
+
+        </div>
+        @{ var i = 1;}
+        @foreach (var r in Model.TheModel.ServiceType.ServiceRequirements.OrderBy(x => x.OrderNo))
+        {
+            var inputId = $"input{i}";
+            i++;
+            var name = Model.Guid2String(r.Id);
+    <div class="row form-group">
+        <label class="col-sm-4 col-md-3 col-form-label">
+            @r.Name
+        </label>
+        @if (r.InputMethod == ServiceInputTypeEnum.Upload)
+        {
+
+            <input type="file" id=@inputId name="@name" class="form-control col-sm-8 col-md-8" required />
+        }
+        else if (r.InputMethod == ServiceInputTypeEnum.Integer)
+        {
+            <input type="number" id=@inputId name="@name" max="@r.UpperLimit" min="@r.LowerLimit" class="form-control number col-sm-8 col-md-8" required />
+        }
+        else if (r.InputMethod == ServiceInputTypeEnum.Decimal)
+        {
+            <input type="number" id=@inputId name="@name" class="form-control decimal col-sm-8 col-md-8" required />
+        }
+        else if (r.InputMethod == ServiceInputTypeEnum.Date)
+        {
+            <input type="date" id=@inputId name="@name" maxlength="20" class="form-control col-sm-8 col-md-8" required />
+        }
+        else if (r.InputMethod == ServiceInputTypeEnum.Payment)
+        {
+            <input type="email" id=@inputId name="@name" maxlength="50" class="form-control email col-sm-8 col-md-8" required />
+        }
+        else if (r.InputMethod == ServiceInputTypeEnum.SimpleLookup)
+        {
+            <input type="tel" id=@inputId name="@name" maxlength="12" class="form-control mobile col-sm-8 col-md-8" required />
+        }
+       
+        else if (r.InputMethod == ServiceInputTypeEnum.ShortText)
+        {
+            <input type="text" id=@inputId name="@name" maxlength="@r.CharacterLength" class="form-control text col-sm-8 col-md-8" required />
+        }
+        else if (r.InputMethod == ServiceInputTypeEnum.LongText)
+        {
+            <textarea rows="4" id=@inputId name="@name" maxlength="@r.CharacterLength" class="form-control text col-sm-8 col-md-8"></textarea>
+        }
+        else
+        {
+            <input type="text" id=@inputId name="@name" maxlength="@r.CharacterLength" class="form-control text col-sm-8 col-md-8" required />
+        }
+
+
+    </div>
+        }
+
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+
+
+
+</div>
+<script>
+
+
+
+</script>

@@ -1,0 +1,54 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.RegistrationViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Add" : "Edit") Registration Feedback</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate method="post" enctype="multipart/form-data"
+          asp-action="@("UpdateRegistrationFeedback")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Rating
+            </label>
+            <input type="number" class="form-control col-sm-7 col-md-8" asp-for="TheModel.TrainingRating" required />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Feedback
+            </label>
+            <textarea class="form-control col-sm-7 col-md-8" asp-for="TheModel.TrainingFeedback" required></textarea>
+        </div>
+       @* <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Certificate Attachment
+            </label>
+            <div class="col-sm-7 col-md-8 p-0">
+                <input type="text" id="resourceContext" class="form-control " asp-for="TheModel.CertificateAttachment" readonly />
+                <input type="button" onclick="$('#selectfile').click()" id="selectFilebtn" class="btn btn-outline-primary btn-sm" name="Select file" value="Select file" />
+                <input type="file" name="attachmentFile" id="selectfile" hidden onchange="fileChange(this)">
+            </div>
+        </div>*@
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    function fileChange(input) {
+        if (input.files.length > 0) {
+            $('#resourceContext').val(input.files[0].name);
+        } else {
+            $('#resourceContext').val("");
+        }
+    }
+</script>

@@ -1,0 +1,76 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.MeetingViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<div class="container-fluid">
+   
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Registration Deadline</th>
+                                    <th>Minute Signing Deadline</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Registration Deadline</th>
+                                    <th>Minute Signing Deadline</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+
+                                    <tr >
+                                        <td>
+                                            <a asp-controller="@Model.Controller" asp-action="PublicDetail" asp-route-id="@i.Id" class="title ">@Html.DisplayFor(modelItem => i.Title)</a>
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Status)
+                                        </td>
+                                        <td>@i.Date.ToString("yyyy-MM-dd")</td>
+                                        <td>@i.RegistrationDeadline.ToString("yyyy-MM-dd")</td>
+                                        <td>@i.MinuteDeadline.ToString("yyyy-MM-dd")</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="PublicDetail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

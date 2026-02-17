@@ -1,0 +1,516 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Advocacy.Model.DialogMeetingViewModel
+
+@{
+    ViewData["Title"] = "Public Private Dialog";
+    Layout = "~/Views/Shared/_AdvocacyLayout.cshtml";
+    var canEdit = @Model.TheDialog.Status == StatusEnum.Active && @Model.IsUserOrAdmin;
+}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Detail",Model.Controller,new { Area =Model.Area, id=@Model.TheModel.DialogId})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>Detail </a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-9">
+
+                            <h4> Meeting on:  @Model.TheDialog.Title  </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theMeetingModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Date:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Date.ToLongDateString()
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Agenda
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Agendas
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Chaired By
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.ChairPersons
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Participants
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Participants
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Consultant
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Consultant
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    TWG Members
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.TWGMembers
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Remark
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Remark
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="margin-top: 1px" />
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab0Active" id="recommendations-tab" data-toggle="tab" href="#recommendations" role="tab" aria-controls="recommendations" aria-selected="true">Recommendations</a>
+                </li>
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab1Active" id="attachments-tab" data-toggle="tab" href="#attachments" role="tab" aria-controls="attachments" aria-selected="true">Documents</a>
+                </li>
+            </ul>
+            <div class="tab-content " id="myTabContent" style="padding-left: 10px;padding-right: 10px;">
+                <div class="tab-pane @Model.Tab0Active " id="recommendations" role="tabpanel" aria-labelledby="recommendations-tab">
+                    <br />
+                    <table class="table table-bordered" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Responsible Body</th>
+                                <th>Followup Person</th>
+                               <th>Implementation Text</th>
+                                <th>
+                                    @if (canEdit && Model.Issues.Count > 0)
+                                    {
+                                        <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                                            data-toggle="modal"
+                                            data-target="#theModal"
+                                            title="Add New Meeting Issue">
+                                            <i class="fas fa-plus fa-sm text-white-50"></i>  New
+                                        </button>
+                                    }
+                                </th>
+
+                            </tr>
+
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Responsible Body</th>
+                                <th>Followup Person</th>
+                                <th>Implementation Text</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            @foreach (var item in Model.TheModel.Points.OrderBy(x=> x.Recommendation.No))
+                            {
+                                var sId = Model.Guid2String(item.Id);
+                                <tr>
+                                    <td>@item.Recommendation.No</td>
+                                    <td>
+
+                                        @Html.DisplayFor(modelItem => item.Recommendation.Title)
+
+                                    </td>
+                                    <td>@item.Declaration.GetDisplayName()</td>
+                                    <td>
+                                        @item.ResponsibleBody
+                                    </td>
+                                    <td>
+                                        @item.FollowupPerson
+                                    </td>
+                                    <td>@item.Recommendation.ImplementationText</td>
+                                    <td>
+                                         @if (canEdit)
+                                        {
+                                            <a onclick="return confirmDelete($('#deletePoint@(sId)')[0], 'Delete');"
+                                                class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deletePoint@(sId)"
+                                                asp-action="DeleteMeetingPoint" asp-antiforgery="true">
+                                                <input type="hidden" name="Id" value="@item.Id" />
+                                                <input type="hidden" name="MeetingId" value="@item.MeetingId" />
+                                                <input type="hidden" name="RecommendationId" value="@item.RecommendationId" />
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="tab-pane @Model.Tab1Active" id="attachments" role="tabpanel" aria-labelledby="attachments-tab">
+                    <br />
+                    <table class="table table-bordered"  width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th></th>
+                            </tr>
+
+                            @if (@canEdit)
+                            {
+                                <form method="post" enctype="multipart/form-data"
+                                  asp-action="SaveAttachment" asp-antiforgery="true">
+                                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                                    <input type="hidden" name="MeetingId" value="@Model.TheModel.Id" />
+                                    <input type="hidden" name="DialogId" value="@Model.TheModel.DialogId" />
+                                <tr>
+                                    <th><input type="text" maxlength="200" name="Title" class="form-control" required /> </th>
+
+                                    <th><input type="file" name="file" class="form-control" required /></th>
+
+                                    <th>
+                                        <input type="submit" value="Add" class="btn btn-outline-primary" />
+                                    </th>
+                                </tr>
+                                </form>
+                            }
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model.TheModel.Documents)
+                            {
+                                var sId = Model.Guid2String(item.Id);
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.Title) </td>
+                                    <td>@item.Extension</td>
+                                    <td>
+                                        @if (canEdit)
+                                        {
+                                            <a onclick="return confirmDelete($('#deleteDocument@(sId)')[0], 'Delete');"
+                                                class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deleteDocument@(sId)"
+                                          asp-action="DeleteAttachment" asp-antiforgery="true">
+                                                <input type="hidden" name="Id" value="@item.Id" />
+                                                <input type="hidden" name="dialogId" value="@item.DialogId" />
+                                                 <input type="hidden" name="MeetingId" value="@item.MeetingId" />
+
+
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (canEdit)
+{
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Meeting Outcome</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate novalidate method="post"
+                      asp-action="SaveMeetingPoint" asp-antiforgery="true">
+                        <input type="hidden" name="Id" id="pointId" />
+                        <input type="hidden" name="MeetingId" asp-for="TheModel.Id" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Issue
+                            </label>
+                            <select id="recommendationId"
+                                name="RecommendationId"
+                                class="custom-select col-sm-8 col-md-8"
+                                required
+                                asp-items="@(new SelectList(Model.Issues,"Id", "NoTitle"))">
+                            </select>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Declaration
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8"
+                                asp-items="@(Html.GetEnumSelectList<PPDRecommendationEnum>())"
+                                    onchange="statusChanged();"
+                                name="Declaration" required id="declarationId">
+                            </select>
+                        </div>
+
+                        <div class="row form-group" id="responsibleBodyId">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Respon. Body
+                            </label>
+                             <input type="text" name="ResponsibleBody" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                            
+                        </div>
+
+                        <div class="row form-group" id="followupPersonId">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Followup Person
+                            </label>
+                            <input type="text" name="FollowupPerson" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                        </div>
+
+                        <div class="row form-group" id="implementationTextId">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Impl. Text
+                            </label>
+                            <input type="text" name="ImplementationText" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                        </div>
+                        <div class="row form-group" id="remarkId">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Remark
+                            </label>
+                            <input type="text" name="ImplementationText" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theMeetingModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Meeting</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate novalidate method="post"
+                      asp-action="SaveMeeting" asp-antiforgery="true">
+                        <input type="hidden" name="DialogId" asp-for="TheModel.DialogId" />
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Date
+                            </label>
+                            <input type="date" name="Date" value="@Model.TheModel.Date.ToString("yyyy-MM-dd")" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Agendas
+                            </label>
+                            <textarea rows="4" name="Agendas" maxlength="800" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.Agendas</textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Chair Persons
+                            </label>
+                            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="ChairPersons" value="@Model.TheModel.ChairPersons" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Participants
+                            </label>
+                            <textarea rows="4" name="Participants" maxlength="800" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.Participants</textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Consultant
+                            </label>
+                            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" value="@Model.TheModel.Consultant" name="Consultant" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                TWG Members
+                            </label>
+                            <textarea rows="4" name="TWGMembers" maxlength="800" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.TWGMembers</textarea>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Remark
+                            </label>
+                            <textarea rows="4" name="Remark" maxlength="800" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.Remark </textarea>
+                        </div>
+
+
+
+
+
+
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theAttachmentModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Law</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                          asp-action="Save" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Guid.Empty" />
+                        <input type="hidden" name="DialogId" value="@Model.TheModel.DialogId" />
+                        <input type="hidden" name="MeetingId" value="@Model.TheModel.Id" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Is Public
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" 
+                                    name="IsPublic" required>
+                                    <option></option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Upload
+                            </label>
+                            <input type="file" name="file" class="form-control col-sm-8 col-md-9" />
+                        </div>
+
+                   
+
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                       class="btn btn-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+    statusChanged();
+    function statusChanged(){
+       const decl = document.getElementById('declarationId');
+       var value = Number( decl.value);
+       const body = document.getElementById('responsibleBodyId');
+       const followup = document.getElementById('followupPersonId');
+       const impl = document.getElementById('implementationTextId');
+       const remark = document.getElementById('remarkId');
+       body.style.display = value==3? '': 'none';
+       followup.style.display =  value==3? '':'none';
+       impl.style.display = value==1 ? '': 'none';
+       remark.style.display =  value == 2? '': 'none';
+    }
+</script>
+}

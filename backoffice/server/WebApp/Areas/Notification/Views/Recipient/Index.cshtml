@@ -1,0 +1,277 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Membership
+@model ECCSA.BackOffice.Server.WebApp.Areas.Notification.Model.RecipientViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Index">
+                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                <div class="btn-group pull-left" role="group" aria-label="Basic example">
+                    Search By &nbsp;&nbsp;<select name="StakeholderType" asp-for="@Model.StakeholderType"
+                                                  asp-items="@(Html.GetEnumSelectList<StakeholderTypeEnum>())"></select>
+                    <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+        <div class="col-md-6 btn-group pull-left" role="group" aria-label="Basic example">
+
+            <button class="col-md-2  btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#theModal"
+                    title="Recipients">
+                <i class="fas fa-plus fa-sm "></i>New
+            </button>
+
+            @if (Model.CurrentModule == ECCSAModuleFlag.Membership)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Import Contacts
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <form method="post" asp-action="ImportAssociationContacts">
+                            <input type="hidden" name="module" value="@Model.CurrentModule" />
+                            <button type="button" onclick="confirm(this.form, 'Reimport association Contacts')" class="dropdown-item">
+                                <i class="fas fa-file-import"></i> Associations
+                            </button>
+                        </form>
+                        <form method="post" asp-action="ImportMemberContacts">
+                            <input type="hidden" name="module" value="@Model.CurrentModule" />
+                            <button type="button" onclick="confirm(this.form, 'Reimport Individual Contacts')" class="dropdown-item">
+                                <i class="fas fa-file-import"></i> Individuals
+                            </button>
+                        </form>
+                        <form method="post" asp-action="ImportStaffContacts">
+                            <input type="hidden" name="module" value="@Model.CurrentModule" />
+                            <button type="button" onclick="confirm(this.form, 'Reimport Staff Contacts')" class="dropdown-item">
+                                <i class="fas fa-file-import"></i> Staffs
+                            </button>
+                        </form>
+                        <form method="post" asp-action="ImportStaffContacts">
+                            <input type="hidden" name="module" value="@Model.CurrentModule" />
+                            <a asp-action="ImportContacts" class="dropdown-item" asp-route-module="@Model.CurrentModule">
+                                <i class="fas fa-file-import"></i> Company From File
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <form method="post" asp-action="ImportStaffContacts">
+                    <input type="hidden" name="module" value="@Model.CurrentModule" />
+                    <button type="button" onclick="confirm(this.form, 'Reimport Staff Contacts')" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-file-import"></i> Import Staff Contacts
+                    </button>
+                </form>
+            }
+
+            <form method="post" asp-action="ImportPublicContacts">
+                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                <button type="button" onclick="confirm(this.form, 'Reimport Public Contacts')" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-file-import"></i> Import Public Contacts
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Company</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th>Type</th>
+                                    <th>Sector</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Company</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th>Type</th>
+                                    <th>Sector</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+
+                                    <tr>
+                                        <td>
+                                            <a asp-controller=@Model.Controller asp-action="Detail" asp-route-id="@item.Id" class="title">
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </a>
+                                        </td>
+                                        <td>@item.CompanyName</td>
+                                        <td>
+                                            @item.Email
+                                        </td>
+                                        <td>
+                                            @item.MobileNo
+                                        </td>
+                                        <td>@item.StakeholderType</td>
+                                        <td>@item.Sector</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller=@Model.Controller asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> New Recipient    </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Owner" asp-for="@Model.CurrentModule" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Category
+                        </label>
+                        <select name="StakeholderType" asp-for="TheModel.StakeholderType"
+                                asp-items="@(Html.GetEnumSelectList<StakeholderTypeEnum>())"></select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sector
+                        </label>
+
+                        <select name="SectorId" class="custom-select col-sm-8 col-md-9" asp-for="TheModel.SectorId"
+                                asp-items="@(new SelectList(Model.Sectors,"Value", "Name"))"></select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" name="Name" maxlength="100" asp-for="TheModel.Name" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Position
+                        </label>
+                        <input type="text" name="Position" maxlength="100" asp-for="TheModel.Position" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Company
+                        </label>
+                        <input type="text" name="CompanyName" maxlength="100" asp-for="TheModel.CompanyName" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" name="Email" maxlength="100" asp-for="TheModel.Email" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Mobile
+                        </label>
+                        <input type="text" name="MobileNo" maxlength="20" asp-for="TheModel.MobileNo" class="form-control col-sm-8 col-md-9" required id="NotificationRecipantMobileNo">
+                        <div id="phone_error" style="color:red;display:none ;background-size:80%; ">Please enter a valid phone number</div>
+
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Office Tel.
+                        </label>
+                        <input type="text" name="OfficeTel" maxlength="20" asp-for="TheModel.OfficeTel" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Business Interest
+                        </label>
+                        <input type="text" name="BusinessInterest" maxlength="255" asp-for="TheModel.BusinessInterest" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Website
+                        </label>
+                        <input type="text" name="Website" maxlength="200" asp-for="TheModel.Website" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script src="~/js/validation.js"></script>
+<script>
+    function confirm(form, msg) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to '+msg+' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+        function validateForm() {
+            return is_validate_mobile("NotificationRecipantMobileNo");
+        }
+</script>
+}

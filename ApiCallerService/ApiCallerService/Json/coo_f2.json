@@ -1,0 +1,95 @@
+  {
+    "ID": "0000011292/21/8360",
+    "IssueDateTime": "20210507",
+    "Submitter": {
+      "ID": "0000011292"
+    },
+    "AdditionalCode": {
+      "ResultTypeCode": "AP"
+    },
+    "LPCO": {
+      "EffectiveDateTime": "20210531",
+      "ID": "ECCSA/21/91/OR1",
+      "TypeCode": "ED_RES_OR",
+      "LPCOAuthorizedParty": {
+        "ID": "ECCSA00"
+      }
+    },
+    "Declaration": {
+      "ID": "ECCSA/21/91",
+      "GoodsShipment": {
+        "GovernmentAgencyGoodsItem": {
+          "SequenceNumeric": "1",
+          "AdditionalCode": {
+            "ResultTypeCode": "AP"
+          },
+          "AdditionalInformation": {
+            "StatementCode": "QTY",
+            "StatementTypeCode": "50"
+          },
+          "Commodity": {
+            "CargoDescription": "sheep",
+            "CountQuantity": {
+              "-unitCode": "UNT",
+              "#text": "50"
+            },
+            "Name": "sheep",
+            "ValueAmount": "10",
+            "Classification": {
+              "ID": "01041000"
+            },
+            "GoodsMeasure": {
+              "GrossMassMeasure": "200",
+              "NetNetWeightMeasure": {
+                "-unitCode": "KGM",
+                "#text": "200"
+              }
+            },
+            "InvoiceLine": [
+              {
+                "ItemChargeAmount": "500",
+                "SequenceNumeric": "1"
+              },
+              {
+                "ItemChargeAmount": "20881.25",
+                "SequenceNumeric": "2"
+              }
+            ]
+          },
+          "Origin": {
+            "CountryCode": "ET"
+          },
+          "Packaging": {
+            "QuantityQuantity": "200",
+            "TypeCode": "PS"
+          }
+        },
+        "Invoice": {
+          "ID": "inv13",
+          "IssueDateTime": "20210504",
+          "TypeCode": "02"
+        }
+      },
+      "LoadingLocation": {
+        "ID": "DJPOD"
+      },
+      "ResponsibleGovernmentAgency": {
+        "ID": "ECCSA",
+        "BranchCode": "ECCSA00"
+      },
+      "Trader": {
+        "ID": "0000011292",
+        "LicenseID": "14/669/32831/2004",
+        "LicenseTypeCode": "BL"
+      },
+      "TraderPartner": {
+        "Name": "ALL STAR TRADING LIMITED",
+        "Address": {
+          "CountryCode": "HU"
+        }
+      },
+      "UnloadingLocation": {
+        "ID": "CNBOS"
+      }
+    }
+  }

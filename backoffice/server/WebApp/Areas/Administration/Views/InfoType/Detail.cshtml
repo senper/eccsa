@@ -1,0 +1,231 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.InfoTypeViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","InfoType",new { Area ="Administration", module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-10">
+
+                            <h4>  @Model.TheModel.Caption </h4>
+                        </div>
+                        <div class="col-sm-2">
+
+                            @*<a onclick="return confirmDelete($('#deleteEventType')[0]);"
+                               class=" btn btn-sm btn-outline-danger float-right">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                            <form data-parsley-validate novalidate method="post" id="deleteEventType"
+                                  asp-action="DeleteEventType" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+
+                            </form>
+
+                            <button data-toggle="modal"
+                                    data-target="#editEventTypeModal"
+                                    title="Edit"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>*@
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Schema
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.SchemaName
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Source Name
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.SourceName
+                                </div>
+                            </div>
+
+                            <a asp-controller="Info"
+                               asp-action="Index"
+                               asp-route-startDate="@DateTime.Today"
+                               asp-route-endDate="@DateTime.Today"
+                               asp-route-infoTypeId="@Model.TheModel.Id" >
+                                View Data
+                            </a>
+                           <a asp-action="DownloadTemplate"
+
+                                        asp-route-Id="@Model.TheModel.Id"
+                                        title="Download Template File" 
+                                        class="btn btn-sm btn-outline-success float-right">Download Template</a>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Columns</h4>
+                  
+                </div>
+                <div class="card-body">
+
+
+                    <div class="row">
+
+                        <div class="col-md-12 ">
+
+                            <br />
+                            <table class="table table-bordered table-striped" id="datatablesurvey" style="margin-top: 5px; margin-left: 5px;">
+                                <thead>
+                                    <tr>
+                                        <th>Caption</th>
+                                        <th >Excel Header</th>
+                                        <th >Field Name</th>
+                                        <th>Data Type</th>
+                                        
+                                        <th>Not Null</th>
+                                        <th>Show In Grid</th>
+                                        <th>Default Value</th>
+                                        <th>Max Size</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var s in Model.TheModel.MetaData)
+                                    {
+                                        <tr>
+                                            <td>@s.Caption</td>
+                                            <td>
+                                                @s.ExcelHeaderName
+                                            </td>
+                                            <td>@s.ColumnName</td>
+                                            <td>@s.DataType</td>
+                                            <td>@s.NotNull</td>
+                                            <td>@s.ShowInGrid</td>
+                                            <td>@s.DefaultValue</td>
+                                            <td>@s.MaxSize</td>
+                                            <td>
+
+                                             
+
+
+                                            </td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editInfoTypeModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Info Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" asp-for="TheModel.Caption" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Schema
+                        </label>
+                        <input type="text" maxlength="100" asp-for="TheModel.SchemaName" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Table Name
+                        </label>
+                        <input type="text" maxlength="100" asp-for="TheModel.SourceName" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+
+
+    $("#datatblquestion").treetable({ expandable: false });
+    <script>
+
+
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+       
+
+
+    </script>
+}

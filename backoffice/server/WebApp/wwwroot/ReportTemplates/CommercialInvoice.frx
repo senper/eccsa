@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" SmoothGraphics="true" ReportInfo.Created="10/21/2021 09:46:33" ReportInfo.Modified="11/30/2023 16:49:57" ReportInfo.CreatorVersion="2023.3.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="CommercialInvoice" ReferenceName="CommercialInvoice" DataType="System.Int32" Enabled="true">
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="CompanyAddress" DataType="System.String"/>
+      <Column Name="Logo" DataType="System.String"/>
+      <Column Name="DateOfShipment" DataType="System.String"/>
+      <Column Name="CountryOfOrigin" DataType="System.String"/>
+      <Column Name="ConsigneeName" DataType="System.String"/>
+      <Column Name="ConsignorName" DataType="System.String"/>
+      <Column Name="PermitNo" DataType="System.String"/>
+      <Column Name="Importer" DataType="System.String"/>
+      <Column Name="CertificateOfOriginNo" DataType="System.String"/>
+      <Column Name="InvoiceNo" DataType="System.String"/>
+      <BusinessObjectDataSource Name="Details" DataType="System.Int32" Enabled="true">
+        <Column Name="No" DataType="System.String"/>
+        <Column Name="MarksNo" DataType="System.String"/>
+        <Column Name="NoPackages" DataType="System.Int32"/>
+        <Column Name="TypeOfPackaging" DataType="System.String"/>
+        <Column Name="Description" DataType="System.String"/>
+        <Column Name="UnitOfM" DataType="System.Int32"/>
+        <Column Name="Qty" DataType="System.Decimal"/>
+        <Column Name="GrossWeight" DataType="System.Decimal"/>
+        <Column Name="NetWeight" DataType="System.Decimal"/>
+        <Column Name="UPrice" DataType="System.Decimal"/>
+        <Column Name="TPrice" DataType="System.Decimal"/>
+        <Column Name="Currency" DataType="System.String"/>
+      </BusinessObjectDataSource>
+      <BusinessObjectDataSource Name="OptionalEntries" DataType="System.Int32" Enabled="true">
+        <Column Name="Label" DataType="System.String"/>
+        <Column Name="Value" DataType="System.String"/>
+        <Column Name="Label1" DataType="System.String"/>
+        <Column Name="Value1" DataType="System.String"/>
+      </BusinessObjectDataSource>
+      <Column Name="BankDetail" DataType="System.String"/>
+      <Column Name="Signature" DataType="System.String"/>
+      <Column Name="AuthorizedBy" DataType="System.String"/>
+      <Column Name="AuthorizerTitle" DataType="System.String"/>
+      <Column Name="AuthorizationDate" DataType="System.String"/>
+      <Column Name="ApproverName" DataType="System.String"/>
+      <Column Name="ApproverTitle" DataType="System.String"/>
+      <Column Name="ApproveredDate" DataType="System.String"/>
+      <Column Name="AmountInWords" DataType="System.String"/>
+      <Column Name="TotalAmount" DataType="System.String"/>
+      <Column Name="CertificateNo" DataType="System.String"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2"/>
+    <PageHeaderBand Name="PageHeader1" Top="4" Width="718.2" Height="85.05" CanGrow="true">
+      <TextObject Name="Text109" Left="141.75" Top="-9.45" Width="330.75" Height="18.9" Text="[CommercialInvoice.CompanyName]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt"/>
+      <PictureObject Name="Picture1" Left="9.45" Top="-26.46" Width="94.5" Height="94.5" DataColumn="CommercialInvoice.Logo" MaxWidth="113.4" MaxHeight="113.4" ImageAlign="Top_Center"/>
+      <TextObject Name="Text33" Left="141.75" Top="9.45" Width="330.75" Height="18.9" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.CompanyAddress]" HorzAlign="Center" Font="Times New Roman, 8pt"/>
+      <LineObject Name="Line2" Left="-9.45" Top="52.92" Width="727.65"/>
+      <TextObject Name="Text42" Left="567" Top="-9.45" Width="151.2" Height="18.9" Text="[CommercialInvoice.InvoiceNo]" Font="Times New Roman, 10pt, style=Underline" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text103" Left="481.95" Top="-9.45" Width="75.6" Height="18.9" Text="Invoice No." Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text104" Left="481.95" Top="9.45" Width="47.25" Height="18.9" Text="Date:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text105" Left="567" Top="9.45" Width="151.2" Height="18.9" Text="[CommercialInvoice.ApproveredDate]" Font="Times New Roman, 10pt"/>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader2" Top="93.05" Width="718.2" Height="104.33" CanGrow="true" Condition="[CommercialInvoice.CertificateNo]">
+      <TextObject Name="Text55" Left="359.1" Top="56.7" Width="340.2" Height="18.9" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.ConsignorName]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text45" Left="359.1" Top="37.8" Width="94.5" Height="18.9" Text="Consignor:" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text54" Left="9.45" Top="56.7" Width="321.3" Height="18.9" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.ConsigneeName]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text120" Top="37.8" Width="94.5" Height="18.9" Text="Consignee:" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+      <TextObject Name="Text43" Left="179.55" Top="-3.02" Width="283.5" Height="28.35" Text="COMMERCIAL INVOICE" HorzAlign="Center" Font="Times New Roman, 16pt, style=Bold, Underline" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text123" Left="9.45" Top="85.43" Width="585.9" Height="9.45" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Importer]" Font="Arial, 10pt"/>
+      <DataBand Name="Data2" Top="201.38" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" DataSource="OptionalEntries">
+        <TextObject Name="Text116" Top="6.43" Width="141.75" Height="18.9" Text="[CommercialInvoice.OptionalEntries.Label1]" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+        <TextObject Name="Text117" Left="151.2" Top="6.43" Width="160.65" Height="18.9" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.OptionalEntries.Value1]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text44" Left="756" Top="28.35" Width="160.65" Height="18.9" Text="Consignee’s Name:" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold"/>
+        <TextObject Name="Text118" Left="491.4" Top="6.43" Width="245.7" Height="18.9" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.OptionalEntries.Value]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text119" Left="349.65" Top="6.43" Width="141.75" Height="18.9" Text="[CommercialInvoice.OptionalEntries.Label]:" HorzAlign="Right" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter2" Top="252.63" Width="718.2"/>
+    </GroupHeaderBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="256.63" Width="718.2" Height="63.33" CanGrow="true" Condition="[CommercialInvoice.CertificateNo]">
+      <TableObject Name="Table1" Top="11.34" Width="718.21" Height="51.99" Fill.Color="WhiteSmoke">
+        <TableColumn Name="Column1" Width="48.11"/>
+        <TableColumn Name="Column2" Width="57.56"/>
+        <TableColumn Name="Column3" Width="38.66"/>
+        <TableColumn Name="Column4" Width="57.56"/>
+        <TableColumn Name="Column5" Width="199.31"/>
+        <TableColumn Name="Column6" Width="38.66"/>
+        <TableColumn Name="Column7" Width="38.66"/>
+        <TableColumn Name="Column8" Width="57.56"/>
+        <TableColumn Name="Column9" Width="57.56"/>
+        <TableColumn Name="Column10" Width="48.11"/>
+        <TableColumn Name="Column11" Width="76.46"/>
+        <TableRow Name="Row1" Height="51.99">
+          <TableCell Name="Cell1" Border.Lines="All" Text="No." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="Marks / No" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="No. of Pkgs" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Type Of Pkging" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Full Description of Good" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell26" Border.Lines="All" Text="Unit Of M." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell27" Border.Lines="All" Text="QTY" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell28" Border.Lines="All" Text="Gross Weight Kg." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell29" Border.Lines="All" Text="Net Weight Kg." HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell48" Border.Lines="All" Text="U. Price" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell59" Border.Lines="All" Text="T. Price" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+      <DataBand Name="Data1" Top="323.96" Width="718.2" Height="47.25" CanGrow="true" DataSource="Details" KeepDetail="true">
+        <TextObject Name="Text124" Left="201.85" Width="198.45" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.Description]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text125" Width="47.25" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.No]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text126" Left="48.01" Width="56.7" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.MarksNo]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text127" Left="105.46" Width="37.8" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.NoPackages]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text128" Left="144.02" Width="56.7" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.TypeOfPackaging]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text129" Left="402.57" Width="37.8" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.UnitOfM]" Font="Times New Roman, 10pt"/>
+        <LineObject Name="Line3" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line4" Left="48.01" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line5" Left="105.46" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line6" Left="144.02" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line7" Left="201.85" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line8" Left="400.68" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line9" Left="440.37" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line10" Top="47.25" Width="718.2"/>
+        <LineObject Name="Line11" Left="718.2" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line12" Width="718.2"/>
+        <TextObject Name="Text130" Left="641.47" Width="75.6" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[FormatNumber([CommercialInvoice.Details.TPrice],2)] [CommercialInvoice.Details.Currency]" HorzAlign="Right" Font="Times New Roman, 10pt">
+          <Formats>
+            <GeneralFormat/>
+            <GeneralFormat/>
+          </Formats>
+        </TextObject>
+        <LineObject Name="Line13" Left="641.47" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line14" Left="593.46" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line15" Left="535.63" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <LineObject Name="Line16" Left="478.17" Height="47.25" CanGrow="true" GrowToBottom="true"/>
+        <TextObject Name="Text131" Left="440.37" Width="37.8" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.Qty]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text132" Left="478.17" Width="56.7" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.GrossWeight]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text133" Left="535.63" Width="56.7" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.NetWeight]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text134" Left="593.46" Width="47.25" Height="47.25" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.Details.UPrice]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="375.21" Width="718.2" Height="81.27" CanGrow="true">
+        <TextObject Name="Text84" Top="52.92" Width="132.3" Height="18.9" Text="Bank Detail:" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text85" Left="141.75" Top="52.92" Width="567" Height="18.9" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.BankDetail]" Font="Times New Roman, 10pt"/>
+        <TableObject Name="Table3" Width="718.2" Height="47.25" GrowToBottom="true" PrintOnParent="true" RepeatHeaders="false">
+          <TableColumn Name="Column23" Width="641.84"/>
+          <TableColumn Name="Column24" Width="76.36"/>
+          <TableRow Name="Row5" Height="28.35">
+            <TableCell Name="Cell108" Border.Lines="All" Text="Total Amount   " HorzAlign="Right" Font="Times New Roman, 10pt"/>
+            <TableCell Name="Cell109" Border.Lines="All" Text="[CommercialInvoice.TotalAmount]" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+          </TableRow>
+          <TableRow Name="Row6">
+            <TableCell Name="Cell110" Border.Lines="All" Text="Amount In Words: &lt;b&gt;[CommercialInvoice.AmountInWords]&lt;/b&gt;" HorzAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlParagraph" ColSpan="2"/>
+            <TableCell Name="Cell111" Border.Lines="All" Font="Arial, 10pt"/>
+          </TableRow>
+        </TableObject>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="460.48" Width="718.2" Height="91">
+      <TextObject Name="Text106" Left="274.05" Top="47.25" Width="349.65" Height="18.9" Text="https://ethiopianchamber.com/verifyCertificate" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text107" Left="406.35" Top="66.15" Width="151.2" Height="18.9" Text="Page [Page#] of [TotalPages#]" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text95" Left="274.05" Top="28.35" Width="75.6" Height="18.9" Text="Signature:" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text97" Left="349.65" Top="28.35" Width="264.6" Height="18.9" Text="[CommercialInvoice.Signature]" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text91" Top="28.35" Width="255.15" Height="28.35" CanGrow="true" GrowToBottom="true" Text="[CommercialInvoice.CompanyName]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text108" Left="274.05" Top="9.45" Width="340.2" Height="18.9" Text="Ethiopian Chamber of Commerce and Sectoral Associations" VertAlign="Center" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text121" Top="9.45" Width="141.75" Height="18.9" Text="Certifcate of Origin No:" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text122" Left="141.75" Top="9.45" Width="113.4" Height="18.9" Text="[CommercialInvoice.CertificateOfOriginNo]" Font="Times New Roman, 10pt"/>
+      <LineObject Name="Line1" Width="718.2" Diagonal="true"/>
+      <BarcodeObject Name="Barcode1" Left="633.15" Width="82" Height="91" Text="https://ethiopianchamber.com/verifyCertificate/[CommercialInvoice.Signature]" Zoom="0.5" AllowExpressions="true" Barcode="QR Code" Barcode.Font="Arial, 11pt" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+      <LineObject Name="Line17" Top="68.04" Width="264.6"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

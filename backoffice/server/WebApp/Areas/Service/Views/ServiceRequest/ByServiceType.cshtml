@@ -1,0 +1,129 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Service.Model.ServiceRequestViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+          <h4>@Model.CurrentOperation Requests</h4>
+
+        </div>
+        <div class="col-md-6 btn-group pull-left" role="group" aria-label="Basic example">
+          
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>TrackingNo </th>
+                                    <th>TIN</th>
+                                    <th>Name</th>
+                                    <th>Mobile</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>TrackingNo </th>
+                                    <th>TIN</th>
+                                    <th>Name</th>
+                                    <th>Mobile</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+
+                                    <tr>
+                                         <td>
+                                            <a asp-controller="ServiceRequest" asp-action="Detail" asp-route-id="@item.Id" class="title">
+                                                @Html.DisplayFor(modelItem => item.TrackingNo)
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.TIN)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.FullName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.MobileNo)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.RequestStatus)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="ServiceRequest" asp-action="Detail" asp-route-id="@item.Id" asp-route-serviceType="@item.ServiceTypeId">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+
+    <script src="~/js/confirmation.js"></script>
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/serviceValidation.js"></script>
+    <script>
+
+        $('.edit').on('click', function () {
+            const serviceType = $('#serviceType').val();
+            var url = `/Service/ServiceRequest/Edit/00000000-0000-0000-0000-000000000000?serviceTypeId=${serviceType}`;
+            console.log(serviceType);
+            console.log(url);
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+
+
+    </script>
+}

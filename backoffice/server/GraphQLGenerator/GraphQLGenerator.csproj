@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ECCSA.BackOffice.Server.Model">
+      <HintPath>..\Model\bin\Debug\net5.0\ECCSA.BackOffice.Server.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="ECCSA.BackOffice.Server.Persistence">
+      <HintPath>..\Persistence\bin\Debug\net5.0\ECCSA.BackOffice.Server.Persistence.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

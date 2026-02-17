@@ -1,0 +1,347 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.PublicUserAdministrationViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+@{
+    var TIN = Model.TheModel.TIN;
+}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","PublicUserAdmin",new { Area ="Administration", module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-10">
+
+                            <h4>  @Model.TheModel.FullName </h4>
+                        </div>
+                        <div class="col-sm-2">
+                            @if (!Model.TheModel.Disabled)
+                            {
+                                <a onclick="return confirmation($('#deleteUser')[0], 'deactivate user');" title="deactivate user"
+                                   class=" btn btn-sm btn-outline-danger float-right">
+                                    <i class="fa fa-ban" aria-hidden="true"></i>
+                                </a>
+                                <form data-parsley-validate novalidate method="post" id="deleteUser"
+                                  asp-action="DisableUser" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                </form>
+                            }
+                            else
+                            {
+                                <a onclick="return confirmation($('#activateUser')[0], 'Activate user');" title="Activate user"
+                                   class=" btn btn-sm btn-outline-success float-right">
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                </a>
+                                <form data-parsley-validate novalidate method="post" id="activateUser"
+                                  asp-action="EnableUser" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                </form>
+                            }
+                            <a data-toggle="modal" data-target="#resetModal" title="Reset Password"
+                               class=" btn btn-sm btn-outline-warning float-right">
+                                <i class="fa fa-key" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            Full Name: <strong>@(Model.TheModel.FullName)</strong><br />
+                            User Name: <strong>@(Model.TheModel.UserName)</strong><br />
+                            TIN: <strong>@(Model.TheModel.TIN)</strong><br />
+                            Address: <strong>@(Model.TheModel.Address)</strong><br />
+                        </div>
+                        <div class="col-md-6">
+                            Mobile: <strong>@(Model.TheModel.MobileNo)</strong>@(Model.TheModel.MobileNoConfirmed ? "(Confirmed)" : "(Not Confirmed)") <br />
+                            Email: <strong>@(Model.TheModel.Email)</strong>@(Model.TheModel.EmailConfirmed ? "(Confirmed)" : "(Not Confirmed)")<br />
+                            Company Name: <strong>@(Model.TheModel.CompanyName)</strong><br />
+                            Status: <strong>@(Model.TheModel.Disabled ? "Inactive" : "Active")</strong><br />
+                        </div>
+                    </div>
+                    @if (!Model.TheModel.MobileNoConfirmed || !Model.TheModel.EmailConfirmed)
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                Mobile Confirmation Code: <strong>@Model.TheModel.MobileConfirmationCode</strong> <br />
+                                Email Confirmation Code: <strong>@Model.TheModel.EmailConfirmationCode</strong> <br />
+                                Confirmation Code Expiry: <strong>@Model.TheModel.ConfirmationCodeExpiryDate</strong> <br />
+                                @if (Model.TheModel.OldMobileNo != null && Model.TheModel.MobileNo != Model.TheModel.OldMobileNo)
+                                {
+                                    @("Old Mobile No : ")
+
+                                    <strong>@Model.TheModel.OldMobileNo</strong> <br />
+                                }
+                                @if (Model.TheModel.OldEmail != null && Model.TheModel.Email != Model.TheModel.OldEmail)
+                                {
+                                    @("Old Email : ")
+                                    <strong>@Model.TheModel.OldEmail</strong> <br />
+                                }
+                                Manually Confirm: 
+                                <a onclick="return confirmation($('#confirmMobileEmail')[0], 'Manually confirm mobile/email');" title="Manually confirm mobile/email"
+                                   class=" btn btn-sm btn-outline-success ">
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                </a>
+                                <form data-parsley-validate novalidate method="post" id="confirmMobileEmail"
+                                  asp-action="ConfirmMobileEmail" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#contactsTab" role="tab" aria-controls="contactsTab">Contacts</a></li>
+
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#legalDocsTab" role="tab" aria-controls="legalDocsTab">Legal Documents</a></li>
+
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#agreementTab" role="tab" aria-controls="agreementTab">Agreements</a></li>
+
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#userHistoryTab" role="tab" aria-controls="userHistoryTab">Login History</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="contactsTab" role="tabpanel">
+                                <div class="row" style="margin-top: 5px; margin-left: 5px;">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered table-striped dataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Priority</th>
+                                                    <th>Contact Type</th>
+                                                    <th>Address</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var s in Model.UserContacts)
+                                                {
+                                                    <tr>
+                                                        <td>@s.Priority</td>
+                                                        <td>@Html.DisplayFor(m => s.ContactType)</td>
+                                                        <td>@(s.Address)</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="legalDocsTab" role="tabpanel">
+                                <div class="row" style="margin-top: 5px; margin-left: 5px;">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered table-striped dataTable" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Document No</th>
+                                                    <th>Type</th>
+                                                    <th>Expirty Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var s in Model.LegalProfiles)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @if (!string.IsNullOrEmpty(s.FileExtension))
+                                                            {
+                                                                <a href="@Url.Action("DownLoadFile",
+                                                                new { id=s.Id, userId=Model.TheModel.Id, fileName =  s.Title + s.FileExtension, extention =s.FileExtension })">
+                                                                    @s.Title
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                @s.Title
+                                                            }
+                                                        </td>
+                                                        <td>@s.DocumentNumber</td>
+                                                        <td>@Html.DisplayFor(m => s.LegalDocumentType)</td>
+                                                        <td>@(s.ExpiryDate?.ToString("yyyy-MM-dd"))</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="agreementTab" role="tabpanel">
+                                <div class="row" style="margin-top: 5px; margin-left: 5px;">
+                                    <div class="col-md-12 ">
+                                        <table class="table table-bordered table-striped dataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Agreement No</th>
+                                                    <th>License No</th>
+                                                    <th>Consignee</th>
+                                                    <th>Country</th>
+                                                    <th>City</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var s in Model.ExportAgreements)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <a data-toggle="modal" data-target="#detailModal" style="color: blue;"
+                                                               data-url="@Url.Action("UserExportAgreementDetail", new { id=s.Id, userId=Model.TheModel.Id })"
+                                                               class="detail title">
+                                                                @s.AgreementNo
+                                                            </a>
+                                                        </td>
+                                                        <td>@s.LicenseNo</td>
+                                                        <td>@s.Consignee</td>
+                                                        <td>@s.Country</td>
+                                                        <td>@s.City</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="userHistoryTab" role="tabpanel">
+                                <div class="row" style="margin-top: 5px; margin-left: 5px;">
+                                    <div class="col-md-6 ">
+                                        <table class="table table-bordered table-striped dataTable" id="userHistory" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Time </th>
+                                                    @*<th>IP Address</th>*@
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var h in Model.UserLoginHistories)
+                                                {
+                                                    <tr>
+                                                        <td>@h.Date.ToString("yyyy-MM-dd")</td>
+                                                        <td>@h.Time.ToString("hh: mm: ss tt")</td>
+                                                        @*<td>@h.IPAddress</td>*@
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="detailModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="resetModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Reset User Password </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="changePasswordfrm" data-parsley-validate method="post" asp-action="ResetPasswordChange">
+                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" name="NewPassword" id="newPassword" class="form-control" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" name="ConfirmPassword" id="confirmPassword" class="form-control" required />
+                            </div>
+                            <input type="submit"
+                                   onclick="return validateResetForm();"
+                                   class="btn btn-warning"
+                                   value="Reset password" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+
+
+    <script src="~/js/confirmation.js"></script>
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/serviceValidation.js"></script>
+
+
+    <script type="text/javascript">
+
+        $('.detail').on('click', function () {
+
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+
+
+        function validateResetForm() {
+            if (!isPassword("newPassword") || !isPassword("confirmPassword")) {
+                return false;
+            }
+            if ($("#newPassword").val() == $("#confirmPassword").val()) {
+                return confirmation($("#changePasswordfrm")[0], "reset password");
+            } else {
+                $.alert({
+                    icon: 'fa fa-bell',
+                    title: 'Information!',
+                    content: 'New Password & Confirm Password are different'
+                });
+                return false;
+            }
+        }
+
+    </script>
+	}

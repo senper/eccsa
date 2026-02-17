@@ -1,0 +1,174 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.WebsiteViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Website Management";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @if (Model.IsUserOrAdmin)
+        {
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Root Menu "
+                data-id="-1"
+                data-status="@((int)StatusEnum.Active)"
+                onclick="addEdit(this)">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Menu Name</th>
+                                    <th>Parent Menu</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Menu Name</th>
+                                    <th>Parent Menu</th>
+
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList.OrderBy(m=>m.Order).ThenBy(m=> m.Title))
+                                {
+
+
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.TitleFull)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.ParentTitleFull)
+                                        </td>
+                                        
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+                                              
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1"
+     role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Root Menu </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="CreateMenu" asp-antiforgery="true">
+                        <input type="hidden" name="Id"  />
+
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="Title  " />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                
+                            </label>
+                            <input type="text" name="TitleLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="ርዕስ  " />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Q. Link Header
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" id="linkId"
+                                asp-items="@(new SelectList(Model.QuickLinkHeaders,"Id", "LabelFull"))"
+                                name="HeaderId">
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Path
+                            </label>
+                            <input type="text" name="Path" maxlength="100" class="form-control col-sm-9 col-md-8" id="startDateId" required/>
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Order
+                            </label>
+                            <input type="text"  name="Order" id="Order" maxlength="10" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        
+                        <div class="row form-group" >
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Show On Main Menu
+                            </label>
+                            <input type="checkbox"  name="ShowOnMainMenu" id="ShowOnMainMenu" value="true" maxlength="10"  />
+                        </div>
+                       
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

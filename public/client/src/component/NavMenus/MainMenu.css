@@ -1,0 +1,88 @@
+.navitems {
+    /* color: darkgreen; */
+    /* font-size: medium; */
+    font-size: 2.8em;
+    /* color: blue; */
+    margin-top: 5px;
+    display: flex;
+}
+.searchform{
+    padding-left:0px;
+    color: #fff;
+    
+}
+::placeholder {
+    color: green;
+  }
+  
+  .force-opaque::placeholder {
+    opacity: 1;
+  }
+  
+.css-1x51dt5-MuiInputBase-input-MuiInput-input::placeholder {
+    color: white;
+    opacity: 2.42;
+}
+.btn {
+    float: right;
+    margin: 25px;
+    background-color: #0d8523;
+    color: #fff;
+    
+}
+input::placeholder {
+    color: rgb(255, 255, 255);
+    font-size: 1.2em;
+    font-style: italic;
+  }
+  
+a:hover {
+    /* background-color: yellow; */
+  }
+.row1 {
+    padding: 2px;
+    width: 100%;
+}
+
+.dark2 {
+    color: #ffffff;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: green;
+}
+
+.navigation {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2em;
+    font-weight: 400;
+    color: #ffffff;
+    list-style: none;
+    display: inline-block;
+}
+
+.main1 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2em;
+    font-weight: 400;
+    color: #ffffff;
+}
+
+.selected {
+    background-color: rgb(17, 102, 9);
+    color: red;
+    cursor: not-allowed;
+}
+
+.card-header {
+    background-color: #198754;
+    color: #ffffff;
+}
+
+.text-green {
+    text-decoration: none;
+    padding: "20px";
+    font-size: 1.0rem;
+    text-anchor: middle;
+    border: 10px;
+}

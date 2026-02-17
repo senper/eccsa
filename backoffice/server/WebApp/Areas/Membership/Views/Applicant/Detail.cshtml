@@ -1,0 +1,773 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Membership
+@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.ApplicantViewModel
+
+@{
+    ViewData["Title"] = "Associations";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Applicant",new { Area ="Membership", associationId = Model.TheModel.AssociationId})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-10">
+
+                            <h4>
+                                @if (Model.TheModel.UnderReview)
+                                {
+                                    @Model.TheModel.FullName
+                                    <small>&nbsp; @Model.TheModel.PendingDocumentsNo pending req. </small>
+
+                                    <small> &nbsp;@Model.TheModel.OperatorName </small>
+                                }
+                                else if (Model.TheModel.ReadyForApproval || Model.TheModel.Approved)
+                                {
+                                    if (Model.TheModel.Rejection)
+                                    {
+                                        <span class="text-danger">
+                                            @Model.TheModel.FullName  <small>[ @Model.TheModel.OperatorName ] </small>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <a id="filename" class="title" asp-action="DownLoadFile" asp-route-id="@Model.TheModel.Id"
+                                   asp-route-title="@Model.TheModel.Name @Model.TheModel.TIN">
+                                            @Model.TheModel.FullName  <small>[ @Model.TheModel.Signature ] </small><small>[ @Model.TheModel.OperatorName ] </small>
+                                        </a>
+                                    }
+
+                                }
+                                else
+                                {
+                                    @Model.TheModel.FullName
+                                    <small> @Model.TheModel.PendingDocumentsNo pending req. </small>
+                                }
+                            </h4>
+                        </div>
+                        <div class="col-sm-1" style="padding-right:0;">
+                            @if (Model.TheModel.UnderReview && Model.IsUserOrAdmin)
+                            {
+                                if (Model.FullName != Model.TheModel.OperatorName)
+                                {
+                                    <form data-parsley-validate novalidate method="post"
+                                  asp-action="StartProcessing" asp-antiforgery="true">
+                                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                                        <button onclick="this.form.submit()" title="start reviewing this document" class="btn btn-sm btn-outline-success float-right">Review</button>
+                                    </form>
+                                }
+                            }
+                        </div>
+                        <div class="col-sm-1" style="padding-left:0;">
+                            @if (Model.IsAdmin && Model.Users.Count > 1)
+                            {
+
+                                <button title="assign to different reviewer"
+                                    data-toggle="modal"
+                                    data-target="#assignUserModal"
+                                    class="btn btn-sm btn-outline-warning">
+                                    Assign
+                                </button>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+
+
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Reason
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Reason
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Request Date
+                                </div>
+                                <div class="col-sm-10">
+                                    @Model.TheModel.ApplicationDate.ToLongDateString()
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Tracking Number
+                                </div>
+                                <div class="col-sm-10">
+                                    @Model.TheModel.TrackingNo
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Invoice No
+                                </div>
+                                <div class="col-sm-10">
+                                    @Model.TheModel.InvoiceNo   @(Model.TheModel.ApplicationFee.ToString("#,##0.00"))Birr
+                                    @if (Model.IsCurrentOperator && String.IsNullOrEmpty(Model.TheModel.InvoiceNo) && Model.TheModel.ApplicationStatus >= WorkflowStateEnum.Submitted)
+                                    {
+                                        <button class=" btn btn-sm btn-outline-primary shadow-sm"
+                                            data-toggle="modal"
+                                            data-target="#invoiceModal"
+                                            title="Generate Invoice">
+                                            <i class="fas fa-file-invoice-dollar"></i>&nbsp;Invoice
+                                        </button>
+
+
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Last Receipt No
+                                </div>
+                                <div class="col-sm-10">
+                                    @Model.TheModel.ReceiptNo (@Model.TheModel.PaymentStatus)
+                                    @{
+                                        var lstSet = Model.TheModel.Invoice?.Settlments.FirstOrDefault(s => s.ReceiptNo == Model.TheModel.ReceiptNo);
+                                        var otherReceipts = Model.TheModel.Invoice?.Settlments.Where(s => s.ReceiptNo != Model.TheModel.ReceiptNo);
+                                    }
+                                    @if (lstSet != null && !String.IsNullOrWhiteSpace(lstSet.Extension))
+                                    {
+                                        <a class="title" data-toggle="modal"
+                                       data-target="#dialog"
+                                       title="Preview Receipt"
+                                       data-src="@lstSet.RelativePath"
+                                       data-text=""
+                                       data-id="@lstSet.Id"
+                                       data-title="@lstSet.ReceiptNo"
+                                       data-additional="1"
+                                       onclick="previewPdf(this);">
+                                            Preview Receipt
+                                        </a>
+                                    }
+                                    @if (!Model.TheModel.PrintReceipt && !String.IsNullOrEmpty(Model.TheModel.InvoiceNo) &&
+                                    !String.IsNullOrEmpty(Model.TheModel.ReceiptNo))
+                                    {
+                                        <form data-parsley-validate method="post"
+                                          asp-action="ConfirmPayment" asp-antiforgery="true">
+                                            <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                                            <input type="hidden" name="ReceiptNo" value="@Model.TheModel.ReceiptNo" />
+                                            <input type="hidden" name="InvoiceNo" value="@Model.TheModel.InvoiceNo" />
+                                            <input type="number" min="0" name="ConfirmedAmount" placeholder="Confirmed Amount" title="Confirmed Amount" required />
+                                            <button onclick="return confirmDelete(this.form, 'Confirm Payment')" title="Confirm Payment" class="btn btn-sm btn-outline-success ">Confirm Payment</button>
+                                        </form>
+                                    }
+                                    @if (Model.TheModel.RequestStatus <= WorkflowStateEnum.UnderReview && !String.IsNullOrWhiteSpace(Model.TheModel.InvoiceNo) &&
+                                    !String.IsNullOrWhiteSpace(Model.TheModel.ReceiptNo) && Model.TheModel.PaymentStatus != PaymentStatusEnum.Rejected)
+                                    {
+                                        <form data-parsley-validate method="post"
+                                          asp-action="RejectReceipt" asp-antiforgery="true">
+                                            <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                                            <input type="hidden" name="ReceiptNo" value="@Model.TheModel.ReceiptNo" />
+                                            <input type="hidden" name="InvoiceNo" value="@Model.TheModel.InvoiceNo" />
+                                            <button onclick="return confirmDelete(this.form, 'Reject Receipt')" title="Confirm Payment" class="btn btn-sm btn-outline-danger ">Reject Receipt</button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Total Payment
+                                </div>
+                                <div class="col-sm-10">
+                                    @((Model.TheModel.Invoice?.TotalPaid ?? 0).ToString("#,##0.00"))Birr
+                                </div>
+                            </div>
+                            @if (otherReceipts != null && otherReceipts.Count() > 0)
+                            {
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        Other Receipts
+                                    </div>
+                                    <div class="col-sm-10">
+                                        @foreach (var r in otherReceipts)
+                                        {
+                                            @if (!string.IsNullOrWhiteSpace(r.Extension))
+                                            {
+                                                <a class="title" data-toggle="modal"
+                                       data-target="#dialog"
+                                       title="Preview Receipt @r.ReceiptNo"
+                                       data-src="@r.RelativePath"
+                                       data-text=""
+                                       data-id="@r.Id"
+                                       data-title="@r.ReceiptNo"
+                                       data-additional="1"
+                                       onclick="previewPdf(this);">
+                                                    Preview Receipt @r.ReceiptNo
+                                                </a> <text>&nbsp;</text>
+                                            }
+                                            else
+                                            {
+                                                @r.ReceiptNo
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Status
+                                </div>
+                                <div class="col-sm-4">
+                                    @Model.TheModel.ApplicationStatus.GetDisplayName()
+                                </div>
+                                @if (Model.TheModel.UnderReview)
+                                {
+                                    if (Model.IsUserOrAdmin && Model.IsCurrentOperator)
+                                    {
+                                        if (Model.TheModel.PendingDocumentsNo <= 0)
+                                        {
+                                            <button class="col-sm-3 btn btn-sm btn-outline-success shadow-sm"
+                                        data-toggle="modal"
+                                        data-target="#recommendAcceptModal"
+                                        title="Recommend Approval">
+                                                <i class="fa fa-check"></i>&nbsp;Approve
+                                            </button>
+                                        }
+                                        <button class="btn btn-sm btn-outline-warning shadow-sm"
+                                        data-toggle="modal"
+                                        data-target="#recommendRejectModal"
+                                        title="Recommend Rejection">
+                                            <i class="fa fa-times"></i>&nbsp;Reject
+                                        </button>
+                                    }
+                                }
+                                else if (Model.TheModel.ReadyForApproval)
+                                {
+                                    if (Model.IsAdmin)
+                                    {
+                                        if (Model.TheModel.Rejection)
+                                        {
+
+                                            <form data-parsley-validate novalidate method="post"
+                                      asp-action="AcceptRejection" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <button onclick="this.form.submit()"
+                                            title="Accept Approve request"
+                                            class="btn btn-sm btn-outline-success">
+                                                    <i class="fa fa-check"></i>Approve
+                                                </button>
+
+                                            </form>
+                                            <form data-parsley-validate novalidate method="post"
+                                      asp-action="DeclineRejection" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <button onclick="this.form.submit()" title="Decline Approve request" class="btn btn-sm btn-outline-warning"><i class="fa fa-times"></i>Decline</button>
+                                            </form>
+
+                                        }
+                                        else
+                                        {
+                                            <form data-parsley-validate novalidate method="post"
+                                      asp-action="AcceptApprove" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <button onclick="this.form.submit()"
+                                            title="Accept Approve request"
+                                            class="btn btn-sm btn-outline-success">
+                                                    <i class="fa fa-check"></i>Approve
+                                                </button>
+
+                                            </form>
+                                            <form data-parsley-validate novalidate method="post"
+                                      asp-action="DeclineApprove" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <button onclick="this.form.submit()" title="Decline Approve request" class="btn btn-sm btn-outline-warning"><i class="fa fa-times"></i>Decline</button>
+                                            </form>
+                                        }
+
+                                    }
+                                }
+                                else if (Model.TheModel.Approved)
+                                {
+                                    <div class="col-sm-6">
+                                        <p>Reviewed By: @Model.TheModel.OperatorName </p>
+                                        <p>Approved By: @Model.TheModel.ApproverName</p>
+                                    </div>
+                                }
+
+
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Remark:
+                                </div>
+                                <div class="col-sm-10">
+                                    @Model.TheModel.Remark
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="card">
+                <div class="card-header">Responses</div>
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-md-11 ">
+                            <table class="table table-bordered table-striped" id="datatblquestion" style="margin-top: 5px; margin-left: 5px;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Requirement</th>
+                                        <th>Value</th>
+                                        <th>Status</th>
+                                        <th>
+
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var q in Model.TheModel.Responses)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @q.Requirement.OrderNo
+
+                                            </td>
+                                            <td>
+
+                                                @q.Name
+
+                                            </td>
+                                            <td>
+                                                @if (q.Requirement.InputMethod == ServiceInputTypeEnum.Upload)
+                                                {
+                                                    <a class="title" data-toggle="modal"
+                                               data-target="#dialog"
+                                               title="Review Document"
+                                               data-src="@q.RelativePath"
+                                               data-text=""
+                                               data-id="@q.Id"
+                                               data-title="@q.Requirement.OrderNo @q.Requirement.Name"
+                                               onclick="previewPdf(this);">
+                                                        Preview
+                                                    </a>
+                                                }
+                                                else if (
+                                                q.Requirement.InputMethod == ServiceInputTypeEnum.LegalDocument)
+                                                {
+                                                    <a class="title" data-toggle="modal"
+                                               data-target="#dialog"
+                                               title="Review Document"
+                                               data-src="@q.RelativePath"
+                                               data-text="@q.TextResponse"
+                                               data-id="@q.Id"
+                                               data-title="@q.Requirement.OrderNo @q.Requirement.Name"
+                                               onclick="previewPdf(this);">
+                                                        @q.TextResponse
+                                                    </a>
+                                                }
+                                                else if (q.Requirement.InputMethod == ServiceInputTypeEnum.TradeAgreement ||
+                                                q.Requirement.InputMethod == ServiceInputTypeEnum.LongText)
+                                                {
+                                                    <a class="title" data-toggle="modal"
+                                               data-target="#dialog"
+                                               title="Review Document"
+                                               data-src="@q.RelativePath"
+                                               data-text="@q.TextResponse"
+                                               data-id="@q.Id"
+                                               data-title="@q.Requirement.OrderNo @q.Requirement.Name"
+                                               onclick="previewPdf(this);">
+                                                        Preview
+                                                    </a>
+                                                }
+
+                                                else
+                                                {
+                                                    @q.Response
+                                                }
+
+
+                                            </td>
+                                            <td>@q.ReviewStatus</td>
+                                            <td>
+
+                                                @if (Model.IsCurrentOperator && q.ReviewStatus != DocumentReviewStatusEnum.Accepted &&
+                                               q.ReviewStatus != DocumentReviewStatusEnum.NotApplicable &&
+                                               q.ReviewStatus != DocumentReviewStatusEnum.NotSet)
+                                                {
+
+                                                    <button data-toggle="modal"
+                                                    data-target="#reviewResponseModal"
+                                                    title="Review Document"
+                                                    data-id="@q.Id"
+                                                    data-remark="@q.Remark"
+                                                    data-orderno="@q.Requirement.OrderNo"
+                                                    data-status=" @q.ReviewStatus"
+                                                    onclick="editDocumentReview(this)"
+                                                    class=" float-right btn btn-outline-success btn-sm">
+                                                        <i class="fa fa-pen "></i>
+                                                    </button>
+
+                                                }
+
+
+                                            </td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+@if (Model.TheModel.UnderReview)
+{
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="reviewResponseModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="questionTitle">Review Response</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="ReviewResponse" asp-antiforgery="true">
+                        <input type="hidden" name="ResponseId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="responseId" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <label id="idResponseNo" class="col-sm-4 col-md-3 col-form-label"></label>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Review Outcome
+                            </label>
+                            <select name="Status" id="responseStatus" class="form-control col-sm-8 col-md-9">
+                                <option value="0"></option>
+                                <option value="2">Accepted</option>
+                                <option value="3">Rejected</option>
+                                <option value="4">Not Applicable</option>
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Remark
+                            </label>
+                            <textarea type="text" rows="4" maxlength="250" id="idResponseRemark" name="Remark" class="col-sm-8 col-md-9 col-form-control"></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Submit" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="assignUserModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Change Reviewer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="AssignUser" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Assign to User
+                            </label>
+                            <select name="userId"
+                                class="form-control col-sm-8 col-md-9"
+                                asp-items="@(new SelectList(Model.Users,"Id", "FullName"))"
+                                required>
+                            </select>
+                        </div>
+
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Submit" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="recommendAcceptModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Recommend Approve</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="RecommendApprove" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="AssociationId" value="@Model.TheModel.AssociationId" />
+                        @if (Model.TheModel.ApplicationType == ApplicationTypeEnum.New)
+                        {
+                            <div class="row form-group">
+                                <label class="col-sm-8 col-md-7 col-form-label">
+                                    Membership Code
+                                </label>
+                                <input type="text" maxlength="10" name="Code" class="col-sm-4 col-md-5 col-form-control" />
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="code" value="@(Model.TheModel.Signature)" />
+                        }
+                        @if (Model.TheModel.IndividualId.HasValue)
+                        {
+                            <input type="hidden" name="IndividualId" value="Model.TheModel.IndividualId.Value" />
+                        }
+                        else
+                        {
+                            <input type="hidden" name="IndividualId" value="Model.TheModel.Id" />
+                        }
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Submit" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="recommendRejectModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Recommend Reject</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="RecommendRejection" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Reason
+                            </label>
+                            <textarea rows="4" maxlength="250" name="Remark" class="col-sm-8 col-md-9 col-form-control"></textarea>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Submit" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="width:920px !important;">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewTitle">Preview Document</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <iframe id="frame" style="width:900px; min-height:400px; max-height:600px;"></iframe>
+                    <pre id="longText" style="width:900px; height:auto; max-height:600px;display:none;"></pre>
+                </div>
+                <br />
+                <div class="row" id="reviewInputRow">
+                    <form data-parsley-validate method="post" class="col-md-12"
+                          asp-action="ReviewResponse" asp-antiforgery="true">
+                        <input type="hidden" name="ResponseId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="previewResponseId" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-4 col-form-label">
+                                Review Outcome
+                            </label>
+                            <select name="Status" id="previewResponseStatus" class="form-control col-sm-6 col-md-6" required>
+                                <option value="0"></option>
+                                <option value="2">Accepted</option>
+                                <option value="3">Rejected</option>
+                                <option value="4">Not Applicable</option>
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-4 col-form-label">
+                                Remark
+                            </label>
+                            <textarea maxlength="250" id="idPreviewResponseRemark" rows="5" name="Remark" class="col-sm-8 col-md-8 col-form-control"></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12 ">
+                                <input type="submit" value="Submit" class="btn btn-primary float-right">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section script {
+<script src="~/js/confirmation.js"></script>
+<script src="~/js/validation.js"></script>
+<script src="~/js/serviceValidation.js"></script>
+
+
+<script type="text/javascript">
+
+
+
+    function previewPdf(e) {
+        const id = document.getElementById('previewResponseId');
+        const title = document.getElementById('previewTitle');
+
+        const frame = document.getElementById('frame');
+        const longDiv = document.getElementById('longText');
+
+        frame.style.display = "none";
+        longDiv.style.display = "none";
+
+        const idVal = $(e).attr('data-id');
+        const srcVal = $(e).attr('data-src');
+        const textVal = $(e).attr('data-text');
+
+        const titleVal = $(e).attr('data-title');
+        const additional = $(e).attr('data-additional');
+        if(additional == '1'){
+            document.getElementById("reviewInputRow").style.display = "none";
+        } else {
+            document.getElementById("reviewInputRow").style.display = "";
+        }
+
+        id.value = idVal;
+        title.innerHTML = titleVal;
+        if(srcVal.length > 2){
+            frame.style.display = '';
+            $("#frame").attr("src", srcVal);
+        }else {
+            longDiv.style.display = '';
+            longDiv.innerHTML = textVal;
+        }
+    }
+
+
+
+
+
+    function generateInvoice(e) {
+        const id = document.getElementById('invoiceResponseId');
+
+        const idVal = $(e).attr('data-id');
+
+        id.value = idVal;
+    }
+
+
+    function editDocumentReview(e) {
+        const id = document.getElementById('responseId');
+        const remark = document.getElementById('idResponseRemark');
+        const orderNo = document.getElementById('idResponseNo');
+
+        const idVal = $(e).attr('data-id');
+        const remarkVal = $(e).attr('data-remark');
+        const orderVal = $(e).attr('data-orderno');
+        const statusVal = $(e).attr('data-status');
+
+
+        id.value = idVal;
+        remark.value = remarkVal;
+        orderNo.innerHTML = orderVal;
+        choiceText.value = choiceVal;
+        $('#responseStatus').val(statusVal).change();
+
+
+    }
+    function confirmDelete(form, txt) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to '+txt+' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+</script>
+}

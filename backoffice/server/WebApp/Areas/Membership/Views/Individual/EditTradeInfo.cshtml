@@ -1,0 +1,261 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IndividualViewModel
+
+<link href="~/vendor/combotree/style.css" rel="stylesheet" />
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Create New Member" : "Edit Member Info") </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+          asp-action="Save" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <input type="hidden" asp-for="TheModel.ParentAssociationId" />
+        <input type="hidden" asp-for="TheMember.LocationId" id="locationId" />
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                TIN
+            </label>
+            <input type="text" maxlength="10" class="form-control col-sm-4 col-md-4" asp-for="TheMember.TaxIdNumber" />
+        </div>
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameEng" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                ስም
+            </label>
+            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameLocal" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Membership Code
+            </label>
+            <input type="text" maxlength="20" class="form-control col-sm-4 col-md-4" asp-for="TheModel.Code" />
+        </div>
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Location
+            </label>
+
+
+            <select id="locationSelectorId" class="custom-select col-sm-8 col-md-9" asp-for="TheMember.LocationId"
+                    onchange="loadLocation()"></select>
+
+        </div>
+
+        @*<div class="row card" style="margin-top:2px; margin-bottom:2px;">
+
+            <div class="card-header">
+                <a class="title" href="#" id="showhideAddress" data-toggle="collapse" data-target="#address_info" aria-expanded="true" aria-controls="address_info">
+                    <strong>Address</strong>
+                </a>
+            </div>
+
+            <div class="card-body collapse hide" id="address_info">
+                <div class="row form-group">
+                    <label class="col-sm-4 col-md-3 col-form-label">
+                        Location
+                    </label>
+                    <input type="text" id="justAnotherInputBox" placeholder="Type to filter" autocomplete="off" />
+                    <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Member.LocationId"
+                            asp-items="@(new SelectList(Model.Locations,"Id", "Name"))"></select>
+                </div>
+                <div class="row form-group">
+                    <label class="col-sm-4 col-md-3 col-form-label">
+                        Address
+                    </label>
+                    <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.Member.TaxIdNumber" />
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-sm-4 col-md-3 col-form-label">
+                        Phone Number
+                    </label>
+                    <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.Member.NameEng" />
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <div class="row card" style="margin-top:2px; margin-bottom:2px;">
+
+
+            <div class="card-header">
+
+                <a class="title" href="#" id="showhideTrade" data-toggle="collapse" data-target="#trade_info" aria-expanded="true" aria-controls="trade_info">
+                    <strong>Trade</strong>
+                </a>
+            </div>
+            <div class=" card-body collapse hide" id="trade_info">
+
+                <div class="row form-group">
+                    <label class="col-sm-4 col-md-3 col-form-label">
+                        VAT Registration No
+                    </label>
+                    <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.Member.TaxIdNumber" />
+                </div>
+
+                <div class="row form-group">
+                    <label class="col-sm-4 col-md-3 col-form-label">
+                        Business Sector
+                    </label>
+                    <input type="text" placeholder="code" maxlength="6" class="form-control col-sm-3 col-md-3" asp-for="TheModel.Member.NameEng" />
+                    <input type="text" placeholder="text" class="form-control col-sm-5 col-md-6" asp-for="TheModel.Member.TaxIdNumber" />
+                </div>
+
+
+
+                <div class="row form-group">
+                    <label class="col-sm-4 col-md-3 col-form-label">
+                        Legal Status
+                    </label>
+                    <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Member.LegalStatus">
+                        <option value="0"> </option>
+                        <option value="1">Proprietary </option>
+                        <option value="2">PLC</option>
+                        <option value="3">Share Company</option>
+                    </select>
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div class="row card" style="margin-top:2px; margin-bottom:4px;">
+
+
+            <div class="card-header">
+
+                <a class="title" href="#" id="showhideMember" data-toggle="collapse" data-target="#member_info" aria-expanded="true" aria-controls="member_info">
+                    <strong>Membership</strong>
+                </a>
+            </div>
+            <div class="card-body collapse hide" id="member_info">
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Status
+            </label>
+            <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Stakeholder.Status">
+                <option value="1">Active</option>
+                <option value="2">Inactive</option>
+            </select>
+        </div>*@
+
+
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+
+
+    
+</div>
+<script>
+
+
+        let SampleJSONData = [
+            {
+                id: 0,
+                title: 'Horse'
+            }, {
+                id: 1,
+                title: 'Birds',
+                isSelectable: false,
+                subs: [
+                    {
+                        id: 10,
+                        title: 'Pigeon',
+                        isSelectable: false
+                    }, {
+                        id: 11,
+                        title: 'Parrot'
+                    }, {
+                        id: 12,
+                        title: 'Owl'
+                    }, {
+                        id: 13,
+                        title: 'Falcon'
+                    }
+                ]
+            }, {
+                id: 2,
+                title: 'Rabbit'
+            }, {
+                id: 3,
+                title: 'Fox'
+            }, {
+                id: 5,
+                title: 'Cats',
+                subs: [
+                    {
+                        id: 50,
+                        title: 'Kitty'
+                    }, {
+                        id: 51,
+                        title: 'Bigs',
+                        subs: [
+                            {
+                                id: 510,
+                                title: 'Cheetah'
+                            }, {
+                                id: 511,
+                                title: 'Jaguar'
+                            }, {
+                                id: 512,
+                                title: 'Leopard'
+                            }
+                        ]
+                    }
+                ]
+            }, {
+                id: 6,
+                title: 'Fish'
+            }
+        ];
+   
+    let url = `individual/getTree`;
+    
+    
+        var comboTree1, comboTree2;
+
+        jQuery(document).ready(function ($) {
+
+            loadLocation();
+            jQuery.get(url, function (data) {
+                SampleJSONData = data;
+                console.log(SampleJSONData);
+
+                comboTree2 = $('#justAnotherInputBox').comboTree({
+                    source: SampleJSONData,
+                    isMultiple: false
+                });
+            });
+            
+        });
+
+</script>

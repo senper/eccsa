@@ -1,0 +1,386 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Common.Planning
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.ProgressViewModel
+
+@{
+    ViewData["Title"] = "Progress";// = Model.PageTitle;
+    Layout = Model.LayoutPage;
+    var isQuarter = Model.CurrentMonth % 3 == 0;
+    var quarterNo = Model.CurrentMonth / 3;
+    var isSemiAnual = Model.CurrentMonth == 6;
+    var isAnual = Model.CurrentMonth == 12;
+    var quarterLabel = isAnual ? "Annual" : isSemiAnual ? "Semi Annual" : $"Quarter: {quarterNo}";
+
+    var unApproved = Model.TheList.Any(s => s.ResponsibleUnit == Model.CurrentSubsystem && s.SupportingUnitId == Model.SupportingUnitId && s.Status <= PlanningStatusEnum.Submitted);
+}
+@{
+    async Task Template(List<Plan> plans, string parentCode)
+    {
+        foreach (var ind in plans)
+        {
+            var hasChildren = Model.HasChildren(ind.Id);
+            var labelSubPlan = Model.AreAllLabelChildren(ind.Id);
+            var ids = Model.Guid2String(ind.Id);
+
+            var unitName = ind.ResponsibleUnit.GetDisplayName();
+            var style = hasChildren ? "" : "";
+            var parent_tt = string.IsNullOrEmpty(parentCode) ? "root" : $"child";
+            var quarterNo = ind.QuarterNo(Model.CurrentMonth);
+            var plan = ind.QuarterPlan(Model.CurrentMonth, Model.CurrentMonth);
+            var actual = ind.QuarterActual(Model.CurrentMonth, Model.CurrentMonth);
+            var remark = ind.IsLabel ? "" : ind.QuarterRemark(Model.CurrentMonth);
+            var sPlan = ind.IsLabel ? "" : plan.ToString();
+            var sActual = ind.IsLabel ? "" : actual.ToString();
+           
+            if (!ind.IsLabel)
+            {
+                <form data-parsley-validate method="post" onsubmit="return saveProgress(this)"
+      asp-action="SaveQuarter" asp-antiforgery="true">
+                    
+                    <input type="hidden" name="MonthNo" value="@Model.CurrentMonth" />
+                    <input type="hidden" name="subSystem" value="@Model.CurrentSubsystem" />
+                    <tr class=" @parent_tt @parentCode" id="@ind.Code">
+                        <td>
+
+                            @ind.NameWithCode
+
+
+                            <input type="hidden" name="PlanId" value="@ind.Id" />
+
+
+                        </td>
+                        <td>@ind.UnitName </td>
+                        <td>@ind.PlanAmountName</td>
+                        <td>@sPlan</td>
+                        <td>@sActual</td>
+                        <td>
+
+                            <textarea rows="2" type="text" name="Output">@remark </textarea>
+
+                        </td>
+                        
+                        <td>@if (@Model.CurrentMonth > 0 && @Model.CurrentYear > 0 )
+                    {
+                                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="savebtn@(ind.Id)" />
+                    }</td>
+                    </tr>
+                </form>
+            }
+            else
+            {
+                //<tr class=" @parent_tt @parentCode" id="@ind.Code">
+                //    <td>
+                //        @if (hasChildren)
+                //        {
+                //            <a data-tt="@ind.Code" onclick="showHideChildren(this);" class="title"><i class="fas fa-angle-right"></i>@ind.NameWithCode </a>
+                //        }
+                //        else
+                //        {
+                //            @ind.NameWithCode
+                //        }
+
+
+
+                //    </td>
+                //    <td>@ind.UnitName </td>
+                //    <td>@ind.PlanAmountName</td>
+                //    <td></td>
+                //    <td>                    </td>
+                //    <td>                    </td>
+                //    <td>                    </td>
+                    
+                //</tr>
+            }
+
+
+            @if (@hasChildren)
+            {
+                var children = Model.GetSubPlans(ind.Id);
+                await Template(children, ind.Code);
+            }
+        }
+
+    }
+}
+<div class="container-fluid">
+    @if (Model.RoleLevel == RoleLevelEnum.Admin)
+    {
+        <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+            <div class=" btn-group" role="group" aria-label="Basic example">
+            </div>
+        </div>
+    }
+
+
+    
+
+    <div class="row">
+        <div class="col-12">
+        
+            @if(unApproved)
+            {
+                <p style="font-weight: bolder;">All Plan must be approve to update progress.</p>
+            }
+            else {
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <h4 for="yearfrom" class="col-sm-8 col-form-label">Progress Report for @quarterLabel @Model.CurrentYear </h4>
+                    <hr />
+
+                    <div class="form-group row">
+                        <div class="col-sm-12 table-responsive">
+
+                            <table id="example1" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="width:400px;">Name</th>
+                                        <th rowspan="2" style="width:50px;">Unit</th>
+                                        <th rowspan="2">Plan</th>
+                                        <th colspan="3">Progress Report for @quarterNo</th>
+                                        
+                                        <th rowspan="2"></th>
+                                    </tr>
+                                    <tr>
+                                        <th> Plan</th>
+                                        <th> Actual</th>
+                                        <th>Outcome</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody id="tableDetail">
+                                    @{
+                                        await Template(Model.RootPlans, "");
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="planModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit Plan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveMainPlan" asp-antiforgery="true">
+                        <input type="hidden" name="PlanId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="MonthNo" value="@Model.CurrentMonth" />
+                        <input type="hidden" name="module" value="@Model.CurrentSubsystem" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Parent
+                            </label>
+                            <span id="parentId" class="col-sm-8 col-md-9 ">
+
+                            </span>
+
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Item
+                            </label>
+                            <span id="nameId" class="col-sm-8 col-md-9 ">
+
+                            </span>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Monthly Plan
+                            </label>
+                            <span id="planId" class="col-sm-8 col-md-9 ">
+
+                            </span>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Actual
+                            </label>
+                            <input type="number" min="0" id="actualId" name="ExpectedResult" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Remark
+                            </label>
+                            <textarea rows="3" maxlength="200" id="remarkId" name="EstimatedBudget" class="form-control col-sm-4 col-md-4" required></textarea>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+@section script {
+
+
+<script>
+        function saveProgress(form) {
+            var formData = new FormData(form);
+            let savebtn = $("#savebtn" + formData.get("PlanId"));
+            savebtn.attr("value", "Saving...");
+            savebtn.prop("disabled", true);
+            $.ajax({
+                url: 'SaveQuarterlyForm',
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function (data) {
+                    savebtn.attr("value", "Save");
+                    savebtn.prop("disabled", false);
+                    $.alert({
+                        icon: 'fa fa-bell',
+                        title: 'Information!',
+                        content: 'Successfully Saved'
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    savebtn.attr("value", "Save");
+                    savebtn.prop("disabled", false);
+                    $.alert({
+                        icon: 'fa fa-bell',
+                        title: 'Information!',
+                        content: thrownError
+                    });
+                }
+            });
+            return false;
+        }
+
+    function editPlan(e){
+        const id = document.getElementById('pId');
+        const code = document.getElementById('cId');
+        const name = document.getElementById('nId');
+
+        const target = document.getElementById('tId');
+        const result = document.getElementById('resultId');
+
+        const budget = document.getElementById('budgetId');
+        const donor = document.getElementById('donorId');
+        const chamber = document.getElementById('chamId');
+
+        const idVal = $(e).attr('data-id');
+        const parentVal = $(e).attr('data-parent');
+        const codeVal = $(e).attr('data-code');
+        const nameVal = $(e).attr('data-name');
+
+        const targetVal = $(e).attr('data-plan');
+        const unitVal = $(e).attr('data-unit');
+        const resultVal = $(e).attr('data-result');
+        const budgetVal = $(e).attr('data-budget');
+
+        const donorVal = $(e).attr('data-donor');
+        const chamberVal = $(e).attr('data-chamber');
+
+        id.value = idVal;
+        code.value = codeVal;
+        name.value = nameVal;
+
+        target.value = targetVal;
+        result.value = resultVal;
+        budget.value = budgetVal;
+
+         donor.value = donorVal;
+        chamber.value = chamberVal;
+
+        $('#parentId').val(parentVal).change();
+        $('#unitId').val(unitVal).change();
+
+    }
+    function cancelPlan() {
+
+         document.getElementById('editbtn').hidden = false;
+        document.getElementById('savebtn').hidden = true;
+        document.getElementById('cancelbtn').hidden = true;
+    }
+
+    function hideChildren(){
+         const children = document.getElementsByClassName('child');
+         for(var i = 0; i < children.length; i++){
+             children[i].style.display='none';
+         }
+    }
+    //hideChildren();
+    function hideDescendant(e){
+        console.log(e);
+        const parent = $(e).attr('data-tt');
+        const children = document.getElementsByClassName(parent);
+        for(var i = 0; i < children.length; i++){
+             const child = children[i];
+             child.style.display='none';
+             //console.log(child.id, child, document.getElementsByClassName(child.id).length);
+             if(document.getElementsByClassName(child.id).length > 0){
+                 $(child).find('i').removeClass('fa-angle-down');
+                 $(child).find('i').addClass('fa-angle-right');
+                 hideDescendant($(child).find('a')[0]);
+             }
+
+         }
+    }
+
+    function showHideChildren(e) {
+        const ank = $(e);
+        let show = true;
+
+       for (let i = 0; i < ank[0].children.length; i++)
+       {
+                const child = ank[0].children[i];
+                if (child.localName == 'i') {
+                    if (child.classList.contains('fa-angle-right')) {
+                        show = true;
+                        child.classList.remove('fa-angle-right');
+                        child.classList.add('fa-angle-down');
+                    } else {
+                        show = false;
+                        child.classList.add('fa-angle-right');
+                        child.classList.remove('fa-angle-down');
+                    }
+                }
+       }
+
+        if(show)
+        {
+            const parent = $(e).attr('data-tt');
+            const children = document.getElementsByClassName(parent);
+            for(var i = 0; i < children.length; i++)
+            {
+             children[i].style.display='';
+            }
+        }
+        else
+        {
+            hideDescendant(e);
+        }
+    }
+
+
+
+</script>
+}

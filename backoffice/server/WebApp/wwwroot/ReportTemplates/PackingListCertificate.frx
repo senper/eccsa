@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="10/21/2021 09:46:33" ReportInfo.Modified="10/13/2023 17:19:48" ReportInfo.CreatorVersion="2023.3.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="PackingListModel" ReferenceName="PackingListModel" DataType="System.Int32" Enabled="true">
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="Logo" DataType="System.String"/>
+      <Column Name="ShipperSeller" DataType="System.String"/>
+      <Column Name="FullAddress" DataType="System.String"/>
+      <Column Name="Tel" DataType="System.String"/>
+      <Column Name="Fax" DataType="System.String"/>
+      <Column Name="Email" DataType="System.String"/>
+      <Column Name="VATRegNo" DataType="System.String"/>
+      <Column Name="InvoiceNo" DataType="System.String"/>
+      <Column Name="ShippedBy" DataType="System.String"/>
+      <Column Name="ConsigneeBuyer" DataType="System.String"/>
+      <Column Name="ConsigneeFullAddress" DataType="System.String"/>
+      <Column Name="ConsigneeTel" DataType="System.String"/>
+      <Column Name="ConsigneeFax" DataType="System.String"/>
+      <Column Name="ConsigneeEmail" DataType="System.String"/>
+      <Column Name="ConsigneeVATRegNo" DataType="System.String"/>
+      <Column Name="ConsigneePlaceofdeliveryFullAddress" DataType="System.String"/>
+      <Column Name="InvoiceDate" DataType="System.String"/>
+      <Column Name="AuthorizedBy" DataType="System.String"/>
+      <Column Name="AuthorizerTitle" DataType="System.String"/>
+      <Column Name="AuthorizationDate" DataType="System.String"/>
+      <Column Name="ApproverName" DataType="System.String"/>
+      <Column Name="ApproverTitle" DataType="System.String"/>
+      <Column Name="ApproveredDate" DataType="System.String"/>
+      <Column Name="Signature" DataType="System.String"/>
+      <Column Name="CertificateNo" DataType="System.String"/>
+      <BusinessObjectDataSource Name="Details" DataType="System.Int32" Enabled="true">
+        <Column Name="DescriptionoftheGoods" DataType="System.String"/>
+        <Column Name="Noofpackages" DataType="System.Decimal"/>
+        <Column Name="Quantity" DataType="System.Decimal"/>
+        <Column Name="NetWeight" DataType="System.Decimal"/>
+        <Column Name="GrossWeight" DataType="System.Decimal"/>
+      </BusinessObjectDataSource>
+    </BusinessObjectDataSource>
+    <Total Name="TotalNewWeight" Expression="[PackingListModel.Details.NetWeight]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="TotalGrossWeight" Expression="[PackingListModel.Details.GrossWeight]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="TotalQuantity" Expression="[PackingListModel.Details.Quantity]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+    <Total Name="TotalNoOfPackages" Expression="[PackingListModel.Details.Noofpackages]" Evaluator="Data1" PrintOn="GroupFooter1"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" Watermark.Font="Arial, 60pt">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="132.3">
+      <TextObject Name="Text107" Top="56.7" Width="708.75" Height="28.35" Text="PACKING LIST" HorzAlign="Center" Font="Times New Roman, 16pt, style=Bold, Underline" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text106" Top="28.35" Width="708.75" Height="28.35" Text="[PackingListModel.CompanyAddress]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text103" Left="444.15" Top="88.83" Width="85.05" Height="18.9" Text="Invoice No." HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text104" Left="444.15" Top="107.73" Width="85.05" Height="18.9" Text="Date:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text108" Left="538.65" Top="88.83" Width="170.1" Height="18.9" Text="[PackingListModel.InvoiceNo]" Font="Times New Roman, 10pt, style=Underline" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text105" Left="538.65" Top="107.73" Width="170.1" Height="18.9" Text="[Date]" Format="Date" Format.Format="MMMM dd, yyyy" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text111" Width="699.3" Height="18.9" Text="[PackingListModel.CompanyName]" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 14pt"/>
+      <PictureObject Name="Picture1" Left="529.2" Width="75.6" Height="75.6" DataColumn="PackingListModel.Logo"/>
+    </PageHeaderBand>
+    <GroupHeaderBand Name="GroupHeader1" Top="136.3" Width="718.2" Height="321.3" Condition="[PackingListModel.CertificateNo]">
+      <TableObject Name="Table1" Top="283.5" Width="708.75" Height="37.8">
+        <TableColumn Name="Column1" Width="277.83"/>
+        <TableColumn Name="Column2" Width="98.28"/>
+        <TableColumn Name="Column3" Width="107.73"/>
+        <TableColumn Name="Column4" Width="107.73"/>
+        <TableColumn Name="Column5" Width="117.18"/>
+        <TableRow Name="Row1" Height="37.8">
+          <TableCell Name="Cell1" Border.Lines="All" Text="Description Of Goods" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell2" Border.Lines="All" Text="No. of packages" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell3" Border.Lines="All" Text="Quantity" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell4" Border.Lines="All" Text="Net Weight" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell5" Border.Lines="All" Text="Gross Weight" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="Text59" Left="132.3" Top="226.8" Width="226.8" Height="18.9" Text="[PackingListModel.InvoiceDate]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text57" Left="-18.9" Top="226.8" Width="141.75" Height="18.9" Text="Invoice Date:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text58" Left="519.75" Top="198.45" Width="189" Height="56.7" Text="[PackingListModel.ConsigneePlaceofdeliveryFullAddress]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text53" Left="368.55" Top="198.45" Width="141.75" Height="18.9" Text="Place of delivery:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text12" Left="9.45" Top="198.45" Width="113.4" Height="18.9" Text="Invoice No:" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text55" Left="132.3" Top="198.45" Width="226.8" Height="18.9" Text="[PackingListModel.InvoiceNo]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text9" Left="9.45" Top="141.75" Width="113.4" Height="18.9" Text="Full Address:" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text36" Left="132.3" Top="141.75" Width="226.8" Height="47.25" Text="[PackingListModel.FullAddress]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text42" Left="368.55" Top="141.75" Width="141.75" Height="18.9" Text="Full Address:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text48" Left="519.75" Top="141.75" Width="189" Height="47.25" Text="[PackingListModel.ConsigneeFullAddress]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text34" Left="9.45" Top="113.4" Width="113.4" Height="18.9" Text="VAT Reg No:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text40" Left="122.85" Top="113.4" Width="236.25" Height="18.9" Text="[PackingListModel.VATRegNo]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text46" Left="368.55" Top="113.4" Width="141.75" Height="18.9" Text="VAT Reg No:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text52" Left="519.75" Top="113.4" Width="189" Height="18.9" Text="[PackingListModel.ConsigneeVATRegNo]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text33" Left="9.45" Top="85.05" Width="113.4" Height="18.9" Text="Email:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text39" Left="122.85" Top="85.05" Width="236.25" Height="18.9" Text="[PackingListModel.Email]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text45" Left="368.55" Top="85.05" Width="141.75" Height="37.8" Text="Email:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text51" Left="519.75" Top="85.05" Width="189" Height="18.9" Text="[PackingListModel.ConsigneeEmail]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text14" Left="9.45" Top="56.7" Width="113.4" Height="18.9" Text="Fax:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text38" Left="122.85" Top="56.7" Width="236.25" Height="18.9" Text="[PackingListModel.Fax]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text44" Left="368.55" Top="56.7" Width="141.75" Height="37.8" Text="Fax" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text50" Left="519.75" Top="56.7" Width="189" Height="18.9" Text="[PackingListModel.ConsigneeFax]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text10" Left="9.45" Top="28.35" Width="113.4" Height="18.9" Text="Tel:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text37" Left="122.85" Top="28.35" Width="236.25" Height="18.9" Text="[PackingListModel.Tel]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text43" Left="368.55" Top="28.35" Width="141.75" Height="37.8" Text="Tel:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text49" Left="519.75" Top="28.35" Width="189" Height="18.9" Text="[PackingListModel.ConsigneeTel]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text8" Top="1.51" Width="122.85" Height="18.9" Text="Shipper/Seller:&#13;&#10;" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text35" Left="122.85" Top="1.51" Width="236.25" Height="18.9" Text="[PackingListModel.ShipperSeller]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text41" Left="368.55" Width="141.75" Height="37.8" Text="Consignee/Buyer:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text47" Left="519.75" Width="189" Height="18.9" Text="[PackingListModel.ConsigneeBuyer]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text56" Left="132.3" Top="255.15" Width="226.8" Height="18.9" Text="[PackingListModel.ShippedBy]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text54" Left="9.45" Top="255.15" Width="113.4" Height="18.9" Text="Shipped By:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <DataBand Name="Data1" Top="461.6" Width="718.2" Height="56.7" DataSource="Details">
+        <TableObject Name="Table4" Width="708.75" Height="56.7">
+          <TableColumn Name="Column12" Width="277.83"/>
+          <TableColumn Name="Column13" Width="98.28"/>
+          <TableColumn Name="Column14" Width="107.73"/>
+          <TableColumn Name="Column15" Width="107.73"/>
+          <TableColumn Name="Column16" Width="117.18"/>
+          <TableRow Name="Row7" Height="56.7">
+            <TableCell Name="Cell25" Border.Lines="All" Text="[PackingListModel.Details.DescriptionoftheGoods]" VertAlign="Center" Font="Times New Roman, 10pt"/>
+            <TableCell Name="Cell26" Border.Lines="All" Text="[PackingListModel.Details.Noofpackages]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+            <TableCell Name="Cell27" Border.Lines="All" Text="[PackingListModel.Details.Quantity]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+            <TableCell Name="Cell28" Border.Lines="All" Text="[PackingListModel.Details.NetWeight]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+            <TableCell Name="Cell29" Border.Lines="All" Text="[PackingListModel.Details.GrossWeight]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt"/>
+          </TableRow>
+        </TableObject>
+      </DataBand>
+      <GroupFooterBand Name="GroupFooter1" Top="522.3" Width="718.2" Height="132.3">
+        <TableObject Name="Table5" Width="708.75" Height="28.35">
+          <TableColumn Name="Column17" Width="277.83"/>
+          <TableColumn Name="Column18" Width="98.28"/>
+          <TableColumn Name="Column19" Width="107.73"/>
+          <TableColumn Name="Column20" Width="107.73"/>
+          <TableColumn Name="Column21" Width="117.18"/>
+          <TableRow Name="Row8" Height="28.35">
+            <TableCell Name="Cell30" Border.Lines="All" Border.Width="2" Text="Total" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell31" Border.Lines="All" Border.Width="2" Text="[TotalNoOfPackages]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell32" Border.Lines="All" Border.Width="2" Text="[TotalQuantity]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell33" Border.Lines="All" Border.Width="2" Text="[TotalNewWeight]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+            <TableCell Name="Cell34" Border.Lines="All" Border.Width="2" Text="[TotalGrossWeight]" Format="Number" Format.UseLocale="false" Format.DecimalDigits="2" Format.DecimalSeparator="." Format.GroupSeparator="," Format.NegativePattern="1" HorzAlign="Right" VertAlign="Center" Font="Times New Roman, 10pt, style=Bold"/>
+          </TableRow>
+        </TableObject>
+        <TextObject Name="Text114" Left="113.4" Top="66.15" Width="274.05" Height="18.9" Text="[PackingListModel.AuthorizedBy]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text117" Top="66.15" Width="113.4" Height="18.9" Text="Authorized By:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text112" Top="85.05" Width="113.4" Height="18.9" Text="Title:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text115" Left="113.4" Top="85.05" Width="274.05" Height="18.9" Text="[PackingListModel.AuthorizerTitle]" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text113" Top="103.95" Width="113.4" Height="18.9" Text="Date:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+        <TextObject Name="Text116" Left="113.4" Top="103.95" Width="274.05" Height="18.9" Text="[PackingListModel.AuthorizationDate]" Font="Times New Roman, 10pt"/>
+      </GroupFooterBand>
+    </GroupHeaderBand>
+    <PageFooterBand Name="PageFooter1" Top="658.6" Width="718.2" Height="132.3">
+      <TextObject Name="Text95" Left="292.95" Top="85.05" Width="94.5" Height="18.9" Text="Signature:" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text97" Left="387.45" Top="75.6" Width="217.35" Height="28.35" Text="[PackingListModel.Signature]" VertAlign="Bottom" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text89" Top="56.7" Width="113.4" Height="18.9" Text="Title:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text90" Top="85.05" Width="113.4" Height="18.9" Text="Date:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text91" Left="113.4" Top="37.8" Width="274.05" Height="18.9" Text="[PackingListModel.ApproverName]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text92" Left="113.4" Top="56.7" Width="274.05" Height="18.9" Text="[PackingListModel.ApproverTitle]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text93" Left="113.4" Top="85.05" Width="160.65" Height="18.9" Text="[PackingListModel.ApproveredDate]" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text86" Top="37.8" Width="113.4" Height="18.9" Text="Approved By:" HorzAlign="Right" Font="Times New Roman, 10pt"/>
+      <TextObject Name="Text109" Left="37.8" Top="103.95" Width="340.2" Height="18.9" Text="https://ethiopianchamber.com/verifyCertificate" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
+      <TextObject Name="Text110" Left="396.9" Top="103.95" Width="151.2" Height="18.9" Text="Page [Page#] of [TotalPages#]" HorzAlign="Right" VertAlign="Bottom" Font="Times New Roman, 9pt"/>
+      <BarcodeObject Name="Barcode1" Left="623.7" Top="28.35" Width="82" Height="91" Text="https://ethiopianchamber.com/verifyCertificate/[PackingListModel.Signature]" Zoom="0.5" AllowExpressions="true" Barcode="QR Code" Barcode.Font="Arial, 11pt" Barcode.ErrorCorrection="L" Barcode.Encoding="UTF8" Barcode.QuietZone="true"/>
+      <LineObject Name="Line1" Top="3.78" Width="708.75" Diagonal="true"/>
+      <TextObject Name="Text118" Left="75.6" Top="9.45" Width="699.3" Height="18.9" Text="Ethiopian Chamber of Commerce and Sectoral Associations" HorzAlign="Center" VertAlign="Center" Font="Times New Roman, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

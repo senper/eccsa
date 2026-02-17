@@ -1,0 +1,395 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Advocacy.Model.ProjectViewModel
+
+@{
+    ViewData["Title"] = "Project";
+    Layout = "~/Views/Shared/_AdvocacyLayout.cshtml";
+}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.Title  </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Planned Start End Dates:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.PlannedStartDate.ToString("yyyy-MM-dd")    @Model.TheModel.PlannedEndDate.ToString("yyyy-MM-dd")
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Actual Start End Dates:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.StartDate.ToString("yyyy-MM-dd")    @Model.TheModel.EndDateString
+                                </div>
+                            </div>
+
+
+
+
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Description
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Description
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Remark
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Remark
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+                                </div>
+                            </div>
+                            <br />
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Followup</h4>
+                    @if (Model.IsUserOrAdmin)
+                    {
+                        <button data-toggle="modal"
+                            data-target="#followupStatusModal"
+                            title="Review Document"
+                            data-id="@Guid.Empty"
+                            data-remark=""
+                            data-title=""
+                            data-pstart=""
+                            data-pend=""
+                            data-start=""
+                            data-end=""
+                            onclick="editFollowup(this)"
+                            class=" float-right btn btn-outline-success btn-sm">
+                            <i class="fa fa-pen "></i>&nbsp; Followup
+                        </button>
+                    }
+                </div>
+                <div class="card-body">
+
+                    
+                                <div class="row">
+
+                                    <div class="col-md-12 ">
+
+                                        <br />
+                                        <table class="table table-bordered table-striped" id="datatablesurvey" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="2">Title</th>
+                                                    <th colspan="2" style="text-align: center">Start Date</th>
+                                                    <th colspan="2" style="text-align: center">End Date</th>
+
+                                                    <th rowspan="2"></th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Planned</th>
+                                                    <th>Actual</th>
+                                                    <th>Planned</th>
+                                                    <th>Actual</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var s in Model.TheModel.Followups.OrderBy(f => f.StartDate))
+                                                {
+                                                    <tr>
+                                                        <td>@s.Title</td>
+                                                        <td>
+                                                            @s.PlannedStartDate.ToString("yyyy-MM-dd")
+                                                        </td>
+                                                        <td>@s.StartDate.ToString("yyyy-MM-dd")</td>
+                                                        <td>@s.PlannedEndDate.ToString("yyyy-MM-dd")</td>
+                                                        <td>@s.EndDateString</td>
+                                                        <td>
+                                                @if (Model.IsUserOrAdmin)
+                                                {
+                                                    <button data-toggle="modal"
+                                                                    data-target="#followupStatusModal"
+                                                                    title="Review Document"
+                                                                    data-id="@s.Id"
+                                                                    data-remark="@s.Remark"
+                                                                    data-title="@s.Title"
+                                                                    data-pstart="@(s.PlannedStartDate.ToString("yyyy-MM-dd"))"
+                                                                    data-pend="@(s.PlannedEndDate.ToString("yyyy-MM-dd"))"
+                                                                    data-start="@(s.StartDate.ToString("yyyy-MM-dd"))"
+                                                                    data-end="@(s.EndDate.HasValue? s.EndDate.Value.ToString("yyyy-MM-dd"):"")"
+                                                                    onclick="editFollowup(this)"
+                                                                    class=" float-right btn btn-outline-success btn-sm">
+                                                        <i class="fa fa-pen "></i>
+                                                    </button>
+                                                }
+
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                           
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="followupStatusModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Followup</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SaveFollowup" asp-antiforgery="true">
+                    <input type="hidden" name="ProjectId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Id" id="followupId" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" id="idTitle" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Planned Start Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="PlannedStartDate" id="idPlannedStartDate" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Actual Start Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="StartDate" id="idStartDate" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Planned End Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="PlannedEndDate" id="idPlannedEndDate" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Actual End Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="EndDate" id="idEndDate" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <textarea rows="4" maxlength="250" id="idfollowupRemark" name="Remark" class="col-sm-8 col-md-9 col-form-control"></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Submit" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Project</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" asp-for="TheModel.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" asp-for="TheModel.Title" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" asp-for="TheModel.Description" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <textarea rows="4" name="Remark" asp-for="TheModel.Remark" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Planned Start Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="PlannedStartDate" asp-for="TheModel.PlannedStartDate" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Actual Start Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="StartDate" asp-for="TheModel.StartDate" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Planned End Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="PlannedEndDate" asp-for="TheModel.PlannedEndDate" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Actual End Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="EndDate" asp-for="TheModel.EndDate" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" required>
+                            <option value="1">Active</option>
+                            <option value="0">In-active</option>
+                        </select>
+                    </div>
+
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function editFollowup(e) {
+            const id = document.getElementById('followupId');
+            const title = document.getElementById('idTitle');
+            const PlannedStartDate = document.getElementById('idPlannedStartDate');
+            const StartDate = document.getElementById('idStartDate');
+            const PlannedEndDate = document.getElementById('idPlannedEndDate');
+            const EndDate = document.getElementById('idEndDate');
+
+            const remark = document.getElementById('idfollowupRemark');
+
+            const idVal = $(e).attr('data-id');
+            const titleVal = $(e).attr('data-title');
+            const psDateVal = $(e).attr('data-pstart');
+            const peDateVal = $(e).attr('data-pend');
+            const sDateVal = $(e).attr('data-start');
+            const eDateVal = $(e).attr('data-end');
+
+            const remarkVal = $(e).attr('data-remark');
+
+
+            id.value = idVal;
+            title.value = titleVal;
+            PlannedStartDate.value = psDateVal;
+            StartDate.value = sDateVal;
+            PlannedEndDate.value = peDateVal;
+            EndDate.value = eDateVal;
+            remark.value = remarkVal;
+
+        }
+    </script>
+}

@@ -1,0 +1,147 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.SettingVariableViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Setting Variables";
+    Layout = "~/Views/Shared/_AcademyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    @if (Model.RoleLevel == RoleLevelEnum.Admin)
+    {
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("SettingVariableEdit", new { Id=Guid.Empty })"
+                class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        </div>
+    }
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Data Type</th>
+                                    <th>Min Value</th>
+                                    <th>Max Value</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Data Type</th>
+                                    <th>Min Value</th>
+                                    <th>Max Value</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.NameEng)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DataType)
+                                        </td>
+                                        <td>
+                                            @if (item.DataType == ECCSA.BackOffice.Server.Model.Academy.SettingVariableDataType.Int)
+                                            {
+                                                @Html.DisplayFor(modelItem => item.MinValue)
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.DataType == ECCSA.BackOffice.Server.Model.Academy.SettingVariableDataType.Int)
+                                            {
+                                                @Html.DisplayFor(modelItem => item.MaxValue)
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                @* @if (Model.RoleLevel == RoleLevelEnum.Admin)
+                                                    {*@
+                                                <button data-toggle="modal"
+                                                    data-target="#AddEditModal"
+                                                    data-url="@Url.Action("SettingVariableEdit", new { Id=item.Id })"
+                                                    class="  edit btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pen "></i>
+                                                </button>
+                                                <a onclick="return confirmDelete($('#deleteSettingVariable@(item.Id)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+
+                                                <form data-parsley-validate novalidate method="post" id="deleteSettingVariable@(item.Id)"
+                                                  asp-action="DeleteSettingVariable" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                </form>
+                                                @* }*@
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+}
+
+
+@section script {
+<script>
+    $('.edit').on('click', function () {
+
+        var url = $(this).attr('data-url');
+        $($(this).attr('data-target')).find(".modal-content").html("");
+
+        $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+            $(item).html("");
+
+            if (url && url.length > 0) {
+                $(item).load(url);
+            }
+        });
+    });
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

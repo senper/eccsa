@@ -1,0 +1,227 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.LawsViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Resource";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @if (Model.IsUserOrAdmin)
+        {
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Law"
+                data-id="@Guid.Empty"
+                data-status="@((int)StatusEnum.Active)"
+                onclick="addEdit(this)">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+
+
+                                    <tr>
+                                        <td>
+                                            <a id="filename" 
+                                            asp-action="DownLoadFile" 
+                                            asp-controller="Laws" 
+                                            asp-area="Communication" 
+                                            title="@i.Brief"
+                                            asp-route-id="@i.Id" 
+                                            class="title"
+                                            asp-route-fileName="@(i.Title + i.Extension)">
+                                    @Html.DisplayFor(modelItem => i.Title)
+                                        </a>&nbsp;
+                                            <a id="filenameLocal"
+                                           asp-action="DownLoadFileLocal"
+                                           asp-controller="Laws"
+                                           asp-area="Communication"
+                                           title="@i.BriefLocal"
+                                           asp-route-id="@i.Id"
+                                           class="title"
+                                           asp-route-fileName="@(i.TitleLocal + i.ExtensionLocal)">
+                                                @Html.DisplayFor(modelItem => i.TitleLocal)
+                                            </a>
+                                           
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.LawType)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Category)
+                                        </td>
+
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                               
+                                                <a onclick="return confirmDelete($('#deleteResource@(i.Id)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteResource@(i.Id)"
+                                                  asp-action="Delete" asp-antiforgery="true" asp-route-id="@i.Id">
+                                                    <input type="hidden" name="id" value="@i.Id" />
+                                                </form>
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin)
+    {
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Law</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                    
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" maxlength="100" class="form-control col-sm-8 col-md-9" placeholder="Title  " required />
+                    </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                
+                            </label>
+                            <input type="text" name="TitleLocal" maxlength="100" class="form-control col-sm-8 col-md-9" placeholder="ርዕስ  " required />
+                        </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Category
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" 
+                                asp-items="@(Html.GetEnumSelectList<LawCategoryEnum>())"
+                                name="Category" required>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Type
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" id="statusId"
+                                asp-items="@(Html.GetEnumSelectList<LawTypeEnum>())"
+                                name="LawType" required>
+                        </select>
+                    </div>
+
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Brief
+                        </label>
+                            <textarea rows="4" name="Brief" id="descriptionId" maxlength="800" class="form-control col-sm-8 col-md-9" placeholder="Brief  " required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            
+                        </label>
+                            <textarea rows="4" name="BriefLocal" id="descriptionLocalId" maxlength="800" class="form-control col-sm-8 col-md-9" required placeholder="ማብራርያ  "></textarea>
+                    </div>
+                   
+
+                   
+                   
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Upload
+                        </label>
+                        <input type="file" name="upload" class="form-control col-sm-8 col-md-9" />
+                    </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                
+                            </label>
+                            <input type="file" name="uploadLocal" class="form-control col-sm-8 col-md-9" />
+                        </div>
+                   
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+}
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

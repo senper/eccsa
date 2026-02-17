@@ -1,0 +1,75 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.SettingVariableViewModel
+@using ECCSA.BackOffice.Server.Model.Academy
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == 0 ? "Add" : "Edit") Setting Variable</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate method="post"
+          asp-action="@(Model.TheModel.Id == 0 ? "CreateSettingVariable" : "UpdateSettingVariable")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />        
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Code
+            </label>
+            <input type="text" class="form-control col-sm-7 col-md-8" asp-for="TheModel.Code" required/>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" class="form-control col-sm-7 col-md-8" asp-for="TheModel.NameEng" placeholder="Name  " required/>
+        </div>
+        <div class="row form-group" style="display:none;">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                ስም
+            </label>
+            <input type="text" class="form-control col-sm-7 col-md-8" asp-for="TheModel.NameLocal" placeholder="ስም  " />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Data Type
+            </label>
+            <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.DataType" id="dataTypeInput"
+                            onchange="dataTypeChange()"
+                            asp-items="@(Html.GetEnumSelectList<SettingVariableDataType>())" required></select>
+        </div>
+        <div class="row form-group forNumber">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                MinValue
+            </label>
+            <input type="number" class="form-control col-sm-7 col-md-8" asp-for="TheModel.MinValue" />
+        </div>
+        <div class="row form-group forNumber">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                MaxValue
+            </label>
+            <input type="number" class="form-control col-sm-7 col-md-8" asp-for="TheModel.MaxValue" />
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    dataTypeChange();
+    function dataTypeChange(item){
+        const e = document.getElementById('dataTypeInput');
+        item = e.value;
+        if($(item).val() == 1){            
+            $(".forNumber").removeClass("d-none");
+        } else {
+            $(".forNumber").addClass("d-none");
+        }
+    }
+
+    dataTypeChange($("#dataTypeInput"));
+</script>

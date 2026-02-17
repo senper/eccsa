@@ -1,0 +1,432 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Common.Planning
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.ProgressViewModel
+
+@{
+    ViewData["Title"] = "Progress";// = Model.PageTitle;
+    Layout = Model.LayoutPage;
+    var isQuarter = Model.CurrentMonth % 3 == 0;
+    var quarterNo = Model.CurrentMonth / 3;
+    var periodName = "የወሩ";
+
+    if (Model.SelectedPeriod.StartsWith("Q"))
+    {
+
+        if (int.TryParse(Model.SelectedPeriod.Replace("Q", ""), out var tmp))
+        {
+            switch (tmp)
+            {
+                case 1:
+                case 3:
+                    periodName = "የሩብ አመቱ";
+                    break;
+                case 2:
+                    periodName = "የመንፈቅ አመቱ";
+                    break;
+                case 4:
+                    periodName = "የእስካሁን";
+                    break;
+
+            }
+        }
+    }
+
+
+    async Task Template(Plan parent, string parentCode, List<Plan> subPlans, string padding)
+    {
+
+        await BuildRow(parent, parentCode, subPlans, padding);
+
+
+        padding += "&nbsp;&nbsp;&nbsp;";
+        foreach (var ind in subPlans)
+        {
+            var plans = Model.TheList.Where(p => p.ParentId == ind.Id).OrderBy(p => p.Code).ToList();
+            await Template(ind, parent.InternalCode, plans, padding);
+        }
+    }
+
+    async Task BuildRow(Plan ind, string parentCode, List<Plan> subPlans, string padding)
+    {
+        var hasChildren = Model.HasChildren(ind.Id);
+        var labelSubPlan = Model.AreAllLabelChildren(ind.Id);
+        var isPlanning = ind.Status == PlanningStatusEnum.Planning || ind.Status == PlanningStatusEnum.Rejected;
+
+        var ownedIndicator = ind.ResponsibleUnit == Model.CurrentSubsystem && ind.SupportingUnitId == Model.SupportingUnitId;
+        var unitName = @ind.ResponsibleUnit.GetDisplayName();
+
+        var parentTt = !ind.ParentId.HasValue ? "root" : $"child";
+        if (!Model.TreeView)
+        {
+            parentCode = String.Empty;
+            parentTt = string.Empty;
+        }
+            <tr class=" @parentTt @parentCode" id="@ind.InternalCode">
+                <td>
+                    @Html.Raw(@padding)
+                    @if (hasChildren && Model.TreeView)
+                {
+                        <a data-tt="@ind.InternalCode" onclick="showHideChildren(this);" style="text-decoration: none; color: gray;"><i class="fas fa-angle-right"></i>@ind.NameWithCode </a>
+                }
+                else
+                {
+                        @ind.NameWithCode
+                }
+                </td>
+
+
+
+                <td class="tdYearPlan">@ind.TotalPlanString @ind.UnitName</td>
+
+                <td class="tdPeriodActual" style="@ind.ReportedProgressStyle"> <span style="border-bottom-style: solid; border-block-color: gray; width: 100%;">@ind.ReportedActual</span> <br /> @ind.ReportedPlan </td>
+
+
+                <td class="tdPeriodAf">@ind.ReportedOutput</td>
+
+                <td class="tdAggActual" style="@ind.ReportedYtDProgressStyle"> <span style="border-bottom-style: solid; border-block-color: gray; width: 100%;">@ind.ReportedYtDActual</span> <br /> @ind.ReportedYtDPlan </td>
+
+
+                <td class="tdAggAf">@ind.ReportedYtDOutput</td>
+
+
+                <td class="tdRemark">@ind.Remark</td>
+               
+                <td>
+                    @{
+                    var sUnit = Model.SupportingUnits.FirstOrDefault(s => s.Value == ind.SupportingUnitId.ToString())?.Name;
+                    }
+                    @ind.ResponsibleUnitCode@(ind.SupportingUnitId != 0 && !string.IsNullOrEmpty(sUnit) ? $"_{sUnit}" : "")
+                </td>
+            </tr>
+    }
+}
+
+<div class="container-fluid">
+    <form data-parsley-validate method="get"
+          asp-action="AggregateReport">
+        <input type="hidden" name="subSystem" value="@Model.CurrentModule" />
+        <div class="row d-sm-flex align-items-center justify-content-center" style="margin-left: 15px; margin-bottom: 2px;">
+
+            <label class="col-sm-2 col-md-1 col-form-label">
+                Fiscal Year
+            </label>
+            <input type="number" class="col-sm-2 col-md-1 form-control" name="SelectedYear" min="@Model.Config.MinOperationYear" max="@Model.CurrentYear" value="@Model.SelectedYear" />
+
+
+            <label class="col-sm-2 col-md-1 col-form-label">
+                Period
+            </label>
+            <select class="custom-select col-sm-3 col-md-2" asp-for="@Model.SelectedPeriod"
+                    asp-items="@Model.GetMonthsOnly(@Model.CurrentMonth)"
+                    required>
+            </select>
+
+
+            @if (Model.CurrentSubsystem == ECCSAModuleEnum.MandE)
+            {
+                <label class="col-sm-2 col-md-1 col-form-label">
+                    Show For
+                </label>
+                <select name="responsibleUnitFilter"
+                        class="form-select-sm col-sm-2 col-md-2"
+                        asp-for="@Model.ResponsibleUnitFilter">
+                    @foreach (var u in Enum.GetValues(typeof(ECCSAModuleEnum)).Cast<ECCSAModuleEnum>())
+                    {
+                        if (u == ECCSAModuleEnum.Bmo)
+                        {
+                            continue;
+                        }
+                        else if (u == ECCSAModuleEnum.None)
+                        {
+                            <option value="0_0">All</option>
+                        }
+                        else if (u == ECCSAModuleEnum.Support)
+                        {
+                            foreach (var su in Model.SupportingUnits)
+                            {
+                                if (!string.IsNullOrWhiteSpace(su.Name))
+                                {
+                                    <option value="@((int)@u)_@(su.Value)">@su.Name</option>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <option value="@((int)@u)_0">@u.GetDisplayName()</option>
+                        }
+                    }
+                </select>
+            }
+            else
+            {
+                <input name="responsibleUnitFilter" value="@Model.ResponsibleUnitFilter" />
+            }
+
+        </div>
+
+        <div class="row d-sm-flex align-items-center justify-content-center" style="margin-left: 15px; margin-bottom: 2px;">
+            <label class="col-sm-6 col-md-4 col-form-label">
+
+            </label>
+            <div class="col-sm-2 col-md-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="idTreeView" name="treeMode" asp-for="@Model.TreeView" >
+                    <label class="form-check-label" for="idTreeView">Tree View</label>
+                </div>
+            </div>
+            <label class="col-sm-2 col-md-1 col-form-label">
+                Score
+            </label>
+            <select name="SelectedScore"
+                    class="form-control col-sm-2 col-md-2" asp-for="@Model.SelectedScore"
+                    asp-items="@Model.ScoreList">
+            </select>
+
+            <input type="submit" value="Show" class="btn col-md-1 btn-primary">
+
+
+
+        </div>
+
+
+    </form>
+
+    <div class="row">
+        <div class="col-12">
+            @*<p class="float-left">
+                <a href="#" onclick="tableToExcel('example1', 'MandE', 'ProgressReport.xls')"><img src="~/img/excel-new.png" alt="Download Excel"></a>
+            </p>*@
+            <a id="previewCertificate" asp-action="ExportAggregateReport" asp-route-selectedYear="@Model.SelectedYear"
+               asp-route-selectedPeriod="@Model.SelectedPeriod" asp-route-responsibleUnitFilter="@Model.ResponsibleUnitFilter"
+               asp-route-selectedScore="@Model.SelectedScore" asp-route-treeMode="@Model.TreeView"
+               asp-route-subSystem="@Model.CurrentSubsystem"
+               class="d-none d-sm-inline-block">
+                <img src="~/img/excel-new.png" alt="Download Excel">
+            </a>
+        </div>
+    </div>
+
+    @if (@Model.ScoreCards.Count > 0)
+    {
+        <div class="row" style="margin-bottom: 10px;">
+            <div class="col-6 ">
+                <div class="card">
+                    <div class="card-header btn " data-state="none" onclick="toggleBody(this)">
+                        Score Card
+
+                    </div>
+
+                    <table class=" card-body table table-bordered" id="scoreTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Legend</th>
+                                <th style="background-color: @Configuration.RedColor; font-weight:400; font-size:small;"> Below @Model.Config.YelloValue%</th>
+                                <th style="background-color: @Configuration.OrangeColor;font-weight:400; font-size:small;">@Model.Config.YelloValue - @Model.Config.BlueValue%</th>
+                                <th style="background-color: @Configuration.YelloColor;font-weight:400; font-size:small;">@Model.Config.BlueValue - @Model.Config.BlueGreenValue%</th>
+                                <th style="background-color: @Configuration.YellowGreen;font-weight:400; font-size:small;">@Model.Config.BlueGreenValue - @Model.Config.GreenValue%</th>
+                                <th style="background-color: @Configuration.GreenColor;font-weight:400; font-size:small; color: white;"> Above @Model.Config.GreenValue%</th>
+                            </tr>
+                        </thead>
+                        @foreach (var i in @Model.ScoreCards)
+                        {
+                            <tr>
+                                <td>@i.ResponsibleUnit @i.TotalIndicators </td>
+                                <td style="background-color: @Configuration.RedColor; font-weight:400; font-size:small;text-align:center;">@i.FIndicators</td>
+                                <td style="background-color: @Configuration.OrangeColor; font-weight:400; font-size:small;text-align:center;">@i.DIndicators</td>
+                                <td style="background-color: @Configuration.YelloColor; font-weight:400; font-size:small;text-align:center;">@i.CIndicators</td>
+                                <td style="background-color: @Configuration.YellowGreen; font-weight:400; font-size:small;text-align:center;">@i.BIndicators</td>
+                                <td style="background-color: @Configuration.GreenColor; font-weight:400; font-size:small;text-align:center; color: white;">@i.AIndicators</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <h4 for="yearfrom" class="col-sm-8 col-form-label">Aggregate Report for: @Model.MonthFullName(@Model.SelectedPeriod) @Model.CurrentYear </h4>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="checkbox" id="showYearPlanchk" class="showHideCol" checked /> Show የአመቱ ዕቅድ &nbsp;&nbsp;
+                            <input type="checkbox" id="showPeriodActualchk" class="showHideCol" checked /> Show @periodName ክንውን &nbsp;&nbsp;
+                            <input type="checkbox" id="showPeriodAfchk" class="showHideCol" checked /> Show አፈጻጸም &nbsp;&nbsp;
+                            <input type="checkbox" id="showAggActualchk" class="showHideCol" checked /> Show እስከዚህ ወር የተከናወነ &nbsp;&nbsp;
+                            <input type="checkbox" id="showAggAfchk" class="showHideCol" checked /> Show እስከዚህ ወር አፈጻጸም &nbsp;&nbsp;
+                            <input type="checkbox" id="showRemarkchk" class="showHideCol" checked /> Show አስተያየት &nbsp;&nbsp;
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-12 table-responsive">
+
+                            <table id="example1" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th >በዕቅድ የተያዙዋናዋና ግቦች፣ ዓላማዎችና ተግባራት</th>
+                                        
+                                        <th class="tdYearPlan" style="width: 120px;"> የአመቱ ዕቅድ </th>
+
+                                        <th class="tdPeriodActual" style="align-content: center; width: 150px;"><u>@periodName ክንውን</u> <br />ዕቅድ</th>
+                                        
+                                        
+                                        <th class="tdPeriodAf"> አፈጻጸም  </th>
+
+                                        <th class="tdAggActual" style="align-content: center; width: 150px;"><u>እስከዚህ ወር የተከናወነ</u> <br />ዕቅድ</th>
+
+
+                                        <th class="tdAggAf"> እስከዚህ ወር አፈጻጸም  </th>
+
+
+                                        <th class="tdRemark"> አስተያየት </th>
+
+                                        <th style="width: 80px;"> ክፍል/አካል</th>
+
+
+                                    </tr>
+
+                                </thead>
+                                <tbody id="tableDetail">
+                                    @{
+                                        if (Model.TreeView)
+                                        {
+                                                @foreach (var root in Model.RootPlans)
+                                            {
+                                                var subPlans = Model.TheList.Where(p => p.ParentId == root.Id).OrderBy(p => p.Code).ToList();
+                                                if (subPlans.Count == 0) continue;
+                                                await Template(root, "", subPlans, "");
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            foreach (var plan in Model.TheList)
+                                            {
+                                                await BuildRow(plan, "", new List<Plan>(), "");
+                                            }
+                                        }
+                                    }
+
+
+                                    @if (Model.UnplannedActivity != null && Model.UnplannedActivity.Id != Guid.Empty && !string.IsNullOrEmpty(Model.UnplannedActivity.ActivitySummary))
+                                    {
+                                        <tr>
+                                            <td colspan="3">@(Model.UnplannedActivity.ActivitySummary)</td>
+
+
+                                            <td>
+                                                @if (Model.UnplannedActivity.NetIncome != 0)
+                                                {
+                                                    @("Net Income: " + Model.UnplannedActivity.NetIncome)
+                                                }
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var sUnit = Model.SupportingUnits.FirstOrDefault(s => s.Value == Model.UnplannedActivity.SupportingUnitId.ToString())?.Name;
+                                                }
+                                                @Model.UnplannedActivity.ResponsibleUnitCode@(Model.UnplannedActivity.SupportingUnitId != 0 && !string.IsNullOrEmpty(sUnit) ? $"_{sUnit}" : "")
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script src="~/js/excellib.min.js"></script>
+
+    <script>
+
+        $(".showHideCol").on("click", function () {
+            var classN = this.id.replace("show", "").replace("chk", "");
+            if (this.checked) {
+                $(".td" + classN).css("display", "");
+            } else {
+                $(".td" + classN).css("display", "none");
+            }
+        });
+
+        function toggleBody(e) {
+            const body = document.getElementById("scoreTable");
+            if ($(e).attr('data-state') === "none") {
+                body.style.display = "block";
+                $(e).attr('data-state', "block");
+            } else {
+                body.style.display = "none";
+                $(e).attr('data-state', "none");
+            }
+
+        }
+
+        function hideChildren() {
+            const children = document.getElementsByClassName('child');
+            for (var i = 0; i < children.length; i++) {
+                children[i].style.display = 'none';
+            }
+        }
+
+        hideChildren();
+
+        function hideDescendant(e) {
+            console.log(e);
+            const parent = $(e).attr('data-tt');
+            const children = document.getElementsByClassName(parent);
+            for (var i = 0; i < children.length; i++) {
+                const child = children[i];
+                child.style.display = 'none';
+                //console.log(child.id, child, document.getElementsByClassName(child.id).length);
+                if (document.getElementsByClassName(child.id).length > 0) {
+                    $(child).find('i').removeClass('fa-angle-down');
+                    $(child).find('i').addClass('fa-angle-right');
+                    hideDescendant($(child).find('a')[0]);
+                }
+
+            }
+        }
+
+        function showHideChildren(e) {
+            const ank = $(e);
+            let show = true;
+
+            for (let i = 0; i < ank[0].children.length; i++) {
+                const child = ank[0].children[i];
+                if (child.localName == 'i') {
+                    if (child.classList.contains('fa-angle-right')) {
+                        show = true;
+                        child.classList.remove('fa-angle-right');
+                        child.classList.add('fa-angle-down');
+                    } else {
+                        show = false;
+                        child.classList.add('fa-angle-right');
+                        child.classList.remove('fa-angle-down');
+                    }
+                }
+            }
+
+            if (show) {
+                const parent = $(e).attr('data-tt');
+                const children = document.getElementsByClassName(parent);
+                for (var i = 0; i < children.length; i++) {
+                    children[i].style.display = '';
+                }
+            } else {
+                hideDescendant(e);
+            }
+        }
+
+      
+
+    </script>
+}

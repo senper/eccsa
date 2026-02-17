@@ -1,0 +1,176 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.TradingViewModel
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = Model.LayoutPage;
+
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area, endDateAfter = Model.EndDateAfter, module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <h4>@Model.TheModel.Title</h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <button data-toggle="modal"
+                                    data-target="#editModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                   
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong>Link: </strong>@Model.TheModel.Link
+                        </div>
+
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <strong> End Date: </strong>@Model.TheModel.EndDate.ToString("yyyy-MM-dd")
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong> Description: <br /></strong>
+                            <pre style="max-width: 95%;">@(Model.TheModel.Description)</pre>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            @if (Model.TheModel.ImageSetted)
+                                {
+                                    @("Photo:") <br />
+                                <img height="100" src="/@Model.TheModel.ImageUrlRelative" title="@Model.TheModel.TitleFull" alt="@Model.TheModel.TitleFull Photo" />
+                                    <br />
+                                    <form data-parsley-validate novalidate
+                                          method="post"
+                                      asp-action="RemovePhoto" asp-antiforgery="true">
+                                    <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                    <input type="hidden" name="endDateAfter" value="@Model.EndDateAfter" />
+                                        <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                        <button title="Remove Photo" type="submit"
+                                                class="btn btn-outline-danger btn-sm">
+                                            Remove
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    @("Photo: Not Set")
+                                }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top: 1px" />
+
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Business Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                          asp-action="Save" asp-antiforgery="true">
+                        <input type="hidden" id="idInput" name="Id" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="module" value="@Model.CurrentModule" />
+                        <input type="hidden" name="endDateAfter" value="@(Model.EndDateAfter.ToString("yyyy-MM-dd"))" />
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" class="form-control col-sm-7 col-md-8" id="title" placeholder="Title  " name="Title" value="@Model.TheModel.Title" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" class="form-control col-sm-7 col-md-8" id="titlelocal" placeholder="ርዕስ  " name="TitleLocal" value="@Model.TheModel.TitleLocal" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+                            <textarea class="form-control col-sm-7 col-md-8" id="description" placeholder="Description  " rows="5"
+                                      name="Description" required>@Model.TheModel.Description</textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <textarea class="form-control col-sm-7 col-md-8" id="descriptionlocal" placeholder="ማብራርያ  " rows="5"
+                                      name="DescriptionLocal" required> @Model.TheModel.DescriptionLocal </textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Link
+                            </label>
+                            <input type="text" class="form-control col-sm-7 col-md-8" id="link" name="Link" value="@Model.TheModel.Link" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                End Date
+                            </label>
+                            <input type="date" class="form-control col-sm-7 col-md-8" id="endDate" name="EndDate" value="@(Model.TheModel.EndDate.ToString("yyyy-MM-dd"))" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">Photo</label>
+                            <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" />
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" id="submitPayment" class="btn btn-primary">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section script {
+
+        <script>
+
+
+
+            function confirmAction(form, msg) {
+                $.confirm({
+                    icon: 'fa fa-exclamation-triangle',
+                    title: 'Confirm!',
+                    content: 'Are you sure want to ' + msg + ' ?',
+                    buttons: {
+                        yes: function () {
+                            form.submit();
+                        },
+                        no: function () {
+                        }
+                    }
+                });
+                return false;
+            }
+        </script>
+    }

@@ -1,0 +1,153 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.AssociationViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Add" : "Edit") </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate  method="post" enctype="multipart/form-data"
+          asp-action="@(Model.TheModel.Id == Guid.Empty ? "Create" : "Update")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+
+        <div class="row form-group" style="margin-bottom:1px;">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.NameEng" required  placeholder="Name  "/>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.NameLocal" placeholder="ስም  " />
+        </div>
+        <div class="row form-group" style="margin-bottom:1px;">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Short Name
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.ShortName" maxlength="35" required placeholder="Short Name   "/>
+        </div>        
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.ShortName_Local" maxlength="35" placeholder="አጭር ስም" required />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Type
+            </label>
+            <select class="custom-select col-sm-8 col-md-8" required
+                    asp-for="TheModel.AssociationType">
+                <option value="0">Please select ...</option>
+                <option value="1">Administrative</option>
+                <option value="2">Sectoral</option>
+            </select>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Level
+            </label>
+            <select class="custom-select col-sm-8 col-md-8" required
+                    asp-for="TheModel.AssociationLevel">
+                <option value="0">National</option>
+                <option value="1">Regional</option>
+                <option value="3">Woreda</option>
+
+            </select>
+            <span asp-validation-for="TheModel.AssociationLevel" class="text-danger"></span>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Location
+            </label>
+            <input type="hidden" id="hdnlocationSelected" name="LocationId" value="@Model.TheModel.LocationId" />
+            <select id="locationSelectorId" class="custom-select col-sm-8 col-md-8" asp-for="TheModel.LocationId" required
+                    onchange="locationChanged()" asp-items="@(new SelectList(Model.Locations,"Id", "Name"))"></select>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Member Of
+            </label>
+            <select class="custom-select col-sm-8 col-md-8" asp-for="TheModel.ParentId"
+                    asp-items="@(new SelectList(Model.TheList,"Id", "Name"))"></select>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Member Since
+            </label>
+            <input type="date" class="form-control col-sm-6 col-md-5" asp-for="TheModel.MemberSince" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">Photo</label>
+            <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Registration Fee
+            </label>
+            <div class="input-group col-sm-8 col-md-8" style="padding-left: 0px;padding-right: 0px;">
+                <input type="number" min="0" max="100000" class="form-control " asp-for="TheModel.RegistrationFee" />
+                <div class="input-group-append" style="max-height: 39px;">
+                    <span class="input-group-text" id="basic-addon2" s>Birr</span>
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Renewal Fee
+            </label>
+            <div class="input-group   col-sm-8 col-md-8" style="padding-left: 0px;padding-right: 0px;">
+                <input type="number" min="0" max="100000" class="form-control" asp-for="TheModel.RenewalFee" />
+                <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">Birr</span>
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Status
+            </label>
+            <select class="custom-select col-sm-8 col-md-8" asp-for="TheModel.Stakeholder.Status" required>
+                <option value="1">Active</option>
+                <option value="2">Inactive</option>
+            </select>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+      loadLocation();
+    function locationChanged() {
+        document.getElementById('hdnlocationSelected').value = document.getElementById('locationSelectorId').value;
+        loadLocation();
+    }
+
+    function loadLocation() {
+        const id = document.getElementById('hdnlocationSelected').value;
+        let selectedV = '';
+        let url = `/Membership/Applicant/GetLocation`;
+        jQuery.get(url, { parentId: id }, function (data) {
+            $('#locationSelectorId')
+                .empty();
+            $.each(data.$values, function (index, value) {
+                selectedV = '';
+                if (id == value.id) {
+                    selectedV = `selected="selected"`;
+                }
+                const option = `<option  ${selectedV} value="${value.id}">${value.name}</option>`;
+                $('#locationSelectorId').append(option);
+            });
+        });
+
+    }
+</script>

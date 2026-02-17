@@ -1,0 +1,1040 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Membership
+@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.AssociationViewModel
+
+@{
+    ViewData["Title"] = "Associations";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+    HashSet<Guid> associationSet = new HashSet<Guid>();
+    HashSet<Guid> individualSet = new HashSet<Guid>();
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Association",new { Area ="Membership"})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <img src="@Model.LogoPath" alt="Logo" style="max-height: 90px; max-width: 90px; min-height: 30px; min-width: 30px; " />
+                        </div>
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.NameEng @Model.TheModel.NameLocal </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <button data-toggle="modal"
+                                    data-target="#AddEditModal"
+                                    title="Edit"
+                                    data-url="@Url.Action("Edit", new { Id=Model.TheModel.Id })"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    ShortName:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.ShortName @Model.TheModel.ShortName_Local
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Type:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.AssociationType
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Level
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.AssociationLevel
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Location
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Location.NameEng @Model.TheModel.Location.NameLocal
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Member of
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Parent == null? "": Model.TheModel.Parent.Name)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Stakeholder.Status
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    New Membership Fee
+                                </div>
+                                <div class="col-sm-8">
+                                   Current: @Model.TheModel.RegistrationFee Birr , Proposed: @Model.TheModel.ProposedRegistrationFee Birr
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Renewal Fee
+                                </div>
+                                <div class="col-sm-8">
+                                    Current: @Model.TheModel.RenewalFee Birr , Proposed: @Model.TheModel.ProposedRenewalFee Birr
+                                </div>
+                            </div>
+                            <br />
+                            <div class="card">
+                                <div class="card-header">
+                                    Contact Details <button class="card-header-action btn edit btn-outline-success btn-sm"
+                                                            id="newbtn"
+                                                            data-url="@Url.Action("EditContact", new {AssociationId = Model.TheModel.Id, Id=Guid.Empty })"
+                                                            data-toggle="modal"
+                                                            data-target="#AddEditModal">
+                                        New
+                                    </button>
+                                </div>
+                                <div class="card-body">
+
+
+
+                                    @foreach (var contact in @Model.TheModel.Stakeholder.Contacts.OrderBy(c => c.Priority))
+                                    {
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                @contact.ContactType:
+                                            </div>
+                                            <div class="col-sm-6">
+                                                @contact.Address
+                                            </div>
+                                            <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditContact", new {AssociationId = Model.TheModel.Id,  Id=@contact.Id })"
+                                                    class="edit btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pen "></i>
+                                                </button>
+
+                                                <a onclick="return confirmDelete($('#deleteContact@(Model.Guid2String(contact.Id))')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteContact@(Model.Guid2String(contact.Id))"
+                                                  asp-action="deleteContact" asp-antiforgery="true">
+                                                    <input type="hidden" name="id" value="@contact.Id" />
+                                                    <input type="hidden" name="memberId" value="@contact.MemberId" />
+                                                </form>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="card">
+
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <img id="blah1" src="@Model.BoardDirectorPath" alt="Board Chairperson" style="max-height: 170px; max-width: 170px; min-height: 170px; min-width: 170px; " /> <br />
+                                            @Model.BoardChairman?.PositionType?.Name<br />
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <img id="blah2" src="@Model.SecretaryGeneralPath" alt="Secretary General" style="max-height: 170px; max-width: 170px; min-height: 170px; min-width: 170px; " /><br />
+                                            @Model.CEO?.PositionType?.Name <br />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+
+                <div class="card-body collapse show" id="detail_info">
+
+                    <a class="profile" href="#" id="showhideDetail" data-toggle="collapse" data-target="#profile_info" aria-expanded="true" aria-controls="profile_info">
+                        <strong>Profile</strong>
+                    </a>
+                    <div class="card collapse show" id="profile_info">
+                        <div id="ass_profile_info_text">
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-outline-success btn-sm btn-circle float-right" onclick="editProfile()">
+                                        <i class="fa fa-pen "></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12" id="profileHtml">
+                                    @Html.Raw(Model.TheModel.Profile)
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ass_profile_info_editor" class=" d-none">
+                            <form data-parsley-validate method="post" asp-action="SetProfile" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                <div>
+                                    <textarea id="associationProfile" name="profile" placeholder="Profile ..............." cols="65" rows="10" data-sample-short>
+                                        @(Model.TheModel.Profile)
+                                    </textarea>
+                                </div>
+                                <div class="form-group ">
+                                    <input type="submit" value="Save" class="btn btn-warning localize" data-key="Save">
+                                    <input type="button" value="Cancel" class="btn btn-info localize " data-key="cancel" onclick="profileCancel()">
+                                </div>
+                            </form>
+                        </div>
+                        <div id="ass_profile_info_text_local">
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-outline-success btn-sm btn-circle float-right" onclick="editProfileLocal()">
+                                        <i class="fa fa-pen "></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12" id="profileHtml">
+                                    @Html.Raw(Model.TheModel.Profile_Local)
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ass_profile_info_editor_local" class=" d-none">
+                            <form data-parsley-validate method="post" asp-action="SetProfileLocal" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                <div>
+                                    <textarea id="associationProfileLocal" name="profile" placeholder="Profile Local..............." cols="65" rows="10" data-sample-short>
+                                        @(Model.TheModel.Profile_Local)
+                                    </textarea>
+                                </div>
+                                <div class="form-group ">
+                                    <input type="submit" value="Save" class="btn btn-warning localize" data-key="Save">
+                                    <input type="button" value="Cancel" class="btn btn-info localize " data-key="cancel" onclick="profileLocalCancel()">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link @Model.Tab0Active" data-toggle="tab" href="#representatives" role="tab" aria-controls="representatives">Representatives</a></li>
+
+                            <li class="nav-item"><a class="nav-link @Model.Tab1Active" data-toggle="tab" href="#members" role="tab" aria-controls="members">Membership Requirements</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab2Active" data-toggle="tab" href="#settings" role="tab" aria-controls="settings">Bank Settings</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab3Active" data-toggle="tab" href="#profileImages" role="tab" aria-controls="profileImages">Profile Images</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab4Active" data-toggle="tab" href="#associationInfo" role="tab" aria-controls="profileImages">Additional Info</a></li>
+                            @*<li class="nav-item"><a class="nav-link @Model.Tab5Active" data-toggle="tab" href="#associations" role="tab" aria-controls="members">Members</a></li>*@
+                        </ul>
+                        <div class="tab-content">
+
+                            <div class="tab-pane @Model.Tab0Active" id="representatives" role="tabpanel">
+                                <div class="card-header-actions">
+                                    <button class="card-header-action edit btn btn-outline-success btn-sm"
+                                            id="newbtn"
+                                            data-url="@Url.Action("EditStaff", new {AssociationId = Model.TheModel.Id, Id=Guid.Empty })"
+                                            data-toggle="modal"
+                                            data-target="#AddEditModal">
+                                        New
+                                    </button>
+
+                                    @*<form data-parsley-validate novalidate method="get" id="printInvoice" target="_blank"
+                                        asp-action="PrintInvoice" asp-antiforgery="true">
+                                        <input type="hidden" value="@Model.TheModel.Id" name="id" />
+                                        </form>
+                                        <button type="submit" class="btn btn-primary localize" data-key="Print" onclick="$('#printInvoice').submit();">Print </button>
+
+
+
+                                        <form data-parsley-validate novalidate method="get" id="printReceipt" target="_blank"
+                                        asp-action="PrintReceipt" asp-antiforgery="true">
+                                        <input type="hidden" value="@Model.TheModel.Id" name="id" />
+                                        </form>
+                                        <button type="submit" class="btn btn-primary localize" data-key="Print" onclick="$('#printReceipt').submit();">Print Receipt </button>*@
+
+
+                                </div>
+                                <table class="table table-bordered table-striped" id="datatbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Mobile</th>
+                                            <th>Email</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var r in Model.TheModel.Employees.Where(e => e.Status == ECCSA.BackOffice.Server.Model.Common.StatusEnum.Active))
+                                        {
+                                            <tr>
+                                                <td>@r.Name</td>
+                                                <td>@r.PositionType.Name</td>
+                                                <td>@r.Mobile</td>
+                                                <td>@r.Email</td>
+                                                <td>
+                                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                        <a class="btn btn-outline-success edit btn-sm"
+                                                       data-toggle="modal"
+                                                       data-url="@Url.Action("EditStaff", new {AssociationId = Model.TheModel.Id, Id=r.Id })"
+                                                       data-target="#AddEditModal"><i class="fa fa-pen "></i></a>
+
+                                                        <a class="btn btn-outline-info edit btn-sm"
+                                                       data-toggle="modal"
+                                                       data-url="@Url.Action("StaffDetail", new {AssociationId = Model.TheModel.Id, Id=r.Id })"
+                                                       data-target="#AddEditModal"><i class="fa fa-info" aria-hidden="true"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="tab-pane @Model.Tab1Active" id="members" role="tabpanel">
+                                <div class="card-header-actions">
+                                </div>
+                                <table class="table table-bordered table-striped" id="datatbldocument">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Auto Approve</th>
+                                            <th>For New</th>
+                                            <th>For Renewal</th>
+                                            <th>
+                                                <div class="btn-group float-right">
+
+                                                    @if (Model.RoleLevel == RoleLevelEnum.Admin)
+                                                    {
+                                                        <button class="card-header-action btn btn-outline-success btn-sm"
+                                                            data-toggle="modal"
+                                                            data-target="#editRequirementModal"
+                                                            title="New Requirement"
+                                                            data-id="@Guid.Empty"
+                                                            data-orderno=""
+                                                            data-name=""
+                                                            data-desc=""
+                                                            data-label=""
+                                                            data-labelLocal=""
+                                                            data-approve="true"
+                                                            data-type="0"
+                                                            data-appl="@((int)RequirementLevelEnum.Mandatory)"
+                                                            data-renewal="@((int)RequirementLevelEnum.Mandatory)"
+                                                            onclick="editRequirement(this)">
+                                                            New
+                                                        </button>
+
+
+                                                    }
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var q in Model.TheModel.MembershipRequirements.Where(r => r.Status == StatusEnum.Active).OrderBy(o => o.OrderNo))
+                                        {
+                                            <tr>
+                                                <td>@q.OrderNo</td>
+                                                <td> @q.Name  </td>
+                                                <td> @q.InputMethod  </td>
+                                                <td>@(q.ApproveOnSubmit?"Yes":"No")</td>
+                                                <td>@q.ApplicationRequirementLevel.GetDisplayName()</td>
+                                                <td>@q.RenewalRequirementLevel.GetDisplayName()</td>
+                                                <td>
+                                                    @if (Model.RoleLevel == RoleLevelEnum.Admin)
+                                                    {
+                                                        if (!@q.HasApplicants)
+                                                        {
+                                                            <button data-toggle="modal"
+                                                        data-target="#editRequirementModal"
+                                                        title="Edit Requirement"
+                                                        data-id="@q.Id"
+                                                        data-orderno="@q.OrderNo"
+                                                        data-name="@q.Name"
+                                                        data-desc="@q.Description"
+                                                        data-type="@((int)q.InputMethod)"
+                                                        data-label="@q.Label"
+                                                        data-labellocal="@q.LabelLocal"
+                                                        data-lookuptype="@q.LookupTypeId"
+                                                        data-appl="@((int)q.ApplicationRequirementLevel)"
+                                                        data-renewal="@((int)q.RenewalRequirementLevel)"
+                                                        data-approve="@q.ApproveOnSubmit"
+                                                        onclick="editRequirement(this)"
+                                                        class=" float-right btn btn-outline-success btn-sm">
+                                                                <i class="fa fa-pen "></i>
+                                                            </button>
+                                                        }
+                                                        <a onclick="return confirmDelete($('#delete@(Model.Guid2String(q.Id))')[0]);"
+                                                   class=" btn btn-sm btn-outline-danger float-right">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+                                                        <form data-parsley-validate novalidate
+                                                      method="post" id="delete@(Model.Guid2String(q.Id))"
+                                                      asp-action="DeleteRequirement" asp-antiforgery="true">
+                                                            <input type="hidden" name="requirementId" value="@q.Id" />
+                                                            <input type="hidden" name="associationId" value="@q.AssociationId" />
+                                                        </form>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane @Model.Tab2Active" id="settings" role="tabpanel">
+
+                                <div class="card-header-actions">
+                                    <button class="card-header-action edit btn btn-outline-success btn-sm"
+                                            id="newSettingBtn"
+                                            data-url="@Url.Action("EditSetting", new {AssociationId = Model.TheModel.Id, Id=Guid.Empty })"
+                                            data-toggle="modal"
+                                            data-target="#AddEditModal">
+                                        New
+                                    </button>
+                                </div>
+                                <table class="table table-bordered table-striped" id="datatblsetting">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="3" class="text-center">Current</th>
+                                            <th colspan="3" class="text-center">Proposed</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Bank</th>
+                                            <th>Account No</th>
+                                            <th>Update Date</th>
+                                            <th>Bank</th>
+                                            <th>Account No</th>
+                                            <th>Proposed Date</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var r in Model.TheModel.Settings)
+                                        {
+                                            <tr>
+                                                <td> @r.BankName </td>
+                                                <td>@r.AccountNumber</td>
+                                        <td>
+                                            @(r.UpdatedDate?.ToString("yyyy-MM-dd HH:mm tt"))
+                                        </td>
+                                                <td> @r.ProposedBankName </td>
+                                                <td>@r.ProposedAccountNumber</td>
+                                                
+                                        <td>
+                                            @(r.DateProposed?.ToString("yyyy-MM-dd HH:mm tt"))
+                                        </td>
+                                        
+                                                <td>
+                                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                        <a class="btn btn-outline-success edit btn-sm"
+                                                       data-toggle="modal"
+                                                       data-url="@Url.Action("EditSetting", new {AssociationId = Model.TheModel.Id, Id=r.Id })"
+                                                       data-target="#AddEditModal"><i class="fa fa-pen "></i></a>
+
+                                                        <a onclick="return confirmDelete($('#deleteSetting@(Model.Guid2String(r.Id))')[0]);"
+                                                       class=" btn btn-sm btn-outline-danger">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+                                                        <form data-parsley-validate novalidate method="post" id="deleteSetting@(Model.Guid2String(r.Id))"
+                                                          asp-action="DeleteSetting" asp-antiforgery="true">
+                                                            <input type="hidden" name="id" value="@r.Id" />
+                                                            <input type="hidden" name="associationId" value="@r.AssociationId" />
+                                                        </form>
+
+
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane @Model.Tab3Active" id="profileImages" role="tabpanel">
+
+                                <div class="card-header-actions">
+                                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                                          asp-action="@("AddProfileImage")" asp-antiforgery="true">
+                                        <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                        <input type="button" onclick="$('#selectfile').click()" id="selectFilebtn" class="btn btn-outline-success btn-sm" name="Select file" value="New" />
+                                        <input type="file" name="image" id="selectfile" hidden onchange="this.form.submit()" accept="image/png, image/gif, image/jpeg">
+                                    </form>
+                                </div>
+                                <table class="table table-bordered table-striped" id="datatblsetting">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>Url</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var r in Model.ProfileImages)
+                                        {
+                                            <tr>
+                                                <td> <img src="@r" width="30%" /> </td>
+                                                <td>@r</td>
+                                                <td>
+                                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                        <a onclick="return confirmDelete($('#deleteProfileImage@(Model.ProfileImages.IndexOf(r))')[0]);"
+                                                       class=" btn btn-sm btn-outline-danger">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+                                                        <form data-parsley-validate novalidate method="post" id="deleteProfileImage@(Model.ProfileImages.IndexOf(r))"
+                                                          asp-action="RemoveProfileImage" asp-antiforgery="true">
+                                                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                            <input type="hidden" name="fileName" value="@(r)" />
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane @Model.Tab4Active" id="associationInfo" role="tabpanel">
+                                <div class="row">
+
+                                    <div class="col-md-11 ">
+                                        <table class="table table-bordered table-striped" id="datatblprofile" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Attribute</th>
+                                                    <th>Value</th>
+
+                                                    <th>
+                                                        <button class="card-header-action edit btn btn-outline-success btn-sm"
+                                                                id="newbtn"
+                                                                data-url="@Url.Action("EditProfile", new {id=Guid.Empty, associationId = Model.TheModel.Id })"
+                                                                data-toggle="modal"
+                                                                data-target="#AddEditModal">
+                                                            New
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var a in Model.TheModel.AssociationProfiles)
+                                                {
+                                                    <tr>
+                                                        <td> @a.ProfileAttribure.Name </td>
+                                                        <td> @a.AttributeValue</td>
+                                                        <td>
+
+                                                            <button data-toggle="modal"
+                                                                data-target="#AddEditModal"
+                                                                title="Edit"
+                                                                data-url="@Url.Action("EditProfile", new {id=a.Id, associationId = a.AssociationId })"
+                                                                class=" float-right edit btn btn-outline-success btn-sm">
+                                                                <i class="fa fa-pen "></i>
+                                                            </button>
+
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="tab-pane @Model.Tab5Active" id="associations" role="tabpanel">
+
+
+                                <table class="table table-bordered table-striped" id="datatblsetting">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var r in Model.Associations)
+                                        {
+                                            if (associationSet.Contains(r.Id)) continue;
+                                            if (r.Id == Model.TheModel.Id) continue;
+                                            associationSet.Add(r.Id);
+                                            <tr>
+                                                <td> @r.Name </td>
+                                                <td>@r.AssociationType </td>
+                                                <td>
+                                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                        <a class=" btn btn-sm  btn-outline-info" asp-controller="Association" asp-action="Detail" asp-route-id="@r.Id">
+                                                            <i class="fa fa-info" aria-hidden="true"></i>
+                                                        </a>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (Model.Individuals != null)
+                                        {
+                                            foreach (var i in Model.Individuals)
+                                            {
+                                                if (individualSet.Contains(i.Id)) continue;
+
+                                                individualSet.Add(i.Id);
+                                                <tr>
+                                                    <td> @i.NameEng </td>
+                                                    <td>Individual</td>
+                                                    <td>
+                                                        <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                            <a class=" btn btn-sm  btn-outline-info" asp-controller="Individual" asp-action="Detail" asp-route-id="@i.Id">
+                                                                <i class="fa fa-info" aria-hidden="true"></i>
+                                                            </a>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>*@
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editRequirementModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">  Service Requirement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveRequirement" asp-antiforgery="true" onsubmit="return validateServiceTypeRequirement()">
+                        <input type="hidden" name="AssociationId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="requirementId" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="10" name="OrderNo" id="requirementOrderNo" class="form-control col-sm-4 col-md-3" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="100" name="Name" id="nameEngRequirement" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Label
+                            </label>
+                            <input type="text" maxlength="100" name="Label" id="labelRequirement" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                            </label>
+                            <input type="text" maxlength="100" name="LabelLocal" id="labelLocalRequirement" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+                            <textarea maxlength="800" rows="4" name="Description" id="DescriptionEngRequirement" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Type
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" name="InputMethod" id="inputMethodRequirement" onchange="inputTypeChanged(this);"
+                                asp-items="@(new SelectList(Model.InputeTypes,"Id", "Name"))" required></select>
+                        </div>
+
+                        <div class="row form-group" id="lookupDiv" style="display:none;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Lookup Type
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" name="LookupTypeId" id="lookupTypeId"
+                                asp-items="@(new SelectList(Model.LookupTypes,"Id", "Name"))"></select>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="checkbox"
+                                   checked name="ApproveOnSubmit" id="approveOnSubmit" /> Approve On Submit
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                For New
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" name="ApplicationRequirementLevel" id="applicationRequirementLevel"
+                                asp-items="@(Html.GetEnumSelectList<RequirementLevelEnum>())"></select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                For Renewal
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" name="RenewalRequirementLevel" id="renewalRequirementLevel"
+                                asp-items="@(Html.GetEnumSelectList<RequirementLevelEnum>())"></select>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editServiceTypeModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title"> Edit Service Type</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+@section script {
+
+<script src="~/vendor/ckeditor/ckeditor.js"></script>
+<script>
+    CKEDITOR.replace('associationProfile', {
+        height: 260,
+        width: '100%',
+    });
+
+    function editProfile() {
+        document.getElementById('ass_profile_info_editor').classList.remove('d-none');
+        document.getElementById('ass_profile_info_text').classList.add('d-none');
+    }
+
+    function profileCancel() {
+        document.getElementById('ass_profile_info_editor').classList.add('d-none');
+        document.getElementById('ass_profile_info_text').classList.remove('d-none');
+    }
+
+    
+    CKEDITOR.replace('associationProfileLocal', {
+        height: 260,
+        width: '100%',
+    });
+
+    function editProfileLocal() {
+        document.getElementById('ass_profile_info_editor_local').classList.remove('d-none');
+        document.getElementById('ass_profile_info_text_local').classList.add('d-none');
+    }
+
+    function profileLocalCancel() {
+        document.getElementById('ass_profile_info_editor_local').classList.add('d-none');
+        document.getElementById('ass_profile_info_text_local').classList.remove('d-none');
+    }
+
+    $('.edit').on('click', function () {
+
+        var url = $(this).attr('data-url');
+        $($(this).attr('data-target')).find(".modal-content").html("");
+
+        $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+            $(item).html("");
+
+            if (url && url.length > 0) {
+                $(item).load(url);
+            }
+        });
+    });
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+
+<script>
+
+    function showHideAnswers(e) {
+        const ank = $(e);
+        let show = true;
+        for (let i = 0; i < ank[0].children.length; i++) {
+            const child = ank[0].children[i];
+            if (child.localName == 'i') {
+                if (child.classList.contains('fa-angle-right')) {
+                    show = true;
+                    child.classList.remove('fa-angle-right');
+                    child.classList.add('fa-angle-down');
+                } else {
+                    show = false;
+                    child.classList.add('fa-angle-right');
+                    child.classList.remove('fa-angle-down');
+                }
+            }
+        }
+        const className = ank.attr('data-tt');
+
+        const rows = document.getElementsByClassName(className);
+        for (let i = 0; i < rows.length; i++) {
+            if (show) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+
+    }
+
+    function approvalChanged(e){
+         document.getElementById('approvalRequiredHdn').value =Boolean( e.checked);
+    }
+    function attachmentChanged(e){
+         document.getElementById('approvalAttachmentRequiredHdn').value =Boolean( e.checked);
+    }
+    function inputTypeChanged(e) {
+        const val = Number(e.value);
+
+        const rangeDiv = document.getElementById('lookupDiv');
+        if (val === 10) {
+            rangeDiv.style.display = '';
+            $("#lookupDiv").attr('required', 'required');
+        } else {
+            rangeDiv.style.display = 'none';
+            $("#lookupDiv").removeAttr('required');
+        }
+    }
+
+
+    function editChoice(e) {
+        const id = document.getElementById('choiceId');
+        const title = document.getElementById('choiceTitle');
+        const qid = document.getElementById('choiceQuestionId');
+        const orderNo = document.getElementById('choiceOrderNo');
+        const choiceText = document.getElementById('choiceText');
+
+        const idVal = $(e).attr('data-id');
+        const qidVal = $(e).attr('data-qid');
+        const orderVal = $(e).attr('data-orderno');
+        const choiceVal = $(e).attr('data-choice');
+        const titleVal = $(e).attr('data-title');
+
+        id.value = idVal;
+        qid.value = qidVal;
+        orderNo.value = orderVal;
+        choiceText.value = choiceVal;
+        title.innerHTML = titleVal;
+
+
+    }
+
+    function questionTypeChanged(e) {
+        const val = Number(e.value);
+
+        const rangeDiv = document.getElementById('rangeDiv');
+        if (val === 3) {
+            rangeDiv.style.display = '';
+        } else {
+            rangeDiv.style.display = 'none';
+        }
+    }
+
+    function showParent(e) {
+        const checked = Boolean(e.checked);
+        showHideParent(checked);
+
+    }
+
+    function showHideParent(checked) {
+        const parentChoiceDiv = document.getElementById('parentChoiceDiv');
+        if (checked) {
+            parentChoiceDiv.style.display = '';
+        } else {
+            parentChoiceDiv.style.display = 'none';
+        }
+        const parentOpt = document.getElementById('parentChoice');
+        const qId = document.getElementById('questionId').value;
+        const val = document.getElementById('settingAllChoices').value;
+
+        const choices = JSON.parse(val);
+        console.log(choices);
+        $("#parentChoice").empty();
+        for (let i = 0; i < choices.length; i++) {
+            let item = choices[i];
+
+            if (item != null && item.SimpleChoices != null && item.Id != qId) {
+                var optGrp = document.createElement("optgroup");
+                optGrp.label = `${item.OrderNo} ${item.Question}`
+                for (let j = 0; j < item.SimpleChoices.length; j++) {
+                    let itm = item.SimpleChoices[j];
+                    var opt = document.createElement("option");
+                    opt.value = itm.Id;
+                    opt.innerHTML = itm.ChoiceText;
+                    optGrp.appendChild(opt);
+                }
+                parentOpt.appendChild(optGrp);
+            }
+
+        }
+
+    }
+
+    function editRequirement(e) {
+        const id = document.getElementById('requirementId');
+        const orderNo = document.getElementById('requirementOrderNo');
+        const nameEng = document.getElementById('nameEngRequirement');
+
+        const label = document.getElementById('labelRequirement');
+        const labelLocal = document.getElementById('labelLocalRequirement');
+        const descEng = document.getElementById('DescriptionEngRequirement');
+        const approve = document.getElementById('approveOnSubmit');
+
+        const appl = document.getElementById('applicationRequirementLevel');
+        const renewal = document.getElementById('renewalRequirementLevel');
+
+        const idVal = $(e).attr('data-id');
+        const orderVal = $(e).attr('data-orderno');
+        const nameVal = $(e).attr('data-name');
+        const labelVal = $(e).attr('data-label');
+        const labelLocalVal = $(e).attr('data-labellocal');
+        const lookupVal= $(e).attr('data-lookuptype');
+        const descVal = $(e).attr('data-desc');
+        const typeVal = Number($(e).attr('data-type'));
+        const approveVal = Boolean($(e).attr('data-approve'));
+        const applVal = Number($(e).attr('data-appl'));
+        const renewalVal = Number($(e).attr('data-renewal'));
+        id.value = idVal;
+        orderNo.value = orderVal;
+        nameEng.value = nameVal;
+        label.value = labelVal;
+        labelLocal.value = labelLocalVal;
+        descEng.innerHTML = descVal;
+        approve.value = approveVal;
+
+        $('#inputMethodRequirement').val(typeVal).change();
+        $('#applicationRequirementLevel').val(applVal).change();
+        $('#renewalRequirementLevel').val(renewalVal).change();
+        editRequirementInvoice(e);
+        editRequirementGroup(e);
+    }
+
+
+    function editRequirementGroup(e) {
+        const id = document.getElementById('groupId');
+        const orderNo = document.getElementById('groupOrderNo');
+        const name = document.getElementById('groupName');
+
+        const idVal = $(e).attr('data-id');
+        const orderVal = $(e).attr('data-orderno');
+        const nameEngVal = $(e).attr('data-name');
+
+
+        id.value = idVal;
+        orderNo.value = orderVal;
+        name.value = nameEngVal;
+    }
+
+    function editRequirementInvoice(e) {
+        const id = document.getElementById('invoiceRequirementId');
+        const orderNo = document.getElementById('invoiceOrderNo');
+        const name = document.getElementById('invoiceName');
+
+        const desc = document.getElementById('invoiceDescription');
+
+        const idVal = $(e).attr('data-id');
+        const orderVal = $(e).attr('data-orderno');
+        const nameVal = $(e).attr('data-name');
+
+        const descVal = $(e).attr('data-desc');
+
+
+        id.value = idVal;
+        orderNo.value = orderVal;
+        name.value = nameVal;
+
+        desc.innerHTML = descVal;
+    }
+</script>
+}

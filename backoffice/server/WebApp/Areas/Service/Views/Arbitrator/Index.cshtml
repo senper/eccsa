@@ -1,0 +1,112 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Service.Model.ServiceRequestViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Index">
+                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                <div class="btn-group pull-left" role="group" aria-label="Basic example">
+                    Search By &nbsp;&nbsp;<select name="SearchStatus" asp-for="@Model.SearchStatus"
+                                                  asp-items="@(Html.GetEnumSelectList<WorkflowStateEnum>())">
+                        <option value="-1"></option>
+                    </select>
+                    <input type="text" maxlength="20" name="SearchKey" asp-for="@Model.SearchKey" placeholder="TIN or Tracking No" />
+                    <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+       
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+               
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Service Type</th>
+                                    <th>TrackingNo </th>
+                                    <th>TIN</th>
+                                    <th>Name</th>
+                                    <th>Mobile</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Service Type</th>
+                                    <th>TrackingNo </th>
+                                    <th>TIN</th>
+                                    <th>Name</th>
+                                    <th>Mobile</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ServiceType.Name)
+                                        </td>
+
+                                        <td>
+                                            <a asp-controller="Arbitrator" asp-action="Detail" asp-route-id="@item.Id" class="title">
+                                                @Html.DisplayFor(modelItem => item.TrackingNo)
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.TIN)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.FullName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.MobileNo)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.RequestStatus)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="Arbitrator" asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+

@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LaunchLayout.cshtml";
+}
+
+<div class="container-fluid">
+
+ 
+    <!-- Content Row -->
+
+
+   
+    <div class="row">
+         <div class="col-12">
+                <form data-parsley-validate novalidate method="post" 
+                       asp-action="Launch" asp-antiforgery="true" >
+                                                
+        <input type="submit" class="btn btn-lg btn-outline-primary" style="margin-top: 40px;margin-bottom: 40px;width: 980px;display:block;margin-left:auto; margin-right:auto;" value="Click Here To Launch" />
+        </form>
+        </div>
+    </div>
+   <div class="row">
+        <div class="col-12">
+        <img src="~/img/launch.jpg" style="width: 980px;display:block;margin-left:auto; margin-right:auto;" />
+        </div>
+    </div>
+
+</div>

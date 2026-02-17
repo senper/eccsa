@@ -1,0 +1,206 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.AdvertViewModel
+
+@{
+    ViewData["Title"] = "Advertizement";
+    Layout =Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Advertisments",new { Area = Model.Area, module=@ECCSAModuleFlag.Communication})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.CompanyName   </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right  btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Email
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.Email
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Start Date
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.StartDate.ToLongDateString()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            End Date
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.EndDate.ToLongDateString()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Phone #
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.PhoneNumber
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <hr style="margin-top: 1px" />
+    @if (!string.IsNullOrEmpty(@Model.TheModel.Url))
+    {
+        <img src="@Model.TheModel.Url" alt="advert" />
+    }
+
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Campaign</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true" onsubmit="return validate()" >
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            FullName
+                        </label>
+                        <input type="text" name="FullName" id="fullName" asp-for="TheModel.FullName" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Company Name
+                        </label>
+                        <input type="text" name="CompanyName" maxlength="100" asp-for="TheModel.CompanyName" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                     <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" name="Email" id="email" maxlength="100" asp-for="TheModel.Email" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                     <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Phone
+                        </label>
+                        <input type="text" name="PhoneNumber" asp-for="TheModel.PhoneNumber" maxlength="50" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Section
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.Section" 
+                                asp-items="@(Html.GetEnumSelectList<AdvertisementSectionEnum>())"
+                                name="Section" required>
+                        </select>
+                    </div>
+
+                    
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input type="date" name="StartDate" class="form-control col-sm-8 col-md-9" asp-for="TheModel.StartDate" required />
+                    </div>
+                     <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" name="EndDate" class="form-control col-sm-8 col-md-9" asp-for="TheModel.EndDate" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Ad
+                        </label>
+                        <input type="file" name="upload" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" id="submitPayment"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section script {
+             <script src="~/js/validation.js"></script>
+    <script src="~/js/mediaAgencyValidation.js"></script>
+<script>
+
+  
+     function validate() {
+
+    const email = Number(document.getElementById("email").value);
+
+    const isEmailValid = is_validate_email("email");
+    const isValidName = is_validate_name("fullName");
+   
+    return isValidName && isEmailValid;
+
+}
+
+  
+
+
+</script>
+}

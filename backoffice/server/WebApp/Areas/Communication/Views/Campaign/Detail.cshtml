@@ -1,0 +1,332 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.CampaignViewModel
+
+@{
+    ViewData["Title"] = "Campaign";
+    Layout = "~/Views/Shared/_CommunicationLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area = Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Title   </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right  btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Description
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.Description
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Start Date
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.StartDate.ToLongDateString()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            End Date
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.EndDate.ToLongDateString()
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Purpose
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.Purpose
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Status
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.TheModel.Status
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+                    {
+                        <div class="row">
+                            <div class="col-sm-4">
+                                Attachment
+                            </div>
+                            <div class="col-sm-8">
+                                <a href="@Url.Action("DownLoadFile","Campaign",new { Area ="Communication", id=@Model.TheModel.Id})">Download</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <hr style="margin-top: 1px" />
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="participants-tab" data-toggle="tab" href="#participants" role="tab" aria-controls="participants" aria-selected="true">Participants</a>
+                </li>
+
+            </ul>
+            <div class="tab-content" id="myTabContent" style="padding-left: 10px;padding-right: 10px;">
+                <div class="tab-pane fade show active" id="participants" role="tabpanel" aria-labelledby="participants-tab">
+                    <br />
+                            <form data-parsley-validate novalidate method="post" id="SendEmailfrm"
+                                  asp-action="SendEmail" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                            </form>
+                    <form data-parsley-validate novalidate method="post"
+                          asp-action="SaveParticipants" asp-antiforgery="true">
+                        <input type="hidden" name="id" value="@Model.TheModel.Id" />
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="button" value="Save"
+                                       onclick="return confirmAction(this.form, 'Save');"
+                                       class="btn btn-primary btn-sm">
+                                        <input type="button" value="Send Email"
+                                               onclick="return confirmAction($('#SendEmailfrm')[0], 'Send Email');"
+                                               class="btn btn-warning btn-sm float-right">
+                            </div>
+                        </div>
+                        <table class="table table-bordered" id="dataTablewithOutPageination" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th><input id="checkAllAdd" type="checkbox" onclick="checkAllChangeAdd(this)" /> Check/Uncheck All</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>
+
+                                    </th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.MediaAgencies)
+                                {
+                                    <tr>
+                                        <td> <input name="agencies" class="addReceipent" @Model.Checked(item.Id) onclick="addReceipentChange(this)" value="@item.Id" type="checkbox" /> </td>
+                                        <td>
+                                            @item.Name
+                                        </td>
+                                        <td>@item.Email</td>
+                                        <td>
+                                            @item.Mobile
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Campaign</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true" onsubmit="return valideCampaign()">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" id="titleId" asp-for="TheModel.Title" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" id="descriptionId" asp-for="TheModel.Description" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" asp-for="TheModel.StartDate" name="startDate" id="startDateId" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" asp-for="TheModel.EndDate" name="endDate" id="endDateId" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Purpose
+                        </label>
+                        <textarea maxlength="800" asp-for="TheModel.Purpose" name="Purpose" id="purposeId" class="form-control col-sm-8 col-md-9"></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">Letter</label>
+                        <input accept="application/pdf, image/png, image/jpg" type="file" name="Material" class="form-control-file form-control col-sm-8 col-md-8" />
+                        <input type="hidden" name="Extension" value="@Model.TheModel.Extension" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status"
+                                asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.Model.Communication.CampaignStatusEnum>())" id="statusId" name="Status" required>
+                        </select>
+                    </div>
+
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" id="submitPayment"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section script {
+             <script src="~/js/validation.js"></script>
+    <script src="~/js/mediaAgencyValidation.js"></script>
+<script>
+
+    $('#dataTablewithOutPageination').dataTable({
+            "bPaginate": false,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bSort": true,
+            "bInfo": true,
+            "bAutoWidth": true
+        });
+
+    var checkAllChangeAdd = function (element) {
+        $(".addReceipent").each(function (index) {
+            this.checked = element.checked;
+        });
+    };
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+
+    function editArtifact(e) {
+        const id = document.getElementById('artifactId');
+        const title = document.getElementById('titleId');
+        const description = document.getElementById('descriptionId');
+
+        const idVal = $(e).attr('data-id');
+        const titleVal = $(e).attr('data-title');
+        const descriptionVal = $(e).attr('data-description');
+
+
+        id.value = idVal;
+        title.value = titleVal;
+        description.value = descriptionVal;
+    }
+    function editParticipant(e) {
+        $("#participantId").val($(e).attr('data-id'));
+        $("#fullNameId").val($(e).attr('data-fullname'));
+        $("#emailId").val($(e).attr('data-email'));
+    }
+
+    function confirmAction(form, msg) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to ' + msg + ' ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+
+</script>
+}

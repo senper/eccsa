@@ -1,0 +1,72 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.AttendanceViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Attended Class on" : "Attended Class on") Attendance</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate method="post" enctype="multipart/form-data"
+          asp-action="@(Model.TheModel.Id == Guid.Empty ? "CreateAttendance" : "UpdateAttendance")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <input type="hidden" asp-for="TheModel.RegistrationId" />
+        <input type="hidden" asp-for="TheModel.TrainingId" />
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Date
+            </label>
+            <input type="date" max="@(DateTime.Today.ToString("yyyy-MM-dd"))" class="form-control col-sm-7 col-md-8" asp-for="TheModel.AttendanceDate" required />
+        </div>
+        @if (Model.TheModel.Training?.HasMorning == true)
+        {
+            <div class="row form-group">
+                <label class="col-sm-4 col-md-3 col-form-label">
+                </label>
+                <div class=" col-sm-7 col-md-8" >
+                <input type="checkbox"asp-for="TheModel.Morning" />
+                    Morning</div>
+            </div>
+        }
+        @if (Model.TheModel.Training?.HasAfternoon == true)
+        {
+            <div class="row form-group">
+                <label class="col-sm-4 col-md-3 col-form-label">
+                  
+                </label>
+                <div class=" col-sm-7 col-md-8" >
+                <input type="checkbox" asp-for="TheModel.Afternoon"  />  Afternoon
+            </div></div>
+        }
+        @if (Model.TheModel.Training?.HasEvening == true)
+        {
+            <div class="row form-group">
+                <label class="col-sm-4 col-md-3 col-form-label">
+                   
+                </label>
+                <div class=" col-sm-7 col-md-8" >
+                <input type="checkbox"  asp-for="TheModel.Evening"  /> Evening</div>
+            </div>
+        }
+        @*<div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+            Start Time
+            </label>
+            <input type="time" max="@(DateTime.Now.ToString("HH : mm"))" class="form-control col-sm-7 col-md-8" asp-for="TheModel.StartTime" required />
+            </div>
+            <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+            End Time
+            </label>
+            <input type="time" max="@(DateTime.Now.ToString("HH : mm"))" class="form-control col-sm-7 col-md-8" asp-for="TheModel.EndTime" required />
+            </div>*@
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+

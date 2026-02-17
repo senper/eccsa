@@ -1,0 +1,192 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Common.Planning
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.FinancialPlanViewModel
+
+@{
+    ViewData["Title"] = "Planning";// = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+@{
+    async Task Template(List<FinancialItem> plans, string parentCode)
+    {
+        foreach (var ind in plans)
+        {
+            var code = ind.Code;
+            var name = ind.Name;
+            var plan = ind.Plan(Model.PlanYear);
+            var hasChildren = Model.HasChildren(ind.Id);
+            var labelSubPlan = Model.AreAllLabelChildren(ind.Id);
+
+            var style = hasChildren ? "" : "";
+            // var statusCss = ind.Status == PlanningStatusEnum.Approved ? "" : "danger";
+            var parent_tt = string.IsNullOrEmpty(parentCode) ? "root" : $"child";
+
+            @if (hasChildren)
+            {
+                <tr class=" @parent_tt @parentCode" id="@code">
+                    <td>
+                        <a data-tt="@code" onclick="showHideChildren(this);" class="title"><i class="fas fa-angle-right"></i>@code </a>
+                    </td>
+                    <td>@name</td>
+                    <td>@plan.AnnualPlan </td>
+                    <td>@plan.Quarter1Plan</td>
+                    <td>@plan.Quarter2Plan</td>
+                    <td>@plan.Quarter3Plan</td>
+                    <td>@plan.Quarter4Plan</td>
+                    <td></td>
+                </tr>
+            }
+            else
+            {
+
+                <tr class=" @parent_tt @parentCode" id="@code">
+                   
+                        <form data-parsley-validate method="post"
+                  asp-action="SavePlan" asp-antiforgery="true">
+                            <input type="hidden" name="Id" value="@plan.Id" />
+                            <input type="hidden" name="ItemId" value="@plan.FinancialItemId" />
+                           
+                                    <td> @code</td>
+                                    <td>@name</td>
+                                    <td>@plan.AnnualPlan </td>
+                                    <td><input type="number" min="0" name="Q1" value="@plan.Quarter1Plan" class="form-control" required /></td>
+                                    <td><input type="number" min="0" name="Q2" value="@plan.Quarter2Plan" class="form-control" required /></td>
+                                    <td><input type="number" min="0" name="Q3" value="@plan.Quarter3Plan" class="form-control" required /></td>
+                                    <td><input type="number" min="0" name="Q4" value="@plan.Quarter4Plan" class="form-control" required /></td>
+                                    <td><input type="submit" value="Save" title="Save Quarterly Plan" class="btn btn-primary btn-sm" /></td>
+                               
+                        </form>
+                    
+                </tr>
+
+            }
+
+            @if (@hasChildren)
+            {
+                var children = Model.GetSubItems(ind.Id);
+                await Template(children, ind.Code);
+            }
+        }
+
+    }
+}
+<div class="container-fluid">
+
+
+
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <label for="yearfrom" class="col-sm-8 col-form-label">Planning for the Year: @Model.PlanYear </label>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="col-sm-12 table-responsive">
+
+                            <table id="example1" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px; max-width:50px !important;">#</th>
+                                        <th style="width:400px;">Name</th>
+                                        <th style="width:50px;">Annual Plan</th>
+                                        <th>Quarter 1</th>
+                                        <th>Quarter 2</th>
+                                        <th>Quarter 3</th>
+                                        <th>Quarter 4</th>
+
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableDetail">
+                                    @{
+                                        await Template(Model.RootPlans, "");
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+
+
+<script>
+
+
+
+
+    function hideChildren(){
+         const children = document.getElementsByClassName('child');
+         for(var i = 0; i < children.length; i++){
+             children[i].style.display='none';
+         }
+    }
+    hideChildren();
+    function hideDescendant(e){
+        console.log(e);
+        const parent = $(e).attr('data-tt');
+        const children = document.getElementsByClassName(parent);
+        for(var i = 0; i < children.length; i++){
+             const child = children[i];
+             child.style.display='none';
+             //console.log(child.id, child, document.getElementsByClassName(child.id).length);
+             if(document.getElementsByClassName(child.id).length > 0){
+                 $(child).find('i').removeClass('fa-angle-down');
+                 $(child).find('i').addClass('fa-angle-right');
+                 hideDescendant($(child).find('a')[0]);
+             }
+
+         }
+    }
+
+    function showHideChildren(e) {
+        const ank = $(e);
+        let show = true;
+
+       for (let i = 0; i < ank[0].children.length; i++)
+       {
+                const child = ank[0].children[i];
+                if (child.localName == 'i') {
+                    if (child.classList.contains('fa-angle-right')) {
+                        show = true;
+                        child.classList.remove('fa-angle-right');
+                        child.classList.add('fa-angle-down');
+                    } else {
+                        show = false;
+                        child.classList.add('fa-angle-right');
+                        child.classList.remove('fa-angle-down');
+                    }
+                }
+       }
+
+        if(show)
+        {
+            const parent = $(e).attr('data-tt');
+            const children = document.getElementsByClassName(parent);
+            for(var i = 0; i < children.length; i++)
+            {
+             children[i].style.display='';
+            }
+        }
+        else
+        {
+            hideDescendant(e);
+        }
+    }
+
+
+
+</script>
+}

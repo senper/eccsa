@@ -1,0 +1,77 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.ApplicantViewModel
+
+<link href="~/vendor/combotree/style.css" rel="stylesheet" />
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Create New Member" : "Edit Member Info") </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+          asp-action="Save" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <input type="hidden" asp-for="TheModel.AssociationId" />
+
+       
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheModel.NameEng" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                ስም
+            </label>
+            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheModel.NameLocal" />
+        </div>
+       
+
+       
+
+    
+
+
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+
+
+    
+</div>
+<script>
+
+
+        let SampleJSONData =[];
+   
+    let url = `individual/getTree`;
+    
+    function locationChanged() {
+        document.getElementById('hdnlocationSelected').value = document.getElementById('locationSelectorId').value;
+        loadLocation();
+    }
+        var comboTree1, comboTree2;
+
+        jQuery(document).ready(function ($) {
+
+            loadLocation();
+            jQuery.get(url, function (data) {
+                SampleJSONData = data;
+                console.log(SampleJSONData);
+
+                comboTree2 = $('#justAnotherInputBox').comboTree({
+                    source: SampleJSONData,
+                    isMultiple: false
+                });
+            });
+            
+        });
+
+</script>

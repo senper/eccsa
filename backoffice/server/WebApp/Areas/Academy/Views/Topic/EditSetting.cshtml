@@ -1,0 +1,62 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.SettingViewModel
+@using ECCSA.BackOffice.Server.Model.Academy
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Add" : "Edit") Setting</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate method="post"
+          asp-action="@(Model.TheModel.Id == Guid.Empty ? "CreateSetting" : "UpdateSetting")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <input type="hidden" asp-for="TheModel.TopicId" />
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Setting
+            </label>
+            <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.SettingVariableId" id="settingVar" required>
+                @foreach (var s in Model.SettingsLookup)
+                {
+                    <option data-type="@s.DataType" data-max="@s.MaxValue" data-min="@s.MinValue"
+                            value="@s.Id">
+                        @s.Code - @s.NameEng ( @s.NameLocal ) - @s.DataType
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="row form-group">
+            <label for="Code" class="col-sm-4 col-md-3 col-form-label">
+                Value
+            </label>
+            <input type="text" required id="value" max="" min="" class="form-control col-sm-7 col-md-8" asp-for="TheModel.SettingValue" />
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function settingVarChange() {
+        var option = $(`#settingVar option[value="${$('#settingVar').val()}"]`);
+        var dataType = option.attr('data-type');
+        console.log(dataType);
+        var valueInput = $("#value");
+        if ('@SettingVariableDataType.Int' == dataType) {
+            valueInput.attr("type", "number");
+            valueInput.attr("max", option.attr("data-max"));
+            valueInput.attr("min", option.attr("data-min"));
+        } else if ('@SettingVariableDataType.String' == dataType) {
+            valueInput.attr("type", "text");
+        }
+    }
+    $('#settingVar').on('change', settingVarChange);
+    settingVarChange();
+</script>
+

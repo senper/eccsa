@@ -1,0 +1,31 @@
+.surveyText {
+  width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #198754;
+  text-align: center;
+}
+
+@media (max-width: 70em) {
+  .surveyText {
+    width: 100%;
+  }
+}
+
+@media (max-width: 547px) {
+  .surveyText {
+    width: 300px;
+  }
+}
+
+@media (max-width: 400px) {
+  .surveyText {
+    width: 250px;
+  }
+}
+@media (max-width: 285px) {
+  .surveyText {
+    width: 180px;
+  }
+}

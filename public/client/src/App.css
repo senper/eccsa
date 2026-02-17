@@ -1,0 +1,82 @@
+* {
+    box-sizing: board-box;
+    margin: 0;
+    padding: 0;
+    /* background-color: #fff; */
+    /* font-family: 'Montserrat',sans-serif; */
+}
+pre {
+    font-family:'Source Sans Pro', sans-serif!important;
+    font-size: medium!important;
+    text-align: justify!important;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;
+}
+
+.grid{
+    padding: 10px;
+    background-color: #fff;
+}
+.row{
+    padding: 7px;
+}
+.mmenu{
+    background-color:#fff;
+}
+span {
+    font-size: 20px;
+}
+.breadcrum {
+    background-color: '#000';
+    padding: '10px';
+    margin-left: '100px';
+  }
+.MuiAppBar-colorPrimary{
+    background-color: rgb(20, 128, 20);
+}
+.root{
+    background-color:#fff;
+}
+.section-title {
+    /* background-color: #198754; */
+   
+   text-align: left;
+   color: #198754;
+text-align: left;
+   font-style: normal;
+   font-size: 1.25rem;
+font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+font-weight: 500;
+line-height: 1.6;
+letter-spacing: 0.0075em;
+   font-weight: 600;
+   padding-left: 50px;
+   }
+   /* .section-title::after {
+    position: absolute;
+    content: "";
+    background: linear-gradient(to right, #5ca9fb 0%, #6372ff 100%);
+    height: 4px;
+    width: 60px;
+    bottom: 0;
+    margin-left: -30px;
+    left: 50%;
+} */
+   hr.new5 {
+    border: 10px solid green;
+    border-width: 100%;
+    border-radius: 5px;
+  }
+  .btn {
+    color: #fff;
+    border-color: #ffa700;
+    background: #c82b36;
+  }
+  .btn-outline-success{
+    color: #fff;
+    border-color: #ffa700;
+    background: #c82b36;   
+  }

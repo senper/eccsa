@@ -1,0 +1,166 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Bmo.Model.BmoTypeViewModel
+
+@{
+    ViewData["Title"] = "BMO Type";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <h4>  @Model.TheModel.NameFull </h4>
+                        </div>
+                        <div class="col-sm-2">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                                @if (Model.Contents.Count == 0)
+                                {
+                                    <a onclick="return confirmDelete($('#deleteBmoType@(Model.TheModel.Id)')[0]);"
+                               class=" btn btn-sm btn-outline-danger">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                    <form data-parsley-validate novalidate
+                                  method="post"
+                                  id="deleteBmoType@(Model.TheModel.Id)"
+                                  asp-action="Delete" asp-antiforgery="true" asp-route-id="@Model.TheModel.Id">
+                                        <input type="hidden" name="id" value="@Model.TheModel.Id" />
+
+                                    </form>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header-actions">
+                                    <h4>Contents </h4>
+                                </div>
+                                <table class="table table-bordered table-striped" id="subMenu">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>ርዕስ</th>
+                                            <th>
+                                               
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var r in Model.Contents)
+                                        {
+                                            <tr>
+                                                <td> @r.Title </td>
+                                                <td>@r.TitleLocal</td>
+                                                <td>
+
+                                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                        <a class=" btn btn-sm  btn-outline-info" asp-controller="Home" asp-action="Detail" asp-route-id="@r.Id">
+                                                            <i class="fa fa-info" aria-hidden="true"></i>
+                                                        </a>
+
+                                                    </div>
+
+                                                    
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+</div>
+
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit BMO Type</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" name="Name" asp-for="TheModel.Name" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" name="NameLocal" asp-for="TheModel.NameLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        
+                       
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+}
+
+@section script {
+    <script>
+      
+       
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+    </script>
+}

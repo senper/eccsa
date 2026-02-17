@@ -1,0 +1,84 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IndividualViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.Staff.Id == Guid.Empty ? "Add" : "Edit") </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate novalidate method="post"
+          asp-action="SaveStaff" asp-antiforgery="true" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Staff.Id" />
+        <input type="hidden" asp-for="Staff.IndividualId" />
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Title
+            </label>
+            <input type="text" maxlength="20" class="form-control col-sm-8 col-md-8" asp-for="Staff.Title" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-8" asp-for="Staff.NameEng" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                ስም
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-9" asp-for="Staff.NameLocal" />
+        </div>
+        @*<div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Position
+            </label>
+            <select class="custom-select col-sm-8 col-md-9"
+                    asp-for="Staff.PositionTypeId"
+                    asp-items="@(new SelectList(Model.PositionTypes,"Id", "Name"))">
+                <option>Please select ...</option>
+
+            </select>
+        </div>*@
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Email
+            </label>
+            <input type="email" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="Staff.Email" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Mobile
+            </label>
+            <input type="text" maxlength="20" class="form-control col-sm-8 col-md-8" asp-for="Staff.Mobile" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">Photo</label>
+            <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Start / End Date
+            </label>
+            <input type="date" class="form-control col-sm-4 col-md-4" asp-for="Staff.StartDate" />
+            <input type="date" class="form-control col-sm-4 col-md-4" asp-for="Staff.EndDate" />
+        </div>
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Status
+            </label>
+            <select class="custom-select col-sm-8 col-md-9" asp-for="Staff.Status">
+                <option value="1">Active</option>
+                <option value="2">Inactive</option>
+            </select>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>

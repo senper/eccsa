@@ -1,0 +1,88 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IndividualViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Create New Member" : "Edit Member Info") </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+          asp-action="Save" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <input type="hidden" asp-for="TheModel.ParentAssociationId" />
+        <input type="hidden" asp-for="TheMember.LocationId" id="locationId" />
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                TIN
+            </label>
+            <input type="text" maxlength="10" class="form-control col-sm-4 col-md-4" asp-for="TheMember.TaxIdNumber" />
+        </div>
+
+        <div class="row form-group" style="margin-bottom:1px;">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameEng" placeholder="Name  " />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                
+            </label>
+            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameLocal" placeholder="ስም  " />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Sector
+            </label>
+
+            <select  class="custom-select col-sm-8 col-md-9"  asp-for="TheMember.SectorId"
+                    asp-items="@(new SelectList(Model.Sectors,"Value", "Name"))"></select>
+
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Membership Code
+            </label>
+            <input type="text" maxlength="20" class="form-control col-sm-4 col-md-4" asp-for="TheModel.Code" />
+        </div>
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Location
+            </label>
+            <input type="hidden" id="hdnlocationSelected" name="LocationId" value="@Model.TheMember.LocationId" />
+
+            <select id="locationSelectorId" class="custom-select col-sm-8 col-md-9" name="LocationId" asp-for="TheMember.LocationId"
+                    onchange="locationChanged()"></select>
+
+        </div>
+
+    
+
+
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+
+
+    
+</div>
+<script>
+
+
+   
+    
+    function locationChanged() {
+        document.getElementById('hdnlocationSelected').value = document.getElementById('locationSelectorId').value;
+        loadLocation();
+    }
+
+
+</script>

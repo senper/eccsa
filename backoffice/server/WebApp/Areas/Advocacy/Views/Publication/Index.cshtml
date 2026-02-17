@@ -1,0 +1,328 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Advocacy.Model.PublicationViewModel
+
+@{
+    ViewData["Title"] = "Publications";
+    Layout = "~/Views/Shared/_AdvocacyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+
+        <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Publication">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+        </button>
+
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Funding</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Funding</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+                                    var statusClass = (i.Status == 0 ? "danger" : "");
+
+                                    <tr class="@statusClass">
+                                        <td>
+                                            <a asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id" class="title @statusClass">@Html.DisplayFor(modelItem => i.TitleFull)</a>
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.FundingFull)
+                                        </td>
+
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Create Publication</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="id" />
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" id="nameId" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            
+                        </label>
+                        <input type="text" name="TitleLocal" id="nameLocalId" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <input type="checkbox" name="IsPublic" asp-for="TheModel.IsPublic" class="form-control col-sm-1 col-md-1" />
+                        <label class="col-sm-3 col-form-label">
+                            Is Public
+                        </label>
+                    </div>
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" id="descriptionId" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            
+                        </label>
+                        <textarea rows="4" name="DescriptionLocal" id="descriptionLocalId" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <textarea rows="4" name="Remark" id="remarkId" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <textarea rows="4" name="RemarkLocal" id="remarkLocalId" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Keywords
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="Keywords" required />
+                    </div>
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Funding
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="Funding" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="FundingLocal" required />
+                    </div>
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Author
+                        </label>
+                        <input type="text" name="Author" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <input type="text" name="AuthorLocal" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Publication Date
+                        </label>
+                        <input type="date" name="PublicationDate" class="form-control col-sm-8 col-md-9" id="startDateId" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Url
+                        </label>
+                        <input type="text" name="Url" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Digital
+                        </label>
+                        <input type="file" name="upload" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Digital Cost
+                        </label>
+
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                            <input type="number" min="0" name="DigitalCost" class="form-control col-sm-4 col-md-4" required />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Print (URI)
+                        </label>
+                        <input type="text" name="PrintUri" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Print Cost
+                        </label>
+
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                            <input type="number" min="0" name="PrintCost" class="form-control col-sm-4 col-md-4" />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" id="statusId" name="Status" required>
+                            <option value="1">Active</option>
+                            <option value="0">In-active</option>
+                        </select>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+    <script>
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function addEdit(e) {
+            const id = document.getElementById("id");
+            const name = document.getElementById("nameId");
+            const description = document.getElementById("descriptionId");
+            const remark = document.getElementById("remarkId");
+
+            const repname = document.getElementById("repNameId");
+
+
+            const pername = document.getElementById("idpername");
+
+            const email = document.getElementById("idemail");
+            const mobile = document.getElementById("idmobile");
+
+            const telephone = document.getElementById("idtelephone");
+            const url = document.getElementById("idurl");
+
+
+            const broadcast = document.getElementById("idBroadcast");
+
+            const print = document.getElementById("idPrint");
+            const digital = document.getElementById("idDigital");
+
+
+            const idVal = $(e).attr('data-id');
+            const nameVal = $(e).attr("data-name");
+            const descriptionVal = $(e).attr("data-description");
+            const mediatypeVal = Number($(e).attr("data-mediatype"));
+            const ownershipVal = $(e).attr("data-ownership");
+            const repnameVal = $(e).attr("data-repname");
+
+            const pernameVal = $(e).attr("data-pername");
+
+            const emailVal = $(e).attr("data-email");
+            const mobileVal = $(e).attr("data-mobile");
+
+            const telephoneVal = $(e).attr("data-telephone");
+            const urlVal = $(e).attr("data-url");
+            const remarkVal = $(e).attr("data-remark");
+            const statusVal = $(e).attr("data-status");
+
+            id.value = idVal;
+            name.value = nameVal;
+            description.value = descriptionVal;
+            remark.value = remarkVal;
+
+            repname.value = repnameVal;
+            pername.value = pernameVal;
+            email.value = emailVal;
+            mobile.value = mobileVal;
+            telephone.value = telephoneVal;
+            url.value = urlVal;
+            $('#ownershipId').val(ownershipVal).change();
+            $('#statusId').val(statusVal).change();
+
+            const digitalType = Number(@((int)ECCSA.BackOffice.Server.Model.Communication.MediaTypeFlag.Digital));
+            const broadcastType = Number(@((int)ECCSA.BackOffice.Server.Model.Communication.MediaTypeFlag.Broadcast));
+            const printType = Number(@((int)ECCSA.BackOffice.Server.Model.Communication.MediaTypeFlag.Print));
+
+            broadcast.checked = (mediatypeVal & broadcastType) == broadcastType;
+            print.checked = (mediatypeVal & printType) == printType;
+            digital.checked = (mediatypeVal & digitalType) == digitalType;
+        }
+    </script>
+}

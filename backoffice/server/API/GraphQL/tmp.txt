@@ -1,0 +1,217 @@
+services.AddScoped<CommodityPriceRepository>();
+services.AddScoped<CommodityTypeRepository>();
+services.AddScoped<ExchangeRateRepository>();
+services.AddScoped<ExchangeRateTypeRepository>();
+services.AddScoped<PriceUnitRateRepository>();
+services.AddScoped<AddressRepository>();
+services.AddScoped<AssociationRepository>();
+services.AddScoped<BoardMemberRepository>();
+services.AddScoped<BusinessProfileRepository>();
+services.AddScoped<ContactRepository>();
+services.AddScoped<IndividualRepository>();
+services.AddScoped<LegalDocumentRepository>();
+services.AddScoped<LegalDocumentTypeRepository>();
+services.AddScoped<MembershipEnrollmentRepository>();
+services.AddScoped<PositionTypeRepository>();
+services.AddScoped<ProfileAttribureRepository>();
+services.AddScoped<RenewalHistoryRepository>();
+services.AddScoped<RepresentativeRepository>();
+services.AddScoped<RepresentativeContactRepository>();
+services.AddScoped<StakeholderRepository>();
+services.AddScoped<CampaignRepository>();
+services.AddScoped<CampaignPartnerAgencyRepository>();
+services.AddScoped<MediaAgencyRepository>();
+services.AddScoped<MediaCoverageRepository>();
+services.AddScoped<ResourceRepository>();
+services.AddScoped<FlagRepository>();
+services.AddScoped<FlagTypeRepository>();
+services.AddScoped<ServiceRequestRepository>();
+services.AddScoped<ServiceTypeRepository>();
+services.AddScoped<YesNoRepository>();
+services.AddScoped<AssessmentRepository>();
+services.AddScoped<AttendanceRepository>();
+services.AddScoped<CategoryRepository>();
+services.AddScoped<MemberRepository>();
+services.AddScoped<NeedAssessmentRepository>();
+services.AddScoped<NeedAssessmentDetailRepository>();
+services.AddScoped<RegistrationRepository>();
+services.AddScoped<LearningResourceRepository>();
+services.AddScoped<ResourceDeliveryRepository>();
+services.AddScoped<SettingVariableRepository>();
+services.AddScoped<SponsorRepository>();
+services.AddScoped<TopicRepository>();
+services.AddScoped<TopicSettingRepository>();
+services.AddScoped<TrainingRepository>();
+services.AddScoped<TrainingSlipLetterRepository>();
+services.AddScoped<TrainingSponsorRepository>();
+services.AddScoped<CommodityPriceRepository>();
+services.AddScoped<CommodityTypeRepository>();
+services.AddScoped<ExchangeRateRepository>();
+services.AddScoped<ExchangeRateTypeRepository>();
+services.AddScoped<PriceUnitRateRepository>();
+
+
+		  _commodityPriceRepository = commodityPriceRepository;
+		  _commodityTypeRepository = commodityTypeRepository;
+		  _exchangeRateRepository = exchangeRateRepository;
+		  _exchangeRateTypeRepository = exchangeRateTypeRepository;
+		  _priceUnitRateRepository = priceUnitRateRepository;
+
+
+		 , CommodityPriceRepository commodityPriceRepository
+		 , CommodityTypeRepository commodityTypeRepository
+		 , ExchangeRateRepository exchangeRateRepository
+		 , ExchangeRateTypeRepository exchangeRateTypeRepository
+		 , PriceUnitRateRepository priceUnitRateRepository
+
+
+services.AddScoped<AddressRepository>();
+services.AddScoped<AssociationRepository>();
+services.AddScoped<BoardMemberRepository>();
+services.AddScoped<BusinessProfileRepository>();
+services.AddScoped<ContactRepository>();
+services.AddScoped<IndividualRepository>();
+services.AddScoped<LegalDocumentRepository>();
+services.AddScoped<LegalDocumentTypeRepository>();
+services.AddScoped<LocationRepository>();
+services.AddScoped<MembershipEnrollmentRepository>();
+services.AddScoped<PositionTypeRepository>();
+services.AddScoped<ProfileAttribureRepository>();
+services.AddScoped<RenewalHistoryRepository>();
+services.AddScoped<RepresentativeRepository>();
+services.AddScoped<RepresentativeContactRepository>();
+services.AddScoped<StakeholderRepository>();
+
+
+		  _addressRepository = addressRepository;
+		  _associationRepository = associationRepository;
+		  _boardMemberRepository = boardMemberRepository;
+		  _businessProfileRepository = businessProfileRepository;
+		  _contactRepository = contactRepository;
+		  _individualRepository = individualRepository;
+		  _legalDocumentRepository = legalDocumentRepository;
+		  _legalDocumentTypeRepository = legalDocumentTypeRepository;
+		  _locationRepository = locationRepository;
+		  _membershipEnrollmentRepository = membershipEnrollmentRepository;
+		  _positionTypeRepository = positionTypeRepository;
+		  _profileAttribureRepository = profileAttribureRepository;
+		  _renewalHistoryRepository = renewalHistoryRepository;
+		  _representativeRepository = representativeRepository;
+		  _representativeContactRepository = representativeContactRepository;
+		  _stakeholderRepository = stakeholderRepository;
+
+
+		 , AddressRepository addressRepository
+		 , AssociationRepository associationRepository
+		 , BoardMemberRepository boardMemberRepository
+		 , BusinessProfileRepository businessProfileRepository
+		 , ContactRepository contactRepository
+		 , IndividualRepository individualRepository
+		 , LegalDocumentRepository legalDocumentRepository
+		 , LegalDocumentTypeRepository legalDocumentTypeRepository
+		 , LocationRepository locationRepository
+		 , MembershipEnrollmentRepository membershipEnrollmentRepository
+		 , PositionTypeRepository positionTypeRepository
+		 , ProfileAttribureRepository profileAttribureRepository
+		 , RenewalHistoryRepository renewalHistoryRepository
+		 , RepresentativeRepository representativeRepository
+		 , RepresentativeContactRepository representativeContactRepository
+		 , StakeholderRepository stakeholderRepository
+
+
+services.AddScoped<CampaignRepository>();
+services.AddScoped<CampaignPartnerAgencyRepository>();
+services.AddScoped<MediaAgencyRepository>();
+services.AddScoped<MediaCoverageRepository>();
+services.AddScoped<ResourceRepository>();
+
+
+		  _campaignRepository = campaignRepository;
+		  _campaignPartnerAgencyRepository = campaignPartnerAgencyRepository;
+		  _mediaAgencyRepository = mediaAgencyRepository;
+		  _mediaCoverageRepository = mediaCoverageRepository;
+		  _resourceRepository = resourceRepository;
+
+
+		 , CampaignRepository campaignRepository
+		 , CampaignPartnerAgencyRepository campaignPartnerAgencyRepository
+		 , MediaAgencyRepository mediaAgencyRepository
+		 , MediaCoverageRepository mediaCoverageRepository
+		 , ResourceRepository resourceRepository
+
+
+services.AddScoped<FlagRepository>();
+services.AddScoped<FlagTypeRepository>();
+services.AddScoped<ServiceRequestRepository>();
+services.AddScoped<ServiceTypeRepository>();
+services.AddScoped<YesNoRepository>();
+
+
+		  _flagRepository = flagRepository;
+		  _flagTypeRepository = flagTypeRepository;
+		  _serviceRequestRepository = serviceRequestRepository;
+		  _serviceTypeRepository = serviceTypeRepository;
+		  _yesNoRepository = yesNoRepository;
+
+
+		 , FlagRepository flagRepository
+		 , FlagTypeRepository flagTypeRepository
+		 , ServiceRequestRepository serviceRequestRepository
+		 , ServiceTypeRepository serviceTypeRepository
+		 , YesNoRepository yesNoRepository
+
+
+services.AddScoped<AssessmentRepository>();
+services.AddScoped<AttendanceRepository>();
+services.AddScoped<CategoryRepository>();
+services.AddScoped<MemberRepository>();
+services.AddScoped<NeedAssessmentRepository>();
+services.AddScoped<NeedAssessmentDetailRepository>();
+services.AddScoped<RegistrationRepository>();
+services.AddScoped<LearningResourceRepository>();
+services.AddScoped<ResourceDeliveryRepository>();
+services.AddScoped<SettingVariableRepository>();
+services.AddScoped<SponsorRepository>();
+services.AddScoped<TopicRepository>();
+services.AddScoped<TopicSettingRepository>();
+services.AddScoped<TrainingRepository>();
+services.AddScoped<TrainingSlipLetterRepository>();
+services.AddScoped<TrainingSponsorRepository>();
+
+
+		  _assessmentRepository = assessmentRepository;
+		  _attendanceRepository = attendanceRepository;
+		  _categoryRepository = categoryRepository;
+		  _memberRepository = memberRepository;
+		  _needAssessmentRepository = needAssessmentRepository;
+		  _needAssessmentDetailRepository = needAssessmentDetailRepository;
+		  _registrationRepository = registrationRepository;
+		  _learningResourceRepository = learningResourceRepository;
+		  _resourceDeliveryRepository = resourceDeliveryRepository;
+		  _settingVariableRepository = settingVariableRepository;
+		  _sponsorRepository = sponsorRepository;
+		  _topicRepository = topicRepository;
+		  _topicSettingRepository = topicSettingRepository;
+		  _trainingRepository = trainingRepository;
+		  _trainingSlipLetterRepository = trainingSlipLetterRepository;
+		  _trainingSponsorRepository = trainingSponsorRepository;
+
+
+		 , AssessmentRepository assessmentRepository
+		 , AttendanceRepository attendanceRepository
+		 , CategoryRepository categoryRepository
+		 , MemberRepository memberRepository
+		 , NeedAssessmentRepository needAssessmentRepository
+		 , NeedAssessmentDetailRepository needAssessmentDetailRepository
+		 , RegistrationRepository registrationRepository
+		 , LearningResourceRepository learningResourceRepository
+		 , ResourceDeliveryRepository resourceDeliveryRepository
+		 , SettingVariableRepository settingVariableRepository
+		 , SponsorRepository sponsorRepository
+		 , TopicRepository topicRepository
+		 , TopicSettingRepository topicSettingRepository
+		 , TrainingRepository trainingRepository
+		 , TrainingSlipLetterRepository trainingSlipLetterRepository
+		 , TrainingSponsorRepository trainingSponsorRepository
+
+

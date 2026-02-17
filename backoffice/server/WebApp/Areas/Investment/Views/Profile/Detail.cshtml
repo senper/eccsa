@@ -1,0 +1,304 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Investment.Model.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_InvestmentLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Profile",new { Area ="Investment"})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.NameFull </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body collapse show" id="detail_info">
+
+                    <a class="profile" href="#" id="showhideDetail" data-toggle="collapse" data-target="#profile_info" aria-expanded="true" aria-controls="profile_info">
+                        <strong>Profile</strong>
+                    </a>
+                    <div class="card collapse show" id="profile_info">
+                        <div id="ass_profile_info_text">
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-outline-success btn-sm btn-circle float-right" onclick="editProfile()">
+                                        <i class="fa fa-pen "></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12" id="profileHtml">
+                                    @Html.Raw(Model.TheModel.Profile ?? "")
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ass_profile_info_editor" class=" d-none">
+                            <form data-parsley-validate method="post" asp-action="SaveProfile" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                <div>
+                                    <textarea id="associationProfile" name="profile" placeholder="Profile ..............." cols="65" rows="10" data-sample-short>
+                                        @(Model.TheModel.Profile)
+                                    </textarea>
+                                </div>
+                                <div class="form-group ">
+                                    <input type="submit" value="Save" class="btn btn-warning localize" data-key="Save">
+                                    <input type="button" value="Cancel" class="btn btn-info localize " data-key="cancel" onclick="profileCancel()">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body collapse show" id="detail_info_local">
+
+                    <a class="profile" href="#" id="showhideDetailLocal" data-toggle="collapse" data-target="#profile_info_local" aria-expanded="true" aria-controls="profile_info_local">
+                        <strong>ፕሮፋይል </strong>
+                    </a>
+                    <div class="card collapse show" id="profile_info_local">
+                        <div id="ass_profile_info_text_local">
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-outline-success btn-sm btn-circle float-right" onclick="editProfileLocal()">
+                                        <i class="fa fa-pen "></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12" id="profileHtmlLocal">
+                                    @Html.Raw(Model.TheModel.ProfileLocal ?? "")
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ass_profile_info_editor_local" class=" d-none">
+                            <form data-parsley-validate method="post" asp-action="SaveProfileLocal" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                <div>
+                                    <textarea id="associationProfileLocal" name="profileLocal" placeholder="Profile በአማርኛ ..............." cols="65" rows="10" data-sample-short>
+                                        @(Model.TheModel.ProfileLocal)
+                                    </textarea>
+                                </div>
+                                <div class="form-group ">
+                                    <input type="submit" value="Save" class="btn btn-warning localize" data-key="Save">
+                                    <input type="button" value="Cancel" class="btn btn-info localize " data-key="cancel" onclick="profileCancelLocal()">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+        <br />
+        <div class="card">
+            <div class="card-body">
+                <div class="tab-pane @Model.Tab3Active" id="profileImages" role="tabpanel">
+
+                    <div class="card-header-actions">
+                        <form data-parsley-validate method="post" enctype="multipart/form-data"
+                              asp-action="@("AddProfileImage")" asp-antiforgery="true">
+                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                            <input type="button" onclick="$('#selectfile').click()" id="selectFilebtn" class="btn btn-outline-success btn-sm" name="Select file" value="New" />
+                            <input type="file" name="image" id="selectfile" hidden onchange="this.form.submit()" accept="image/png, image/gif, image/jpeg">
+                        </form>
+                    </div>
+                    <table class="table table-bordered table-striped" id="datatblsetting">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Url</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.ProfileImages)
+                            {
+                                <tr>
+                                    <td> <img src="@r" width="30%" /> </td>
+                                    <td>@r</td>
+                                    <td>
+                                        <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                            <a onclick="return confirmDelete($('#deleteProfileImage@(Model.ProfileImages.IndexOf(r))')[0]);"
+                                           class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deleteProfileImage@(Model.ProfileImages.IndexOf(r))"
+                                              asp-action="RemoveProfileImage" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <input type="hidden" name="fileName" value="@(r)" />
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="card">
+            <div class="card-body">
+                <div class="tab-pane @Model.Tab4Active" id="profileAttachments" role="tabpanel">
+
+                    <div class="card-header-actions">
+                        <form data-parsley-validate method="post" enctype="multipart/form-data"
+                              asp-action="@("AddProfileAttachment")" asp-antiforgery="true">
+                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                            <input type="button" onclick="$('#selectAttachmentfile').click()" id="selectFilebtn" class="btn btn-outline-success btn-sm" name="Select file" value="New" />
+                            <input type="file" name="file" id="selectAttachmentfile" hidden onchange="this.form.submit()" >
+                        </form>
+                    </div>
+                    <table class="table table-bordered table-striped" id="datatblsetting">
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Url</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.ProfileAttachments)
+                            {
+                                var slist = r.Split("/");
+                                <tr>
+                                    <td> <a href="@r" target="_blank">@(slist.Length > 0 ? slist[slist.Length - 1] : "File")</a> </td>
+                                    <td>@r</td>
+                                    <td>
+                                        <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                            <a onclick="return confirmDelete($('#deleteProfileImage@(Model.ProfileAttachments.IndexOf(r))')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deleteProfileImage@(Model.ProfileAttachments.IndexOf(r))"
+                                              asp-action="RemoveProfileAttachment" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <input type="hidden" name="fileName" value="@(r)" />
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="ChangeSectorModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Profile Name </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="SaveProfileName" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" name="Name" value="@Model.TheModel.Name" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <input type="text" name="NameLocal" value="@Model.TheModel.NameLocal" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+@section script {
+
+    <script src="~/vendor/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('associationProfile', {
+            height: 260,
+            width: '100%',
+        });
+        CKEDITOR.replace('associationProfileLocal', {
+            height: 260,
+            width: '100%',
+        });
+        function editProfile() {
+            document.getElementById('ass_profile_info_editor').classList.remove('d-none');
+            document.getElementById('ass_profile_info_text').classList.add('d-none');
+        }
+        function editProfileLocal() {
+            document.getElementById('ass_profile_info_editor_local').classList.remove('d-none');
+            document.getElementById('ass_profile_info_text_local').classList.add('d-none');
+        }
+
+        function profileCancel() {
+            document.getElementById('ass_profile_info_editor').classList.add('d-none');
+            document.getElementById('ass_profile_info_text').classList.remove('d-none');
+        }
+        function profileCancelLocal() {
+            document.getElementById('ass_profile_info_editor_local').classList.add('d-none');
+            document.getElementById('ass_profile_info_text_local').classList.remove('d-none');
+        }
+
+        $('.edit').on('click', function () {
+
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

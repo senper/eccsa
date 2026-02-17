@@ -1,0 +1,1564 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IndividualViewModel
+
+@{
+    ViewData["Title"] = "Members";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Individual",new { Area ="Membership", associationId = Model.TheModel.ParentAssociationId})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Name </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <button data-toggle="modal"
+                                    data-target="#EditIndividualModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Code:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Code
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    TIN
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.TaxIdNumber)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Location
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.Location?.Name)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Member Since
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.EnrollmentDate
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Sector
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.Sector)
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Sub sector
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.Subsector)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Service Type
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.ServiceType.GetDisplayName())
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Agent Type
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.AgencySpecialization.GetDisplayName())
+                                </div>
+                            </div>
+@* 
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Sector
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.Sector)
+                                </div>
+                            </div> *@
+                            
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Capital
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.Capital)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    No of Employees
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Member?.NumberofEmployees)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.MembershipStatus
+                                </div>
+                            </div>
+                            @if (Model.TheMember.CustomFields?.Count > 0)
+                            {
+                                <br/>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <a id="additionalInfoCollapseLink" data-toggle="collapse" href="#additionalInfoCollapse" role="button" aria-expanded="false" aria-controls="additionalInfoCollapse">
+                                            Click To Show Additional Info.
+                                        </a>
+                                        <div class="collapse" id="additionalInfoCollapse">
+                                            <div class="card card-body">
+                                            @foreach (var cf in Model.TheMember.CustomFields)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+                                                        @cf.Text
+                                                    </div>
+                                                    <div class="col-sm-8">
+                                                        @cf.Value
+                                                    </div>
+                                                </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
+                            <br />
+                            <div class="card">
+                                <div class="card-header">
+                                    Contact Details <button class="card-header-action btn edit btn-outline-success btn-sm"
+                                                            id="newbtn"
+                                                            data-url="@Url.Action("EditContact", new {individualId = Model.TheModel.Id, Id=Guid.Empty })"
+                                                            data-toggle="modal"
+                                                            data-target="#addEditContactModal">
+                                        New
+                                    </button>
+                                </div>
+                                <div class="card-body">
+
+
+
+                                    @foreach (var contact in @Model.TheModel.Stakeholder.Contacts.OrderBy(c => c.Priority))
+                                    {
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                @contact.ContactType:
+                                            </div>
+                                            <div class="col-sm-6">
+                                                @contact.Address
+                                            </div>
+                                            <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                <button data-toggle="modal" data-target="#addEditContactModal" data-url="@Url.Action("EditContact", new {individualId = Model.TheModel.Id,  Id=@contact.Id })"
+                                                    class="edit btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pen "></i>
+                                                </button>
+
+                                                <a onclick="return confirmDelete($('#deleteContact@(Model.Guid2String(contact.Id))')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteContact@(Model.Guid2String(contact.Id))"
+                                                  asp-action="deleteContact" asp-antiforgery="true">
+                                                    <input type="hidden" name="id" value="@contact.Id" />
+                                                    <input type="hidden" name="memberId" value="@contact.MemberId" />
+                                                </form>
+                                            </div>
+
+
+
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 row">
+                            <div class="col-md-6" style="padding-right:0px;">
+                                <div class="card ">
+                                    <div class="card-header">  Membership  </div>
+                                    <div class="card-body">
+                                        Fee: &nbsp; @Model.TheModel.AnnualPayment <br />
+
+                                        Renewed On: &nbsp; @Model.TheModel.RenewalDate <br />
+
+                                        Invoice No: &nbsp;@Model.TheModel.InvoiceNo  <br />
+
+                                        Receipt No: &nbsp; @Model.TheModel.BankReceiptNo <br />
+
+                                        Expires On: &nbsp; @Model.TheModel.DateOfExpiry <br />
+
+                                        Renewal Status: &nbsp; @Model.TheModel.RenewalStatus <br />
+
+                                        Document Status &nbsp; @Model.TheModel.DocumentStatus <br />
+
+                                        Remark: <span>@Model.TheModel.Remark</span> <br />
+
+                                        <input type="hidden" value="@Model.TheModel.ExpiryDate.Year" />
+                                        <input type="hidden" value="@Model.TheModel.MembershipStatus" />
+                                        <input type="hidden" value="@Model.TheModel.RenewalStatus" />
+
+                                        <input type="hidden" value="@Model.TheModel.DocumentStatus" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="padding-left:0px;">
+                                <div class="card ">
+
+                                    <div class=" card-header" role="group" aria-label="Basic example">
+                                        @if (@Model.TheModel.ExpiryDate > DateTime.Today && @Model.TheModel.MembershipStatus == StatusEnum.Active)
+                                        {
+                                            if (@Model.TheModel.IdCard != null && @Model.TheModel.IdCard.ReadyForPrint)
+                                            {
+                                                <form method="get" asp-action="PrintMembershipId">
+                                                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+
+                                                    <button onclick="this.form.submit()" style="padding-top: 0px; padding-bottom: 0px;" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                                                        Print Id
+                                                    </button>
+
+                                                </form>
+
+
+
+                                            }
+                                            <button data-toggle="modal"
+                                                data-target="#theModal"
+                                                title="Edit"
+                                                style="padding-top: 0px; padding-bottom: 0px;"
+                                                class=" float-right btn btn-outline-success btn-sm">
+                                                Prepare Id
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <h4>Inactive No Id Card</h4>
+                                        }
+                                    </div>
+
+
+
+                                    <div class="card-body">
+                                        @if (@Model.TheModel.IdCard != null)
+                                        {
+                                            <div>
+                                                Id Holder Name: &nbsp;
+                                                @Model.TheModel.IdCard.FullName
+                                                <br />
+
+                                                Title: &nbsp;
+                                                @Model.TheModel.IdCard.TitleName
+                                                <br />
+
+                                                Zone / Sub City: &nbsp;
+                                                @Model.TheModel.IdCard.Zone
+                                                <br />
+
+                                                Woreda / Keb: &nbsp;
+                                                @Model.TheModel.IdCard.Woreda
+                                                <br />
+
+                                                House No: &nbsp;
+                                                @Model.TheModel.IdCard.HouseNo
+                                                <br />
+                                                Trade License #: &nbsp;
+                                                @Model.TheModel.IdCard.LicenseNo
+                                                <br />
+                                            </div>
+                                        }
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <ul class="nav nav-tabs" role="tablist">
+
+                            <li class="nav-item"><a class="nav-link @Model.Tab0Active" data-toggle="tab" href="#profle" role="tab" aria-controls="representatives">Business Profile</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab7Active" data-toggle="tab" href="#representatives" role="tab" aria-controls="representatives">Representatives</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab1Active" data-toggle="tab" href="#members" role="tab" aria-controls="members">Membership</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab2Active" data-toggle="tab" href="#settings" role="tab" aria-controls="settings">Documents</a></li>
+
+
+                            <li class="nav-item"><a class="nav-link @Model.Tab3Active" data-toggle="tab" href="#licenses" role="tab" aria-controls="licenses">Business Licenses</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab4Active" data-toggle="tab" href="#exports" role="tab" aria-controls="exports">Import/Exports</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab5Active" data-toggle="tab" href="#manufacturing" role="tab" aria-controls="manufacturing">Manufacturing</a></li>
+                            <li class="nav-item"><a class="nav-link @Model.Tab6Active" data-toggle="tab" href="#services" role="tab" aria-controls="services">services</a></li>
+                        </ul>
+                        <div class="tab-content">
+
+                            <div class="tab-pane @Model.Tab0Active" id="profle" role="tabpanel">
+                                <div class="row">
+
+                                    <div class="col-md-11 ">
+                                        <table class="table table-bordered table-striped" id="datatblprofile" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Attribute</th>
+                                                    <th>Value</th>
+
+                                                    <th>
+                                                        <button class="card-header-action edit btn btn-outline-success btn-sm"
+                                                                id="newbtn"
+                                                                data-url="@Url.Action("EditProfile", new {id=Guid.Empty, individualId = Model.TheMember.Id, memberId = Model.TheModel.Id })"
+                                                                data-toggle="modal"
+                                                                data-target="#AddEditModal">
+                                                            New
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var a in Model.TheMember.BusinessProfiles)
+                                                {
+                                                    <tr>
+                                                        <td> @a.ProfileAttribure.Name </td>
+                                                        <td> @a.AttributeValue</td>
+                                                        <td>
+
+                                                            <button data-toggle="modal"
+                                                                data-target="#AddEditModal"
+                                                                title="Edit"
+                                                                data-url="@Url.Action("EditProfile", new {id=a.Id, individualId = a.IndividualId, memberId = Model.TheModel.Id })"
+                                                                class=" float-right edit btn btn-outline-success btn-sm">
+                                                                <i class="fa fa-pen "></i>
+                                                            </button>
+
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane @Model.Tab7Active" id="representatives" role="tabpanel">
+                                <div class="card-header-actions">
+                                    <button class="card-header-action edit btn btn-outline-success btn-sm"
+                                            id="newbtn"
+                                            data-url="@Url.Action("EditStaff", new {individualId = Model.TheModel.Id, Id=Guid.Empty })"
+                                            data-toggle="modal"
+                                            data-target="#AddEditModal">
+                                        New
+                                    </button>
+
+                                </div>
+                                <table class="table table-bordered table-striped" id="datatbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Mobile</th>
+                                            <th>Email</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var r in Model.Staffs.Where(e => e.Status == ECCSA.BackOffice.Server.Model.Common.StatusEnum.Active))
+                                        {
+                                            <tr>
+                                                <td>@r.Name</td>
+                                                <td>@r.Title</td>
+                                                <td>@r.Mobile</td>
+                                                <td>@r.Email</td>
+                                                <td>
+                                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                        <a class="btn btn-outline-success edit btn-sm"
+                                                       data-toggle="modal"
+                                                       data-url="@Url.Action("EditStaff", new {individualId = Model.TheModel.Id, Id=r.Id })"
+                                                       data-target="#AddEditModal"><i class="fa fa-pen "></i></a>
+
+                                                        <a class="btn btn-outline-info edit btn-sm"
+                                                       data-toggle="modal"
+                                                       data-url="@Url.Action("StaffDetail", new {individualId = Model.TheModel.Id, Id=r.Id })"
+                                                       data-target="#AddEditModal"><i class="fa fa-info" aria-hidden="true"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane @Model.Tab1Active" id="members" role="tabpanel">
+                                <div class="row">
+
+                                    <div class="col-md-12 ">
+                                        <table class="table table-bordered table-striped" id="datatblmembership" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>InvoiceNo</th>
+                                                    <th>ReceiptNo</th>
+                                                    <th>Amount</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var a in Model.TheModel.RenewalHistory)
+                                                {
+                                                    <tr>
+                                                        <td>@a.DateRenewed</td>
+                                                        <td>@a.InvoiceNo</td>
+                                                        <td>@a.ReceiptNo</td>
+                                                        <td>@a.Fee</td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane @Model.Tab2Active" id="settings" role="tabpanel">
+
+
+                                <table class="table table-bordered table-striped" id="datatblsetting">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Response</th>
+
+                                            <th>Remark </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var q in Model.TheMember.LegalDocuments.OrderBy(o => o.Requirement.OrderNo))
+                                        {
+                                            <tr>
+                                                <td>@q.Requirement.OrderNo</td>
+                                                <td>@q.Name</td>
+                                                <td>
+                                                    @if (q.Requirement.InputMethod == ServiceInputTypeEnum.Upload)
+                                                    {
+                                                        <a class="title" data-toggle="modal"
+                                                   data-target="#dialog"
+                                                   title="View Document"
+                                                   data-src="@q.RelativePath"
+                                                   data-text=""
+                                                   data-id="@q.Id"
+                                                   data-title="@q.Requirement.OrderNo @q.Requirement.Name"
+                                                   onclick="previewPdf(this);">
+                                                            Preview
+                                                        </a>
+                                                    }
+                                                    else if (
+                                                    q.Requirement.InputMethod == ServiceInputTypeEnum.LegalDocument)
+                                                    {
+                                                        <a class="title" data-toggle="modal"
+                                                   data-target="#dialog"
+                                                   title="View Document"
+                                                   data-src="@q.RelativePath"
+                                                   data-text="@q.TextResponse"
+                                                   data-id="@q.Id"
+                                                   data-title="@q.Requirement.OrderNo @q.Requirement.Name"
+                                                   onclick="previewPdf(this);">
+                                                            @q.TextResponse
+                                                        </a>
+                                                    }
+                                                    else if (q.Requirement.InputMethod == ServiceInputTypeEnum.TradeAgreement ||
+                                                    q.Requirement.InputMethod == ServiceInputTypeEnum.LongText)
+                                                    {
+                                                        <a class="title" data-toggle="modal"
+                                                   data-target="#dialog"
+                                                   title="View Document"
+                                                   data-src="@q.RelativePath"
+                                                   data-text="@q.TextResponse"
+                                                   data-id="@q.Id"
+                                                   data-title="@q.Requirement.OrderNo @q.Requirement.Name"
+                                                   onclick="previewPdf(this);">
+                                                            Preview
+                                                        </a>
+                                                    }
+
+                                                    else
+                                                    {
+                                                        @q.Response
+                                                    }
+
+                                                </td>
+                                                <td>@q.Remark</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane @Model.Tab3Active" id="licenses" role="tabpanel">
+                                <div class="row">
+
+                                    <div class="col-md-11 ">
+                                        <table class="table table-bordered table-striped" id="datatbllicense" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Business Type</th>
+                                                    <th>License No</th>
+                                                    <th>Issue Date</th>
+                                                    <th>Renewal Date</th>
+                                                    <th>
+                                                        @if (Model.IsUserOrAdmin)
+                                                        {
+                                                            <button class="card-header-action btn btn-outline-success btn-sm"
+                                                                data-toggle="modal"
+                                                                data-target="#newLicenseModal"
+                                                                title="New Business Type">
+                                                                New
+                                                            </button>
+                                                        }
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var a in Model.TheMember.BusinessLicenses)
+                                                {
+                                                    <tr>
+                                                        <td> @a.BusinessType </td>
+                                                        <td> @a.LicenseNo</td>
+                                                        <td>@a.IssueDate.ToString("yyyy-MM-dd")</td>
+                                                        <td>@a.RenewalDate.ToString("yyyy-MM-dd")</td>
+                                                        <td>
+                                                            @if (Model.IsUserOrAdmin)
+                                                            {
+                                                                <a onclick="return confirmDelete($('#delete@(Model.Guid2String(a.Id))')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger float-right">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+                                                                <form data-parsley-validate
+                                                              novalidate
+                                                              method="post"
+                                                              id="delete@(Model.Guid2String(a.Id))"
+                                                              asp-action="DeleteLicense"
+                                                              asp-antiforgery="true">
+                                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                                    <input type="hidden" name="IndividualId" value="@a.IndividualId" />
+                                                                    <input type="hidden" name="memberId" value="@Model.TheModel.Id" />
+                                                                    <input type="hidden" name="activeTabIndex" value="3" />
+                                                                </form>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane @Model.Tab4Active" id="exports" role="tabpanel">
+
+                                <div class="row">
+
+                                    <div class="col-md-6 ">
+                                        <h4>Export</h4>
+                                        <table class="table table-bordered table-striped" id="datatblExports" style="margin-top: 5px; margin-left: 5px;">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Product</th>
+                                                    <th>Destination</th>
+                                                    <th>
+                                                        @if (Model.IsUserOrAdmin)
+                                                        {
+                                                            <button class="card-header-action btn btn-outline-success btn-sm"
+                                                                data-toggle="modal"
+                                                                data-target="#newExportModal"
+                                                                title="New Export">
+                                                                New
+                                                            </button>
+                                                        }
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var a in Model.TheMember.Exports)
+                                                {
+                                                    <tr>
+                                                        <td>@a.SerNo</td>
+                                                        <td>@a.ProductName</td>
+                                                        <td>@a.Country</td>
+                                                        <td>
+                                                            @if (Model.IsUserOrAdmin)
+                                                            {
+                                                                <a onclick="return confirmDelete($('#delete@(Model.Guid2String(a.Id))')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger float-right">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+                                                                <form data-parsley-validate
+                                                              novalidate
+                                                              method="post"
+                                                              id="delete@(Model.Guid2String(a.Id))"
+                                                              asp-action="DeleteTrade"
+                                                              asp-antiforgery="true">
+                                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                                    <input type="hidden" name="IndividualId" value="@a.IndividualId" />
+                                                                    <input type="hidden" name="memberId" value="@Model.TheModel.Id" />
+                                                                    <input type="hidden" name="activeTabIndex" value="4" />
+                                                                </form>
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6 ">
+                                        <h4>Import</h4>
+                                        <table class="table table-bordered table-striped" id="datatblImports" style="margin-top: 5px; margin-left: 5px;">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Product</th>
+                                                    <th>Source</th>
+                                                    <th>
+                                                        @if (Model.IsUserOrAdmin)
+                                                        {
+                                                            <button class="card-header-action btn btn-outline-success btn-sm"
+                                                                data-toggle="modal"
+                                                                data-target="#newImportModal"
+                                                                title="New Import">
+                                                                New
+                                                            </button>
+                                                        }
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var a in Model.TheMember.Imports)
+                                                {
+                                                    <tr>
+                                                        <td>@a.SerNo</td>
+                                                        <td>@a.ProductName</td>
+                                                        <td>@a.Country</td>
+                                                        <td>
+                                                            @if (Model.IsUserOrAdmin)
+                                                            {
+                                                                <a onclick="return confirmDelete($('#delete@(Model.Guid2String(a.Id))')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger float-right">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+                                                                <form data-parsley-validate
+                                                              novalidate
+                                                              method="post"
+                                                              id="delete@(Model.Guid2String(a.Id))"
+                                                              asp-action="DeleteTrade"
+                                                              asp-antiforgery="true">
+                                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                                    <input type="hidden" name="IndividualId" value="@a.IndividualId" />
+                                                                    <input type="hidden" name="memberId" value="@Model.TheModel.Id" />
+                                                                    <input type="hidden" name="activeTabIndex" value="4" />
+                                                                </form>
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane @Model.Tab5Active" id="manufacturing" role="tabpanel">
+
+
+                                <table class="table table-bordered table-striped" id="datatblmanufacturing">
+                                    <thead>
+                                        <tr>
+
+                                            <th rowspan="2"> Type of Product</th>
+                                            <th rowspan="2">Unit</th>
+                                            <th colspan="2">Annual Production Capacity</th>
+                                            <th rowspan="2">
+                                                @if (Model.IsUserOrAdmin)
+                                                {
+                                                    <button class="card-header-action btn btn-outline-success btn-sm"
+                                                        data-toggle="modal"
+                                                        data-target="#newManufacturingModal"
+                                                        title="New Manufacturing">
+                                                        New
+                                                    </button>
+                                                }
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Full Capacity</th>
+                                            <th>Utilized Capacity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var a in Model.TheMember.Manufacturings)
+                                        {
+                                            <tr>
+
+                                                <td>
+                                                    @a.Product
+                                                </td>
+                                                <td>@a.Unit</td>
+                                                <td>@a.ProductionCapacity</td>
+                                                <td>@a.UtilizedCapacity</td>
+                                                <td>
+                                                    @if (Model.IsUserOrAdmin)
+                                                    {
+                                                        <a onclick="return confirmDelete($('#delete@(Model.Guid2String(a.Id))')[0]);"
+                                                   class=" btn btn-sm btn-outline-danger float-right">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+                                                        <form data-parsley-validate
+                                                      novalidate
+                                                      method="post"
+                                                      id="delete@(Model.Guid2String(a.Id))"
+                                                      asp-action="DeleteIndividualManufacturing"
+                                                      asp-antiforgery="true">
+                                                            <input type="hidden" name="id" value="@a.Id" />
+                                                            <input type="hidden" name="IndividualId" value="@a.IndividualId" />
+                                                            <input type="hidden" name="memberId" value="@Model.TheModel.Id" />
+                                                            <input type="hidden" name="activeTabIndex" value="5" />
+                                                        </form>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane @Model.Tab6Active" id="services" role="tabpanel">
+
+
+                                <table class="table table-bordered table-striped" id="datatblservices">
+                                    <thead>
+                                        <tr>
+                                            <th>Service</th>
+                                            <th>
+                                                @if (Model.IsUserOrAdmin)
+                                                {
+                                                    <button class="card-header-action btn btn-outline-success btn-sm"
+                                                        data-toggle="modal"
+                                                        data-target="#newServiceModal"
+                                                        title="New Service">
+                                                        New
+                                                    </button>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var a in Model.TheMember.Services)
+                                        {
+                                            <tr>
+                                                <td>@a.ServiceName</td>
+                                                <td>
+                                                    @if (Model.IsUserOrAdmin)
+                                                    {
+                                                        <a onclick="return confirmDelete($('#delete@(Model.Guid2String(a.Id))')[0]);"
+                                                   class=" btn btn-sm btn-outline-danger float-right">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </a>
+                                                        <form data-parsley-validate
+                                                      novalidate
+                                                      method="post"
+                                                      id="delete@(Model.Guid2String(a.Id))"
+                                                      asp-action="DeleteIndividualService"
+                                                      asp-antiforgery="true">
+                                                            <input type="hidden" name="id" value="@a.Id" />
+                                                            <input type="hidden" name="IndividualId" value="@a.IndividualId" />
+                                                            <input type="hidden" name="memberId" value="@Model.TheModel.Id" />
+                                                            <input type="hidden" name="activeTabIndex" value="6" />
+                                                        </form>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="EditIndividualModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Member </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" asp-for="TheModel.ParentAssociationId" />
+                    <input type="hidden" asp-for="TheMember.LocationId" id="locationId" />
+                    <input type="hidden" asp-for="TheMember.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            TIN
+                        </label>
+                        <input type="text" maxlength="10" class="form-control col-sm-4 col-md-4" asp-for="TheMember.TaxIdNumber" />
+                    </div>
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameEng" placeholder="Name  " />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameLocal" placeholder="ስም  " />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sector
+                        </label>
+
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheMember.SectorId"
+                                asp-items="@(new SelectList(Model.Sectors,"Value", "Name",Model.TheMember.SectorId, "ParentName"))"></select>
+
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Membership Code
+                        </label>
+                        <input type="text" maxlength="20" class="form-control col-sm-4 col-md-4" asp-for="TheModel.Code" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Member since
+                        </label>
+                        <input type="date" maxlength="20" class="form-control col-sm-4 col-md-4" asp-for="TheMember.MemberSince" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Location
+                        </label>
+                        <input type="hidden" id="hdnlocationSelected" name="LocationId" value="@Model.TheMember.LocationId" />
+
+                        <select id="locationSelectorId" class="custom-select col-sm-8 col-md-9" name="LocationId" asp-for="TheMember.LocationId"
+                                onchange="locationChanged()"></select>
+
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="makePaymentModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Record Payment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="Payment" asp-antiforgery="true">
+                    <input type="hidden" asp-for="RenewalHistory.Fee" />
+                    <input type="hidden" asp-for="Payment.InvoiceId" />
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" name="RenewalHistory.Id" asp-for="TheModel.LastRenewalId" />
+
+
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Receipt No
+                        </label>
+                        <input type="text" id="receiptNo" onchange="validatePayment()" maxlength="50" class="form-control col-sm-8 col-md-9" asp-for="Payment.ReceiptNo" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Amount
+                        </label>
+                        <input type="hidden" id="remainingBalance" value="@Model.Invoice.DueRemaining" />
+                        <input type="number" name="Payment.AmountPaid" id="amountPaid" min="0" value="@Model.Invoice.DueRemaining" class="form-control col-sm-3 col-md-3" asp-for="Payment.AmountPaid" required /> Birr
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" asp-for="Payment.PaymentDate" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Payment Method
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" id="paymentMethod" onchange="validatePayment()"
+                                asp-for="Payment.PaymentMethod" asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.Model.Common.PaymentMethodEnum>())" required>
+                        </select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <textarea rows="3" maxlength="200" class="form-control col-sm-8 col-md-9" asp-for="Payment.Remark"> </textarea>
+                    </div>
+
+
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" id="submitPayment"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editStatusModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Change Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="ApproveRejectRenewal" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" onchange="validateStatus()" asp-for="TheModel.RenewalStatus"
+                                required>
+                            <option value="0">Please select ...</option>
+                            <option value="5">Accepted</option>
+                            <option value="9">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Expiry Date
+                        </label>
+                        <input type="date" required id="expiryDate" min="@(DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"))" value="@(DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"))" class="form-control col-sm-8 col-md-9" asp-for="TheModel.ExpiryDate" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Renewal Date
+                        </label>
+                        <input type="date" required id="renewalDate" disabled max="@(DateTime.Today.ToString("yyyy-MM-dd"))" value="@(DateTime.Today.ToString("yyyy-MM-dd"))" class="form-control col-sm-8 col-md-9" asp-for="TheModel.RenewalDate" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <input type="text" maxlength="200" id="statusRemark" class="form-control col-sm-8 col-md-9" asp-for="TheModel.Remark" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" id="statusSubmit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="addEditContactModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="newLicenseModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">New Business Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveLicense" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" asp-for="@Model.ActiveTabIndex" value="3" />
+                    <input type="hidden" asp-for="@Model.License.IndividualId" value="@Model.TheMember.Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Business Type
+                        </label>
+                        <input type="text" maxlength="250" required class="form-control col-sm-8 col-md-9" asp-for="@Model.License.BusinessType" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            License No
+                        </label>
+                        <input type="text" maxlength="250" required class="form-control col-sm-8 col-md-9" asp-for="@Model.License.LicenseNo" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Issue Date
+                        </label>
+                        <input type="date" required id="issueDate" max="@(DateTime.Today.ToString("yyyy-MM-dd"))" value="@(DateTime.Today.ToString("yyyy-MM-dd"))" class="form-control col-sm-8 col-md-9" asp-for="@Model.License.IssueDate" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Renewal Date
+                        </label>
+                        <input type="date" required id="renewalDate" max="@(DateTime.Today.ToString("yyyy-MM-dd"))" value="@(DateTime.Today.ToString("yyyy-MM-dd"))" class="form-control col-sm-8 col-md-9" asp-for="@Model.License.RenewalDate" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" id="statusSubmit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="newExportModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">New Export</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveTrade" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" asp-for="@Model.ActiveTabIndex" value="4" />
+                    <input type="hidden" asp-for="@Model.Trade.IndividualId" value="@Model.TheMember.Id" />
+                    <input type="hidden" asp-for="@Model.Trade.TradeDirection" value="E" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Ser. No
+                        </label>
+
+                        <input type="text" maxlength="10" required class="form-control col-sm-4 col-md-4" asp-for="@Model.Trade.SerNo" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Product
+                        </label>
+                        <input type="text" maxlength="250" required class="form-control col-sm-8 col-md-9" asp-for="@Model.Trade.ProductName" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Destination
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" asp-for="@Model.Trade.Country"
+                                required>
+                            <option value="0">Please select ...</option>
+                            @foreach (var c in Country.Countries)
+                            {
+                                <option value="@c.Name">@c.DisplayName</option>
+                            }
+                        </select>
+
+                    </div>
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" id="statusSubmit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="newImportModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">New Import</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveTrade" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" asp-for="@Model.ActiveTabIndex" value="4" />
+                    <input type="hidden" asp-for="@Model.Trade.IndividualId" value="@Model.TheMember.Id" />
+                    <input type="hidden" asp-for="@Model.Trade.TradeDirection" value="I" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Ser. No
+                        </label>
+
+                        <input type="text" maxlength="10" required class="form-control col-sm-4 col-md-4" asp-for="@Model.Trade.SerNo" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Product
+                        </label>
+                        <input type="text" maxlength="250" required class="form-control col-sm-8 col-md-9" asp-for="@Model.Trade.ProductName" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Origin
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" asp-for="@Model.Trade.Country"
+                                required>
+                            <option value="0">Please select ...</option>
+                            @foreach (var c in Country.Countries)
+                            {
+                                <option value="@c.Name">@c.DisplayName</option>
+                            }
+                        </select>
+                    </div>
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" id="statusSubmit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="newManufacturingModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Products and Capacity</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveManufacturing" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" asp-for="@Model.ActiveTabIndex" value="5" />
+                    <input type="hidden" asp-for="@Model.Manufacturing.IndividualId" value="@Model.TheMember.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Product
+                        </label>
+                        <input type="text" maxlength="250" required class="form-control col-sm-8 col-md-9" asp-for="@Model.Manufacturing.Product" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Unit
+                        </label>
+
+                        <input type="text" maxlength="250" required class="form-control col-sm-8 col-md-9" asp-for="@Model.Manufacturing.Unit" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Full Capacity
+                        </label>
+                        <input type="text" maxlength="50" required class="form-control col-sm-8 col-md-9" asp-for="@Model.Manufacturing.ProductionCapacity" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Utilized Capacity
+                        </label>
+
+                        <input type="text" maxlength="50" required class="form-control col-sm-8 col-md-9" asp-for="@Model.Manufacturing.UtilizedCapacity" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" id="statusSubmit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="newServiceModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">New Service</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveService" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" asp-for="@Model.ActiveTabIndex" value="4" />
+                    <input type="hidden" asp-for="@Model.Service.IndividualId" value="@Model.TheMember.Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Service
+                        </label>
+                        <input type="text" maxlength="250" required class="form-control col-sm-8 col-md-9" asp-for="@Model.Service.ServiceName" />
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" id="statusSubmit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="width:920px !important;">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewTitle">Preview Document</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <iframe id="frame" style="width:900px; min-height:400px; max-height:600px;"></iframe>
+                    <pre id="longText" style="width:900px; height:auto; max-height:600px;display:none;"></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Id Card Info</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="UpdateMembershipIdInfo" asp-antiforgery="true">
+                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="IndividualId" value="@Model.TheModel.MemberId" />
+                    <input type="hidden" name="AssociationId" value="@Model.TheModel.ParentAssociationId" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Id Holder Name
+                        </label>
+                        <input type="text" name="FullName" asp-for="TheModel.IdCard.FullName" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="TitleName" asp-for="TheModel.IdCard.TitleName" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Zone (S.C.)
+                        </label>
+                        <input type="text" name="Zone" asp-for="TheModel.IdCard.Zone" maxlength="20" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Woreda (Keb.)
+                        </label>
+                        <input type="text" name="Woreda" asp-for="TheModel.IdCard.Woreda" maxlength="20" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            House No
+                        </label>
+                        <input type="text" name="HouseNo" asp-for="TheModel.IdCard.HouseNo" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            License No
+                        </label>
+                        <input type="text" name="LicenseNo" asp-for="TheModel.IdCard.LicenseNo" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Phone #
+                        </label>
+                        <input type="text" name="PhoneNumber" asp-for="TheModel.IdCard.PhoneNumber" maxlength="20" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sector
+                        </label>
+                        <input type="text" name="Sector" asp-for="TheModel.IdCard.Sector" maxlength="20" class="form-control col-sm-9 col-md-8" required />
+                    </div>
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+        function previewPdf(e) {
+            const title = document.getElementById('previewTitle');
+
+            const frame = document.getElementById('frame');
+            const longDiv = document.getElementById('longText');
+
+            frame.style.display = "none";
+            longDiv.style.display = "none";
+
+            const srcVal = $(e).attr('data-src');
+            const textVal = $(e).attr('data-text');
+
+            const titleVal = $(e).attr('data-title');
+
+            title.innerHTML = titleVal;
+            if (srcVal.length > 2) {
+                frame.style.display = '';
+                $("#frame").attr("src", srcVal);
+            } else {
+                longDiv.style.display = '';
+                longDiv.innerHTML = textVal;
+            }
+        }
+
+        loadLocation();
+        function locationChanged() {
+            document.getElementById('hdnlocationSelected').value = document.getElementById('locationSelectorId').value;
+            loadLocation();
+        }
+
+        function loadLocation() {
+            const id = document.getElementById('hdnlocationSelected').value;
+            let selectedV = '';
+            let url = `/membership/individual/getlocation`;
+            jQuery.get(url, { parentId: id }, function (data) {
+                $('#locationSelectorId')
+                    .empty();
+                $.each(data.$values, function (index, value) {
+                    selectedV = '';
+                    if (id == value.id) {
+                        selectedV = `selected="selected"`;
+                    }
+                    const option = `<option  ${selectedV} value="${value.id}">${value.name}</option>`;
+                    $('#locationSelectorId').append(option);
+                });
+            });
+
+        }
+
+        $('.edit').on('click', function () {
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function confirmation(form, text) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to ' + text + ' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function validateStatus() {
+            const renewalStatus = document.getElementById('renewalStatus');
+            const statusRemark = document.getElementById('statusRemark');
+            const expiryDate = document.getElementById('expiryDate');
+            const statusSubmit = document.getElementById('statusSubmit');
+            const status = Number(renewalStatus.value);
+            statusSubmit.disabled = true;
+            statusRemark.disabled = true;
+            expiryDate.disabled = true;
+            if (status === 5) {
+                expiryDate.disabled = false;
+                statusSubmit.disabled = false;
+            } else if (status == 9) {
+                statusRemark.disabled = false;
+                statusSubmit.disabled = false;
+            }
+        }
+
+        //validateStatus();
+
+        $('#additionalInfoCollapse').on('hide.bs.collapse', function () {
+            $("#additionalInfoCollapseLink").html("Click To Show Additional Info.")
+        })
+        $('#additionalInfoCollapse').on('show.bs.collapse', function () {
+            $("#additionalInfoCollapseLink").html("Click To hide Additional Info.")
+        })
+    </script>
+}

@@ -1,0 +1,294 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IndividualViewModel
+
+@{
+    ViewData["Title"] = "Members";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<div class="container-fluid">
+    @if(Model.ShowAssociations){
+    <div class="row d-sm-flex align-items-center justify-content-between " style="margin-top:4px;margin-left:15px;margin-bottom:4px;margin-right:15px;">
+
+        Association
+        <form method="get" asp-action="Index">
+            <select class="custom-select col-sm-8 col-md-9" asp-for="@Model.AssociationId"
+                    asp-items="@(new SelectList(Model.Associations,"Id", "Name"))"
+                    onchange="this.form.submit()"></select>
+        </form>
+
+    </div>
+    }
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class=" btn-group" role="group" aria-label="Basic example">
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#theModal"
+                    title="Import Individuals">
+                <i class="fa fa-file-excel-o"></i> Import From Excel
+            </button>
+            <a class="btn btn-sm btn-outline-info" asp-action="DownLoadImportTemplate" >Download Template</a>
+
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#AddEditModal"
+                    title="Add New Individual">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+            <a id="previewCertificate" asp-action="ExportIndividuals" asp-route-associationId="@Model.AssociationId"
+               class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                <i class="fa fa-file-excel-o"></i>Export To Excel
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <p class="float-left">
+                <a href="#" onclick="tableToExcel('dataTable', 'Members', 'Members.xls')"><img src="~/img/excel-new.png" alt="Download Excel"></a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Member Name</th>
+                                    <th>Sector/Sub-Sector</th>
+                                    <th>MemberSince</th>
+                                    <th>TIN</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Member Name</th>
+                                    <th>Sector</th>
+                                    <th>MemberSince</th>
+                                    <th>TIN</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                    var statusClass = (item.Stakeholder == null ? "" : item.Stakeholder.Status == 0 ? "danger" : "");
+
+                                    <tr class="@statusClass">
+                                        <td>
+                                            <a asp-controller="Individual" asp-action="Detail" asp-route-id="@item.Id" class="title @statusClass">
+                                                @Html.DisplayFor(modelItem => item.Member.NameEng)
+                                            </a>
+                                        </td>
+                                        <td>
+                                           
+                                                @Html.DisplayFor(modelItem => item.Member.Sector)
+                                           
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.EnrollmentDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Member.TaxIdNumber)
+                                        </td>
+                                        <td>
+                                            @item.MembershipStatus
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="Individual" asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Member </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" asp-for="TheModel.Id" />
+                    <input type="hidden" asp-for="TheModel.ParentAssociationId" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            TIN
+                        </label>
+                        <input type="text" maxlength="10" class="form-control col-sm-4 col-md-4" asp-for="TheMember.TaxIdNumber" />
+                    </div>
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameEng" placeholder="Name  " />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="TheMember.NameLocal" placeholder="ስም  " />
+                    </div>
+                      <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Sector
+            </label>
+
+            <select  class="custom-select col-sm-8 col-md-9"  asp-for="TheMember.SectorId"
+                    asp-items="@(new SelectList(Model.Sectors,"Value", "Name",Model.TheMember.SectorId,"ParentName"))"></select>
+
+        </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Membership Code
+                        </label>
+                        <input type="text" maxlength="20" class="form-control col-sm-4 col-md-4" asp-for="TheModel.Code" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Location
+                        </label>
+                        <input type="hidden" id="hdnlocationSelected" name="LocationId" value="@Model.TheMember.LocationId" />
+
+                        <select id="locationSelectorId" class="custom-select col-sm-8 col-md-9" name="LocationId" asp-for="TheMember.LocationId"
+                                onchange="locationChanged()"></select>
+
+                    </div>
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Import Data    </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="ImportIndividualsNew" asp-antiforgery="true">
+                    <input type="hidden" name="AssociationId" value="@Model.AssociationId" />
+
+
+
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">Excel</label>
+                        <input type="file" name="file" placeholder="Import individuals" class="form-control-file form-control col-sm-8 col-md-8" />
+                    </div>
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+    <script src="~/js/excellib.min.js"></script>
+<script src="/js/comboTreePlugin.js" type="text/javascript"></script>
+
+<script>
+    loadLocation();
+    function locationChanged() {
+        document.getElementById('hdnlocationSelected').value = document.getElementById('locationSelectorId').value;
+        loadLocation();
+    }
+
+    function loadLocation() {
+        const id = document.getElementById('hdnlocationSelected').value;
+        let selectedV = '';
+        let url = `individual/getlocation`;
+        jQuery.get(url, { parentId: id }, function (data) {
+            $('#locationSelectorId')
+                .empty();
+            $.each(data.$values, function (index, value) {
+                selectedV = '';
+                if (id == value.id) {
+                    selectedV = `selected="selected"`;
+                }
+                const option = `<option  ${selectedV} value="${value.id}">${value.name}</option>`;
+                $('#locationSelectorId').append(option);
+            });
+        });
+
+    }
+    $('.edit').on('click', function () {
+        loadLocation();
+    });
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

@@ -1,0 +1,199 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Events.Model.EventTypeViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class=" btn-group" role="group" aria-label="Basic example">
+            <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#editEventTypeModal"
+                    data-id="@Guid.Empty"
+                    data-title=""
+                    data-descr=""
+                    data-status="@((int)StatusEnum.Active)"
+                    onclick="editEventType(this);"
+                    title="Create Event Type">
+                <i class="fas fa-plus fa-sm "></i>  New
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+               
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>Status </th>
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>Status </th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                    var statusClass = (item.Status == StatusEnum.Inactive ? "danger" : "");
+
+                                    <tr class="@statusClass">
+                                        <td>
+                                            <a asp-controller="EventType" asp-action="Detail" asp-route-id="@item.EventTypeId" class="title @statusClass">
+                                                @Html.DisplayFor(modelItem => item.Title)
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Status)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                               @* <button data-toggle="modal"
+                                                        data-target="#editEventTypeModal"
+                                                        data-id="@item.EventTypeId"
+                                                        data-title="@item.Title"
+                                                        data-descr="@item.Description"
+                                                        data-status="@((int)item.Status)"
+                                                        onclick="editEventType(this);"
+                                                        class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pen "></i>
+                                                </button>*@
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="EventType" asp-action="Detail" asp-route-id="@item.EventTypeId">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editEventTypeModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">@(Model.TheModel.EventTypeId == Guid.Empty? "Create " :"Edit ") Event Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveEventType" asp-antiforgery="true">
+                    <input type="hidden" name="EventTypeId" id="eventTypeId" />
+                    <input type="hidden" name="Owner" id="eventTypeOwner" value="@Model.CurrentModule" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" name="Title" id="title" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" maxlength="800" name="Description" id="description" class="form-control col-sm-8 col-md-9" required> </textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" id="eventTypeStatus">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+
+
+    <script>
+
+
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function editEventType(e) {
+            const id = document.getElementById('eventTypeId');
+            const title = document.getElementById('title');
+
+            const description = document.getElementById('description');
+
+            const idVal = $(e).attr('data-id');
+            const titleVal = $(e).attr('data-title');
+            const descrVal = $(e).attr('data-descr');
+
+
+            const statusVal = $(e).attr('data-status');
+
+
+            id.value = idVal;
+            title.value = titleVal;
+            description.innerText = descrVal;
+
+            $('#eventTypeStatus').val(statusVal).change();
+
+
+        }
+
+
+    </script>
+}

@@ -1,0 +1,296 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.MeetingViewModel
+@using ECCSA.BackOffice.Server.Model.Common;
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+    var openForRegistration = (Model.TheModel.Status == MeetingStatusEnum.ReadyForRegistration ||
+                        Model.TheModel.Status == MeetingStatusEnum.ReadyForParticipation) &&
+                       Model.TheModel.RegistrationDeadline >= DateTime.Today && Model.IsUserOrAdmin;
+    var openMinuteSigning = Model.TheModel.Status == MeetingStatusEnum.ReadyForMinuteVoting &&
+    Model.TheModel.MinuteDeadline >= DateTime.Today && Model.IsUserOrAdmin;
+   
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("PublicIndex",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <h4>@Model.TheModel.Title</h4>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            Venue: <strong> @Model.TheModel.Venue</strong>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Date: <strong>@Model.TheModel.Date.ToString("yyyy-MM-dd")</strong>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Registration Deadline: <strong>@Model.TheModel.RegistrationDeadline.ToString("yyyy-MM-dd")</strong>
+                        </div>
+                    </div>
+                    @if (@openMinuteSigning)
+                    {
+                        <form data-parsley-validate novalidate method="post"
+                          asp-action="SaveMinuteStatus" asp-antiforgery="true">
+                            <input type="hidden" name="Id" value="@Model.TheParticipant.Id" />
+                            <input type="hidden" name="MeetingId" value="@Model.TheParticipant.MeetingId" />
+                            <div class="row form-group">
+                                <div class="col-sm-3">
+                                    Minute Status:
+                                </div>
+                                
+                                     <select class="custom-select col-sm-7 col-md-8" id="statusId"
+                                                       asp-items="@(Html.GetEnumSelectList<MinuteStatusEnum>())"
+                                                       name="MinuteStatus" asp-for="TheParticipant.MinuteStatus" required>
+                                    </select>
+                                
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-sm-3">
+                                    Remark:
+                                </div>
+                                
+                                     <textarea rows="2" class="form-control col-sm-9" maxlength="200" name="Remark">@Model.TheParticipant.Remark</textarea>
+                                
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-sm-9"></div>
+                                <div class="col-sm-3">
+                                    <input type="submit" value="Save" class="btn btn-outline-primary" />
+                                </div>
+                            </div>
+                        </form>
+
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-sm-6">
+                                Minute Signing Deadline: <strong>@Model.TheModel.MinuteDeadline.ToString("yyyy-MM-dd")</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                Minute Status: <strong>@Model.TheParticipant.MinuteStatus</strong>
+                            </div>
+                        </div>
+                         <div class="row">
+                                <div class="col-sm-12">
+                                    Reamark: <strong>@Model.TheParticipant.Remark </strong>
+                                </div>
+                            </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <h4>Main Participant</h4>
+                        </div>
+                        <div class="col-sm-3">
+                             <a href="@Url.Action("PrintMeetingCard",Model.Controller,new { id = @Model.TheParticipant.Id, meetingId = @Model.TheParticipant.MeetingId})" class="btn btn-outline-info"><i class="fa fa-print" aria-hidden="true"></i>Print</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            Code: <strong> @Model.TheParticipant.Code</strong>
+                        </div>
+                    </div>
+                    @if (@openForRegistration)
+                    {
+                        <form data-parsley-validate novalidate method="post"
+                          asp-action="SaveParticipant" asp-antiforgery="true">
+                            <input type="hidden" name="Id" value="@Model.TheParticipant.Id" />
+                            <input type="hidden" name="MeetingId" value="@Model.TheParticipant.MeetingId" />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    FullName: <input type="text" maxlength="200" name="FullName" value="@Model.TheParticipant.FullName" class="form-control" required />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    Email: <input type="text" maxlength="200" name="Email" value="@Model.TheParticipant.Email" class="form-control" required />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    Mobile: <input type="text" maxlength="200" name="Mobile" value="@Model.TheParticipant.Mobile" class="form-control" required />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input type="submit" value="Save" class="btn btn-outline-primary" />
+                                </div>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                FullName: <strong> @Model.TheParticipant.FullName</strong>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                Email: <strong>@Model.TheParticipant.Email</strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                Mobile: <strong>@Model.TheParticipant.Mobile</strong>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="margin-top: 1px" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Additional Participants
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Code</th>
+                                <th>FullName</th>
+                                <th>Position</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>
+
+                                </th>
+                            </tr>
+                            @if (@openForRegistration)
+                            {
+                                <form  method="post"
+                                  asp-action="SaveOtherParticipant" asp-antiforgery="true">
+                                  <input type="hidden" name="participantId" value="@Model.TheParticipant.Id" />
+                            <input type="hidden" name="MeetingId" value="@Model.TheParticipant.MeetingId" />
+                                <tr>
+                                    <th><input type="text" maxlength="2" name="OrderNo" class="form-control" required /> </th>
+                                    <th></th>
+                                    <th><input type="text" maxlength="200" name="FullName" class="form-control" required /></th>
+                                    <th><input type="text" maxlength="200" name="Position" class="form-control" required /></th>
+                                    <th><input type="email" maxlength="200" name="Email" class="form-control" required /></th>
+                                    <th><input type="text" maxlength="200" name="Mobile" class="form-control" required /></th>
+                                    <th>
+                                        <input type="submit" value="Add" class="btn btn-outline-primary" />
+                                    </th>
+                                </tr>
+                                </form>
+                            }
+                        </thead>
+
+                        <tbody>
+                            @foreach (var i in Model.TheParticipant.OtherParticipants.OrderBy(x => x.OrderNo))
+                            {
+                                var p = Model.TheParticipant;
+                                var sId = Model.Guid2String(i.Id);
+                                <tr>
+                                    <td> @i.OrderNo </td>
+                                    <td> @i.Code </td>
+                                    <td> @i.FullName </td>
+                                    <td> @i.Position </td>
+                                    <td> @i.Email </td>
+                                    <td> @i.Mobile </td>
+
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            @if (openForRegistration)
+                                            {
+                                                <a onclick="return confirmAction($('#deleteArtifact@(sId)')[0], 'Delete');"
+                                           class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteArtifact@(sId)"
+                                              asp-action="DeleteOtherParticipant" asp-antiforgery="true">
+                                                    <input type="hidden" name="participantId" value="@p.Id" />
+                                                    <input type="hidden" name="meetingId" value="@p.MeetingId" />
+
+                                                    <input type="hidden" name="OrderNo" value="@i.OrderNo" />
+                                                    <input type="hidden" name="Code" value="@i.Code" />
+                                                    <input type="hidden" name="Title" value="@i.Title" />
+                                                    <input type="hidden" name="FullName" value="@i.FullName" />
+                                                    <input type="hidden" name="Position" value="@i.Position" />
+                                                    <input type="hidden" name="Email" value="@i.Email" />
+                                                    <input type="hidden" name="Mobile" value="@i.Mobile" />
+
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+
+<script>
+    function previewPdf(e) {
+        const srcVal = $(e).attr('data-src');
+        $("#frame").attr("src", srcVal);
+    }
+
+
+    function editParticipant(e) {
+        $("#participantId").val($(e).attr('data-id'));
+        $("#fullNameId").val($(e).attr('data-fullname'));
+        $("#emailId").val($(e).attr('data-email'));
+    }
+
+    function confirmAction(form, msg) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to ' + msg + ' ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

@@ -1,0 +1,113 @@
+﻿@using ECCSA.BackOffice.Server.Model.Security
+@using ECCSA.BackOffice.Server.Model.Common
+@using Microsoft.AspNetCore.Identity
+@using System.Linq
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@{
+    var list = Enum.GetValues(typeof(ECCSAModuleFlag)).Cast<ECCSAModuleFlag>();
+    var userProfile = await UserManager.FindByNameAsync(User.Identity.Name);
+
+}
+<!-- Nav Item - User Information -->
+<li class="nav-item dropdown no-arrow">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-list-alt "></i>
+    </a>
+    <!-- Dropdown - User Information -->
+    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+         aria-labelledby="userDropdown">
+        @foreach (var lst in list.OrderBy(l => l.GetDisplayName()))
+        {
+            if (lst == 0) continue;
+            //if (lst.HasFlag(ECCSAModuleFlag.Administration)) continue;
+            // if (lst.HasFlag(ECCSAModuleFlag.Communication)) continue;
+            if (lst.HasFlag(ECCSAModuleFlag.Reporting)) continue;
+            if (!userProfile.AssignedModules.HasFlag(lst)) continue;
+
+            var flag = (int)lst;
+            //userProfile.AssignedModules.HasFlag()
+
+            switch (lst)
+            {
+                case ECCSAModuleFlag.Membership:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = lst.ToString() }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.Communication:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = lst.ToString() }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+
+                case ECCSAModuleFlag.Investment:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "ServiceRequest", new { area = "Service", module= ECCSAModuleFlag.Investment }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.Academy:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = lst.ToString() }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.Support:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = lst.ToString() }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.Arbitration:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = "Service", module= ECCSAModuleFlag.Arbitration }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.Research:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = "Advocacy" }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.TradePromotion:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "ServiceRequest", new { area = "Service", module= ECCSAModuleFlag.TradePromotion }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+
+
+                case ECCSAModuleFlag.Administration:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = lst.ToString() }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.Reporting:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = lst.ToString() }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.MandE:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Dashboard", new { area = "mande",module= ECCSAModuleFlag.MandE }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+                case ECCSAModuleFlag.Bmo:
+                    <a class="dropdown-item" href="@(Url.Action("Index", "Home", new { area = "Bmo",module= ECCSAModuleFlag.Bmo }))">
+                        <i class="fas fa-list-alt fa-fw mr-2 text-gray-400 @(lst.ToString().ToLower())"></i>
+                        @Html.DisplayFor(l => lst)
+                    </a>
+                    break;
+            }
+
+        }
+    </div>
+</li>

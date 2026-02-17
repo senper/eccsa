@@ -1,0 +1,1043 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Common.Servicing
+@model ECCSA.BackOffice.Server.WebApp.Areas.Service.Model.ServiceTypeViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+    var disableDelete = Model.TheModel.ServiceTypeReports.Count > 0;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        @if (Model.CurrentModule == ECCSAModuleFlag.Academy)
+        {
+            <a href="@Url.Action("Detail","Training",
+                     new { Area ="Academy", module=Model.CurrentModule, id = Guid.Empty, serviceTypeId = Model.TheModel.Id })" class="btn btn-outline-info">
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                back to Training
+            </a>
+            <a href="@Url.Action("Index","ServiceType",new { Area ="Service", module=Model.CurrentModule})" class="btn btn-outline-info">
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                back to Service Types
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index","ServiceType",new { Area ="Service", module=Model.CurrentModule})" class="btn btn-outline-info">
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                back
+            </a>
+        }
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Name </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.RoleLevel == RoleLevelEnum.Admin)
+                            {
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button data-toggle="modal"
+                                            data-target="#editServiceTypeModal"
+                                            title="Edit"
+                                            class=" float-right edit btn btn-outline-success btn-sm">
+                                        <i class="fa fa-pen "></i>
+                                    </button>
+                                    @if (!Model.TheModel.HasChildren)
+                                    {
+                                        <a onclick="return confirmDelete($('#deleteServiceType'));"
+                                           class=" btn btn-sm btn-outline-danger float-right">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                        <form data-parsley-validate novalidate method="post" id="deleteServiceType"
+                                      asp-action="DeleteServiceType" asp-antiforgery="true">
+                                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            <input type="hidden" name="module" value="@Model.TheModel.ServiceOwner" />
+                                        </form>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            Description:
+                            <strong>
+                                <pre style="margin-bottom: 0.6rem;">@Model.TheModel.DescriptionEng</pre>
+                                <pre style="margin-bottom: 0.6rem;">@Model.TheModel.DescriptionLocal</pre>
+                            </strong>
+                            Service Charge:
+                            <strong>@Model.TheModel.ServiceCharge</strong><br />
+                            Approval Required:
+                            <strong>@(Model.TheModel.ApprovalRequired ? "Yes" : "No")</strong><br />
+                            Attachment Required:
+                            <strong>@(Model.TheModel.ApprovalAttachmentRequired ? "Yes" : "No")</strong><br />
+                            Allow Additional Attachments:
+                            <strong>@(Model.TheModel.AllowAdditionalAttachments ? "Yes" : "No")</strong><br />
+                            Allow Optional Requirements:
+                            <strong>@(Model.TheModel.AllowOptionalEntries ? "Yes" : "No")</strong><br />
+                            @if (Model.CurrentModule == ECCSAModuleFlag.Arbitration)
+                            {
+                                <text>Requires Two Respondents:</text>
+                                <strong>@(Model.TheModel.IsArbitration ? "Yes" : "No")</strong>
+
+                                <br />
+                            }
+                            Status:
+                            <strong>@Model.TheModel.Status</strong><br />
+                        </div>
+                        <div class="col-md-5 card">
+                            <div class="card-header">
+                                <form data-parsley-validate method="post"
+                                      asp-action="AddContact" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                    <label for="">Contact</label>
+                                    <select class="custom-select col-md-6" name="userId" id="userId"
+                                            asp-items="@(new SelectList(Model.Users, "Id", "FullName"))"></select>
+                                    <input type="submit" class="btn btn-sm btn-outline-success" value="Add" />
+                                </form>
+                            </div>
+                            <div class="card-body">
+                                @foreach (var ur in Model.TheModel.WorkerList)
+                                {
+                                    var ct = Model.Users.FirstOrDefault(u => u.Id == ur.UserId);
+                                    if (ct == null) continue;
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            @ct.FullName:
+                                        </div>
+                                        <div class="col-sm-4">
+                                            @(string.IsNullOrEmpty(ct.MobileNo) ? ct.PhoneNumber : ct.MobileNo)
+                                        </div>
+                                        <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+
+
+                                            <a onclick="return confirmDelete($('#deleteContact@(Model.Guid2String(ct.Id))')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deleteContact@(Model.Guid2String(ct.Id))"
+                                              asp-action="deleteContact" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <input type="hidden" name="userId" value="@ct.Id" />
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#questionsTab" role="tab" aria-controls="representatives">Requirements</a></li>
+
+
+                        </ul>
+                        <div class="tab-content">
+
+                            <div class="tab-pane active" id="questionsTab" role="tabpanel">
+                                <div class="row">
+
+                                    <div class="col-md-11 ">
+                                        <table class="table table-bordered table-striped" id="datatblquestion" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Type </th>
+                                                    <th>Auto Appr</th>
+                                                    @if (Model.TheModel.IsArbitration)
+                                                    {
+                                                        <th>Is For Second Respondent</th>
+                                                    }
+                                                    <th>
+
+
+                                                        <div class="btn-group float-right">
+
+                                                            @if (Model.RoleLevel == RoleLevelEnum.Admin)
+                                                            {
+                                                                <button class="card-header-action btn btn-outline-success btn-sm"
+                                                                        data-toggle="modal"
+                                                                        data-target="#editRequirementModal"
+                                                                        title="New Requirement"
+                                                                        data-id="@Guid.Empty"
+                                                                        data-orderno=""
+                                                                        data-name=""
+                                                                        data-desc=""
+                                                                        data-namelocal=""
+                                                                        data-desclocal=""
+                                                                        data-label=""
+                                                                        data-labellocal=""
+                                                                        data-approve="true"
+                                                                        data-opponent="false"
+                                                                        data-type="0"
+                                                                        onclick="editRequirement(this)">
+                                                                    New
+                                                                </button>
+
+                                                                @*	<button type="button"
+                                                            title="New Group"
+                                                            class="btn btn-sm btn-outline-info"
+                                                            data-toggle="modal"
+                                                            data-target="#editRequirementGroupModal"
+                                                            data-id="@Guid.Empty"
+                                                            data-orderno=""
+                                                            data-name=""
+                                                            onclick="editRequirementGroup(this)">
+                                                            Group
+                                                            </button>*@
+                                                                <button type="button"
+                                                                        title="New Invoice"
+                                                                        data-toggle="modal"
+                                                                        data-target="#editInvoiceRequirementModal"
+                                                                        data-id="@Guid.Empty"
+                                                                        data-orderno=""
+                                                                        data-name=""
+                                                                        data-desc=""
+                                                                        data-namelocal=""
+                                                                        data-desclocal=""
+                                                                        data-label=""
+                                                                        data-labellocal=""
+                                                                        data-opponent="false"
+                                                                        onclick="editRequirementInvoice(this)"
+                                                                        class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fa fa-money" aria-hidden="true"></i>Invoice
+                                                                </button>
+                                                            }
+                                                        </div>
+
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var q in Model.TheModel.ServiceRequirements.Where(o => o.IsParent).OrderBy(o => o.OrderNo))
+                                                {
+                                                    var target = "#editRequirementModal";
+                                                    if (q.RequirementType == RequirementTypeEnum.Invoice)
+                                                    {
+                                                        target = "#editInvoiceRequirementModal";
+                                                    }
+                                                    else if (q.RequirementType == RequirementTypeEnum.Header)
+                                                    {
+                                                        target = "#editRequirementGroupModal";
+                                                    }
+                                                    <tr>
+                                                        <td>
+                                                            @*@if (q.HasChild)
+                                                        {
+                                                        <a data-tt="@q.OrderNo" onclick="showHideAnswers(this);" class="title"> <i class="fas fa-angle-right"></i>&nbsp;@q.OrderNo </a>
+                                                        }
+                                                        else
+                                                        {*@
+                                                            @q.OrderNo
+                                                            @*}*@
+
+                                                        </td>
+                                                        <td> @q.Name  </td>
+                                                        <td> @q.InputType  </td>
+                                                        <td>@(q.ApproveOnSubmit ? "Yes" : "No")</td>
+                                                        @if (Model.TheModel.IsArbitration)
+                                                        {
+                                                            <td>@(q.IsForOpponent ? "Yes" : "No")</td>
+                                                        }
+                                                        <td>
+                                                            @if (Model.RoleLevel == RoleLevelEnum.Admin)
+                                                            {
+                                                                if (q.RequirementType == RequirementTypeEnum.Header)
+                                                                {
+                                                                    if (!q.HasChild && !disableDelete)
+                                                                    {
+                                                                        <a onclick="return confirmDelete($('#delete@(Model.Guid2String(q.Id))')[0]);"
+                                                                           class=" btn btn-sm btn-outline-danger float-right">
+                                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                        </a>
+                                                                        <form data-parsley-validate novalidate method="post" id="delete@(Model.Guid2String(q.Id))"
+                                                              asp-action="DeleteRequirement" asp-antiforgery="true">
+                                                                            <input type="hidden" name="id" value="@q.Id" />
+                                                                            <input type="hidden" name="serviceTypeId" value="@q.ServiceTypeId" />
+                                                                        </form>
+
+                                                                    }
+                                                                    <button type="button"
+                                                                            title="Edit"
+                                                                            class="float-right btn btn-outline-success btn-sm"
+                                                                            data-toggle="modal"
+                                                                            data-target="#editRequirementGroupModal"
+                                                                            data-id="@q.Id"
+                                                                            data-orderno="@q.OrderNo"
+                                                                            data-name="@q.NameEng"
+                                                                            data-desc="@q.DescriptionEng"
+                                                                            data-namelocal="@q.NameLocal"
+                                                                            data-desclocal="@q.DescriptionLocal"
+                                                                            data-approve="@q.ApproveOnSubmit"
+                                                                            data-opponent="@q.IsForOpponent"
+                                                                            onclick="editRequirementGroup(this)">
+                                                                        <i class="fa fa-pen "></i>
+                                                                    </button>
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (!@Model.HasServiceRequest)
+                                                                    {
+
+                                                                        <button data-toggle="modal"
+                                                                                data-target="@target"
+                                                                                title="Edit Requirement"
+                                                                                data-id="@q.Id"
+                                                                                data-orderno="@q.OrderNo"
+                                                                                data-name="@q.NameEng"
+                                                                                data-desc="@q.DescriptionEng"
+                                                                                data-namelocal="@q.NameLocal"
+                                                                                data-desclocal="@q.DescriptionLocal"
+                                                                                data-type="@((int)q.InputMethod)"
+                                                                                data-label="@q.Label"
+                                                                                data-labellocal="@q.LabelLocal"
+                                                                                data-lookuptype="@q.LookupTypeId"
+                                                                                data-approve="@q.ApproveOnSubmit"
+                                                                                data-opponent="@q.IsForOpponent"
+                                                                                onclick="editRequirement(this)"
+                                                                                class=" float-right btn btn-outline-success btn-sm">
+                                                                            <i class="fa fa-pen "></i>
+                                                                        </button>
+
+
+                                                                    }
+                                                                    <a onclick="return confirmDelete($('#delete@(Model.Guid2String(q.Id))')[0]);"
+                                                                       class=" btn btn-sm btn-outline-danger float-right">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                    </a>
+                                                                    <form data-parsley-validate novalidate method="post" id="delete@(Model.Guid2String(q.Id))"
+                                                              asp-action="DeleteRequirement" asp-antiforgery="true">
+                                                                        <input type="hidden" name="id" value="@q.Id" />
+                                                                        <input type="hidden" name="serviceTypeId" value="@q.ServiceTypeId" />
+                                                                    </form>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                    @foreach (var a in Model.TheModel.ServiceRequirements.Where(o => o.ParentId.HasValue && o.ParentId.Value == q.Id).OrderBy(o => o.OrderNo))
+                                                    {
+                                                        target = "#editRequirementModal";
+                                                        if (a.RequirementType == RequirementTypeEnum.Invoice)
+                                                        {
+                                                            target = "#editInvoiceRequirementModal";
+                                                        }
+                                                        else if (a.RequirementType == RequirementTypeEnum.Header)
+                                                        {
+                                                            target = "#editRequirementGroupModal";
+                                                        }
+                                                        <tr class="@q.OrderNo" style="display: none;">
+                                                            <td>&nbsp;&nbsp;&nbsp; @a.OrderNo </td>
+                                                            <td> @a.Name  </td>
+                                                            <td>@a.InputMethod</td>
+                                                            <td></td>
+                                                            <td>
+                                                                @if (Model.RoleLevel == RoleLevelEnum.Admin)
+                                                                {
+                                                                    if (!@Model.HasServiceRequest)
+                                                                    {
+
+                                                                        <button data-toggle="modal"
+                                                                                data-target="@target"
+                                                                                title="Edit Requirement"
+                                                                                data-id="@a.Id"
+                                                                                data-orderno="@a.OrderNo"
+                                                                                data-name="@a.NameEng"
+                                                                                data-desc="@a.DescriptionEng"
+                                                                                data-namelocal="@a.NameLocal"
+                                                                                data-desclocal="@a.DescriptionLocal"
+                                                                                data-type="@((int)a.InputMethod)"
+                                                                                data-label="@a.Label"
+                                                                                data-labellocal="@a.LabelLocal"
+                                                                                data-lookuptype="@a.LookupTypeId"
+                                                                                data-opponent="@a.IsForOpponent"
+                                                                                onclick="editRequirement(this)"
+                                                                                class=" float-right btn btn-outline-success btn-sm">
+                                                                            <i class="fa fa-pen "></i>
+                                                                        </button>
+                                                                    }
+                                                                    <a onclick="return confirmDelete($('#delete@(Model.Guid2String(a.Id))')[0]);"
+                                                                       class=" btn btn-sm btn-outline-danger float-right">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                    </a>
+                                                                    <form data-parsley-validate novalidate method="post" id="delete@(Model.Guid2String(a.Id))"
+                                                              asp-action="DeleteRequirement" asp-antiforgery="true">
+                                                                        <input type="hidden" name="id" value="@a.Id" />
+                                                                        <input type="hidden" name="serviceTypeId" value="@a.ServiceTypeId" />
+                                                                    </form>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<input type="hidden" id="reqNoId" value="@(Model.TheModel.ServiceRequirements.Count + 1)" />
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editRequirementModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">  Service Requirement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveRequirement" asp-antiforgery="true" onsubmit="return validateServiceTypeRequirement()">
+                        <input type="hidden" name="ServiceTypeId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="requirementId" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="10" name="OrderNo" placeholder="ተ.ቁ.(0x)" id="requirementOrderNo" class="form-control col-sm-4 col-md-3" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="100" name="NameEng" id="nameEngRequirement" title="Name  " class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                            </label>
+                            <input type="text" maxlength="100" name="NameLocal" title="ስም  " id="nameLocalRequirement" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Label
+                            </label>
+                            <input type="text" maxlength="100" name="Label" id="labelRequirement" title="Label  " class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                            </label>
+                            <input type="text" maxlength="100" name="LabelLocal" id="labelLocalRequirement" title="መጠሪያ " class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+                            <textarea maxlength="800" rows="4" name="DescriptionEng" id="DescriptionEngRequirement"
+                                      title="Description  " class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <textarea maxlength="800" rows="4" name="DescriptionLocal" title="ማብራርያ  " id="DescriptionLocalRequirement" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+                        <div class="row form-group" style="display:none;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Parent
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" name="ParentId" id="parentId"
+                                asp-items="@(new SelectList(Model.Groups,"Id", "Name"))"></select>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Type
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" name="InputMethod" id="inputMethodRequirement" onchange="inputTypeChanged(this);"
+                                asp-items="@(new SelectList(Model.InputeTypes,"Id", "Name"))" required>
+                                <option value=""></option>
+                            </select>
+                        </div>
+
+                        <div class="row form-group" id="lookupDiv" style="display:none;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Lookup Type
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" name="LookupTypeId" id="lookupTypeId"
+                                asp-items="@(new SelectList(Model.LookupTypes,"Id", "Name"))"></select>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="checkbox"
+                                       checked name="ApproveOnSubmit" id="approveOnSubmit" value="true" /> Approve On Submit
+                            </div>
+                        </div>
+                        @if (Model.TheModel.IsArbitration)
+                        {
+                            <div class="row form-group">
+                                <div class="col-sm-4 col-md-3 ">
+                                </div>
+                                <div class="col-sm-7 col-md-8">
+                                    <input type="checkbox"
+                                           name="IsForOpponent" id="forOpponent" value="true" /> Is For Second Respondent
+                                </div>
+                            </div>
+                        }
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editRequirementGroupModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="choiceTitle">  Requirement Source</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveRequirementHeader" asp-antiforgery="true">
+                        <input type="hidden" name="ServiceTypeId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="groupId" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="10" name="orderNo" id="groupOrderNo" class="form-control col-sm-4 col-md-4" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="50" name="Name" id="groupName" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" maxlength="100" name="NameLocal" id="groupNameLocal" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editInvoiceRequirementModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="choiceTitle"> Payment Requirement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveRequirementInvoice" asp-antiforgery="true">
+                        <input type="hidden" name="ServiceTypeId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="invoiceRequirementId" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="10" name="OrderNo" title="Order No" id="invoiceOrderNo" class="form-control col-sm-4 col-md-4" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label" style="margin-bottom:1px;">
+                                Reason
+                            </label>
+                            <input type="text" maxlength="100" name="Name" title="payment reason" id="invoiceName" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" maxlength="100" name="NameLocal" title="የፍክያ ምክንያት" id="invoiceNameLocal" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+                            <textarea maxlength="800" rows="4" name="Description" title="description of the payment reason" id="invoiceDescription" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <textarea maxlength="800" rows="4" name="DescriptionLocal" title="የፍክያ ምክንያት ማብራሪያ" id="invoiceDescriptionLocal" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+                        @if (Model.TheModel.IsArbitration)
+                        {
+                            <div class="row form-group">
+                                <div class="col-sm-4 col-md-3 ">
+                                </div>
+                                <div class="col-sm-7 col-md-8">
+                                    <input type="checkbox"
+                                           name="IsForOpponent" id="invoiceForOpponent" value="true" /> Is For Second Respondent
+                                </div>
+                            </div>
+                        }
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editServiceTypeModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title"> Edit Service Type</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveServiceType" asp-antiforgery="true" onsubmit="return validateServiceType()">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="ServiceOwner" id="serviceOwner" value="@Model.TheModel.ServiceOwner" />
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label" style="margin-bottom:1px;">
+                                Name
+                            </label>
+                            <input type="text" maxlength="100" name="NameEng" value="@Model.TheModel.NameEng" class="form-control col-sm-8 col-md-9" required placeholder="Name  " />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                            </label>
+                            <input type="text" maxlength="100" name="NameLocal" value="@Model.TheModel.NameLocal" class="form-control col-sm-8 col-md-9" required placeholder="ስም  " />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+                            <textarea rows="4" maxlength="800" name="DescriptionEng" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.DescriptionEng </textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                ማብራርያ
+                            </label>
+                            <textarea rows="4" maxlength="800" name="DescriptionLocal" class="form-control col-sm-8 col-md-9" placeholder="ማብራርያ  " required>@Model.TheModel.DescriptionLocal </textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Rate Basis
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.RateBasis" name="RateBasis" id="rateBasis" onchange="onRateChanged();">
+                                <option value="0"> </option>
+                                <option value="5">Flat</option>
+                                <option value="4">Membership</option>
+
+                            </select>
+                        </div>
+                        <div class="row form-group" id="memberRate" style="display:none;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Members
+                            </label>
+                            <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                                <input type="number" min="0" name="MemberServiceCharge" value="@Model.TheModel.MemberServiceCharge" class="form-control col-sm-4 col-md-4" required />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">Birr</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group member flat " id="otherRate" style="display:none;">
+                            <label class="col-sm-4 col-md-3 col-form-label" id="otherLabel" style="display:none;">
+                                Others
+                            </label>
+                            <label class="col-sm-4 col-md-3 col-form-label" id="flatRate" style="display:none;">
+                                Amount
+                            </label>
+                            <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                                <input type="number" min="0" name="NonMemberServiceCharge" value="@Model.TheModel.NonMemberServiceCharge" class="form-control col-sm-4 col-md-4" required />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">Birr</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="hidden" value="@Model.TheModel.ApprovalRequired" name="ApprovalRequired" id="approvalRequiredHdn" />
+                                <input type="checkbox" asp-for="TheModel.ApprovalRequired" onchange="approvalChanged(this);" /> Approval Required
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="hidden" value="@Model.TheModel.ApprovalAttachmentRequired" name="ApprovalAttachmentRequired" id="approvalAttachmentRequiredHdn" />
+                                <input type="checkbox" asp-for="TheModel.ApprovalAttachmentRequired" onchange="attachmentChanged(this);" title="Attachment is required for approval" /> Attachment Required
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="checkbox"
+                                   asp-for="TheModel.AllowAdditionalAttachments" name="AllowAdditionalAttachments" id="allowAttachemnt" title="Allow Additional Attachments to be added" /> Allow Additional Attachments
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="checkbox"
+                                   asp-for="TheModel.AllowOptionalEntries" name="AllowOptionalEntries" id="allowOptionalEntries" title="Allow Optional Requirements to be added" /> Allow Optional Requirements
+                            </div>
+                        </div>
+                        @if (Model.CurrentModule == ECCSAModuleFlag.Arbitration)
+                        {
+                            <div class="row form-group">
+                                <div class="col-sm-4 col-md-3 ">
+                                </div>
+                                <div class="col-sm-7 col-md-8">
+                                    <input type="checkbox"
+                                   asp-for="TheModel.IsArbitration" name="IsArbitration" id="isArbitration" title="Check if it requires two respondents, eg. Arbitration" /> Requires Two Respondents
+                                </div>
+                            </div>
+                        }
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Status
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" id="settingStatus">
+                                <option value="1">Active</option>
+                                <option value="2">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+@section script {
+    <script src="~/js/confirmation.js"></script>
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/serviceTypeValidation.js"></script>
+                    $("#datatblquestion").treetable({ expandable: false });
+    <script>
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+        function showHideAnswers(e) {
+            const ank = $(e);
+            let show = true;
+            for (let i = 0; i < ank[0].children.length; i++) {
+                const child = ank[0].children[i];
+                if (child.localName == 'i') {
+                    if (child.classList.contains('fa-angle-right')) {
+                        show = true;
+                        child.classList.remove('fa-angle-right');
+                        child.classList.add('fa-angle-down');
+                    } else {
+                        show = false;
+                        child.classList.add('fa-angle-right');
+                        child.classList.remove('fa-angle-down');
+                    }
+                }
+            }
+            const className = ank.attr('data-tt');
+
+            const rows = document.getElementsByClassName(className);
+            for (let i = 0; i < rows.length; i++) {
+                if (show) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+
+        }
+
+        function approvalChanged(e) {
+            document.getElementById('approvalRequiredHdn').value = Boolean(e.checked);
+        }
+        function attachmentChanged(e) {
+            document.getElementById('approvalAttachmentRequiredHdn').value = Boolean(e.checked);
+        }
+        function inputTypeChanged(e) {
+            const val = Number(e.value);
+
+            const rangeDiv = document.getElementById('lookupDiv');
+            if (val === 10) {
+                rangeDiv.style.display = '';
+                $("#lookupDiv").attr('required', 'required');
+            } else {
+                rangeDiv.style.display = 'none';
+                $("#lookupDiv").removeAttr('required');
+            }
+        }
+        onRateChanged();
+
+
+        function editChoice(e) {
+            const id = document.getElementById('choiceId');
+            const title = document.getElementById('choiceTitle');
+            const qid = document.getElementById('choiceQuestionId');
+            const orderNo = document.getElementById('choiceOrderNo');
+            const choiceText = document.getElementById('choiceText');
+
+            const idVal = $(e).attr('data-id');
+            const qidVal = $(e).attr('data-qid');
+            const orderVal = $(e).attr('data-orderno');
+            const choiceVal = $(e).attr('data-choice');
+            const titleVal = $(e).attr('data-title');
+
+            id.value = idVal;
+            qid.value = qidVal;
+            orderNo.value = orderVal;
+            choiceText.value = choiceVal;
+            title.innerHTML = titleVal;
+
+
+        }
+
+        function questionTypeChanged(e) {
+            const val = Number(e.value);
+
+            const rangeDiv = document.getElementById('rangeDiv');
+            if (val === 3) {
+                rangeDiv.style.display = '';
+            } else {
+                rangeDiv.style.display = 'none';
+            }
+        }
+
+        function showParent(e) {
+            const checked = Boolean(e.checked);
+            showHideParent(checked);
+
+        }
+
+        function showHideParent(checked) {
+            const parentChoiceDiv = document.getElementById('parentChoiceDiv');
+            if (checked) {
+                parentChoiceDiv.style.display = '';
+            } else {
+                parentChoiceDiv.style.display = 'none';
+            }
+            const parentOpt = document.getElementById('parentChoice');
+            const qId = document.getElementById('questionId').value;
+            const val = document.getElementById('settingAllChoices').value;
+
+            const choices = JSON.parse(val);
+            console.log(choices);
+            $("#parentChoice").empty();
+            for (let i = 0; i < choices.length; i++) {
+                let item = choices[i];
+
+                if (item != null && item.SimpleChoices != null && item.Id != qId) {
+                    var optGrp = document.createElement("optgroup");
+                    optGrp.label = `${item.OrderNo} ${item.Question}`
+                    for (let j = 0; j < item.SimpleChoices.length; j++) {
+                        let itm = item.SimpleChoices[j];
+                        var opt = document.createElement("option");
+                        opt.value = itm.Id;
+                        opt.innerHTML = itm.ChoiceText;
+                        optGrp.appendChild(opt);
+                    }
+                    parentOpt.appendChild(optGrp);
+                }
+
+            }
+
+        }
+
+        function editRequirement(e) {
+            const reqNo = document.getElementById('reqNoId');
+            const id = document.getElementById('requirementId');
+            const orderNo = document.getElementById('requirementOrderNo');
+            const nameEng = document.getElementById('nameEngRequirement');
+            const nameLocal = document.getElementById('nameLocalRequirement');
+
+            const label = document.getElementById('labelRequirement');
+            const labelLocal = document.getElementById('labelLocalRequirement');
+            const descEng = document.getElementById('DescriptionEngRequirement');
+            const descLocal = document.getElementById('DescriptionLocalRequirement');
+            const approve = document.getElementById('approveOnSubmit');
+            const forOpponent = document.getElementById('forOpponent');
+
+
+            const idVal = $(e).attr('data-id');
+            let orderVal = $(e).attr('data-orderno');
+            const nameVal = $(e).attr('data-name');
+            const nameLocalVal = $(e).attr('data-namelocal');
+            const labelVal = $(e).attr('data-label');
+            const labelLocalVal = $(e).attr('data-labellocal');
+            const lookupVal = $(e).attr('data-lookuptype');
+            const descVal = $(e).attr('data-desc');
+            const descLocalVal = $(e).attr('data-desclocal');
+            const typeVal = Number($(e).attr('data-type'));
+            const approveVal = $(e).attr('data-approve').toLowerCase() === 'true';
+            const opponent = $(e).attr('data-opponent').toLowerCase() === 'true';
+            id.value = idVal;
+            if (idVal === '@(Guid.Empty)') {
+                orderVal = (reqNo.value < 10 ? '0' : '') + reqNo.value;
+            }
+            orderNo.value = orderVal;
+            nameEng.value = nameVal;
+            nameLocal.value = nameLocalVal;
+            label.value = labelVal;
+            labelLocal.value = labelLocalVal;
+            descEng.innerHTML = descVal;
+            descLocal.innerHTML = descLocalVal;
+            approve.checked = approveVal;
+            if (forOpponent) {
+                forOpponent.checked = opponent;
+            }
+
+            $('#inputMethodRequirement').val(typeVal).change();
+            editRequirementInvoice(e);
+            editRequirementGroup(e);
+        }
+
+
+        function editRequirementGroup(e) {
+            const id = document.getElementById('groupId');
+            const orderNo = document.getElementById('groupOrderNo');
+            const name = document.getElementById('groupName');
+            const nameLocal = document.getElementById('nameLocalRequirement');
+            const descEng = document.getElementById('DescriptionEngRequirement');
+            const descLocal = document.getElementById('DescriptionLocalRequirement');
+
+            const idVal = $(e).attr('data-id');
+            const orderVal = $(e).attr('data-orderno');
+            const nameEngVal = $(e).attr('data-name');
+            const nameLocalVal = $(e).attr('data-namelocal');
+            const descVal = $(e).attr('data-desc');
+            const descLocalVal = $(e).attr('data-desclocal');
+            const forOpponent = Boolean($(e).attr('data-opponent'));
+
+
+            id.value = idVal;
+            orderNo.value = orderVal;
+            name.value = nameEngVal;
+            nameLocal.value = nameLocalVal;
+            descEng.innerHTML = descVal;
+            descLocal.innerHTML = descLocalVal;
+        }
+
+        function editRequirementInvoice(e) {
+            const reqNo = document.getElementById('reqNoId');
+            const id = document.getElementById('invoiceRequirementId');
+            const orderNo = document.getElementById('invoiceOrderNo');
+            const name = document.getElementById('invoiceName');
+            const nameLocal = document.getElementById('invoiceNameLocal');
+
+            const desc = document.getElementById('invoiceDescription');
+            const descLocal = document.getElementById('invoiceDescriptionLocal');
+            const forOpponent = document.getElementById('invoiceForOpponent');
+
+            const idVal = $(e).attr('data-id');
+            let orderVal = $(e).attr('data-orderno');
+            const nameVal = $(e).attr('data-name');
+            const nameLocalVal = $(e).attr('data-nameLocal');
+
+            const descVal = $(e).attr('data-desc');
+            const descLocalVal = $(e).attr('data-descLocal');
+            const opponent = $(e).attr('data-opponent').toLowerCase() === 'true';
+
+
+            id.value = idVal;
+            if (idVal === '@(Guid.Empty)') {
+                orderVal = (reqNo.value < 10 ? '0' : '') + reqNo.value;
+            }
+            orderNo.value = orderVal;
+            name.value = nameVal;
+            nameLocal.value = nameLocalVal;
+
+            desc.innerHTML = descVal;
+            descLocal.innerHTML = descLocalVal;
+
+            if (forOpponent) {
+                forOpponent.checked = opponent;
+            }
+        }
+    </script>
+}

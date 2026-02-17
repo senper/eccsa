@@ -1,0 +1,468 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Common.Planning
+@using DocumentFormat.OpenXml.Drawing.Diagrams
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.ProgressViewModel
+
+@{
+    ViewData["Title"] = "Planning";// = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+    var isQuarter = Model.CurrentMonth % 3 == 0;
+    var isSemiAnual = Model.CurrentMonth == 6;
+    var isAnual = Model.CurrentMonth == 12;
+    var quarterNo = Model.CurrentMonth / 3;
+    var quarterLabel = isAnual ? "Annual" : isSemiAnual ? "Semi Anual" : "Quarterly";
+    var isSubmitable = false;
+}
+@{
+
+
+    async Task Template(List<Plan> plans, string parentCode)
+    {
+        foreach (var ind in plans)
+        {
+            var hasChildren = Model.HasChildren(ind.Id);
+            var labelSubPlan = Model.AreAllLabelChildren(ind.Id);
+            var ids = Model.Guid2String(ind.Id);
+
+            var unitName = ind.ResponsibleUnit.GetDisplayName();
+            var style = hasChildren ? "" : "";
+            var parent_tt = string.IsNullOrEmpty(parentCode) ? "root" : $"child";
+            var planMonth = ind.PlanMonth(Model.CurrentMonth);
+            var monthPlanValue = ind.IsLabel ? "" : planMonth.Plan.ToString();
+            var monthOutput = ind.IsLabel ? "" : planMonth.Output ?? "";
+            var monthRemark = ind.IsLabel ? "" : planMonth.Remark??"";
+            var cumulativeWork = ind.IsLabel ? "" : planMonth.CumulativeWorkDone;
+            var actual = planMonth.Actual;
+            var showSave = (planMonth.Actual != 0 || cumulativeWork?.Length > 2 || monthOutput.Length > 2) && planMonth.Status < ProgressStatusEnum.Submitted;
+            @if ((planMonth.Actual != 0 || cumulativeWork?.Length > 2 || monthOutput.Length > 2) && planMonth.Status <= ProgressStatusEnum.Draft)
+            {
+                isSubmitable = true;
+            }
+            if (!ind.IsLabel)
+            {
+
+
+                <input type="hidden" name="MonthNo" value="@Model.CurrentMonth" />
+                <input type="hidden" name="subSystem" value="@Model.CurrentSubsystem" />
+                <tr class=" @parent_tt @parentCode" id="@ind.Code">
+                    <td>
+                        <span title="@ind.Name">@ind.Code</span>
+                        <input type="hidden" name="PlanId" value="@ind.Id" />
+                    </td>
+                    <td class="nametd">
+                        @ind.Name
+                    </td>
+                    <td class="unittd">@ind.UnitName </td>
+                    <td class="aplantd">@ind.PlanAmountName  [@ind.AnnualProgress]</td>
+                    <td>@monthPlanValue</td>
+                    <td>
+
+                       @planMonth.Actual
+
+                    </td>
+                    <td >
+
+                        @monthOutput 
+
+                    </td>
+                    <td>
+
+                        @cumulativeWork
+
+                    </td>
+                    <td style="@(Model.StatusStyle(planMonth.Status))">
+                        @planMonth.Status.GetDisplayName()
+                        @if (ind.ResponsibleUnit == Model.CurrentSubsystem)
+                        {
+                            @if (planMonth.Status == ProgressStatusEnum.Rejected)
+                            {
+                                <br />
+                                <small> @planMonth.Remark</small>
+                            }
+                        }
+
+                    </td>
+                    
+                    <td>
+                        @if (planMonth.Status == ProgressStatusEnum.Submitted)
+                        {
+                            <a class="btn btn-sm btn-outline-danger"
+                               data-toggle="modal"
+                               data-target="#rejectPlanModal"
+                               data-id="@ind.Id"
+                               onclick="editPlan(this);"
+                               style="margin-right: 5px;"
+                               title="Reject Progress">
+                                Reject
+                            </a><br/>
+                            <input type="button" value="approved" class="btn btn-outline-success btn-sm float-right"
+                                   onclick="return confirmAction($('#approveProgress@(Model.Guid2String(ind.Id))')[0], 'Approve Progress')" />
+                            <form data-parsley-validate method="post" id="approveProgress@(Model.Guid2String(ind.Id))"
+              asp-action="ApproveProgress" asp-antiforgery="true">
+                                <input type="hidden" name="Id" value="@ind.Id" />
+                                <input type="hidden" name="PlanYear" value="@Model.PlanYear" />
+                                <input type="hidden" name="responsibleUnitFilter" value="@Model.ResponsibleUnitFilter" />
+
+
+                                <input type="hidden" name="treemode" value="@Model.TreeView" />
+
+                            </form>
+                        }
+                    </td>
+                </tr>
+
+            }
+            else
+            {
+                //<tr class=" @parent_tt @parentCode" id="@ind.Code">
+                //    <td>
+                //        @if (hasChildren)
+                //        {
+                //            <a data-tt="@ind.Code" onclick="showHideChildren(this);" class="title"><i class="fas fa-angle-right"></i>@ind.NameWithCode </a>
+                //        }
+                //        else
+                //        {
+                //            @ind.NameWithCode
+                //        }
+
+
+
+                //    </td>
+                //    <td>@ind.UnitName </td>
+                //    <td>@ind.PlanAmountName</td>
+                //    <td>@monthPlanValue</td>
+                //    <td>                    </td>
+                //    <td>                    </td>
+                //    <td>                    </td>
+                //    <td>                    </td>
+                //</tr>
+            }
+
+
+            @if (@hasChildren)
+            {
+                var children = Model.GetSubPlans(ind.Id);
+                await Template(children, ind.Code);
+            }
+        }
+    }
+}
+<div class="container-fluid">
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h3 for="yearfrom" class="col-sm-8 col-form-label">Review Progress Report for: @Model.MonthFullName(@Model.CurrentMonth.ToString()) @Model.CurrentYear </h3>
+                </div>
+                <div class="card-body">
+
+                    <form data-parsley-validate method="get" id="filterfomr" class="row g-3"
+                          asp-action="Progress" asp-antiforgery="true">
+
+                        <div class="col col-md-1">
+                            <label class="form-label-sm" style="text-align: right;" for="responsibleUnitFilterId">R. Unit</label>
+                        </div>
+                        <div class="col col-md-2">
+                            <select name="responsibleUnitFilter" class="form-select-sm" title="Responsible Unit" id="responsibleUnitFilterId"
+                                    asp-for="@Model.ResponsibleUnitFilter">
+                                @foreach (var u in Enum.GetValues(typeof(ECCSAModuleEnum)).Cast<ECCSAModuleEnum>())
+                                {
+                                    if (u == ECCSAModuleEnum.Bmo)
+                                    {
+                                        continue;
+                                    }
+                                    else if (u == ECCSAModuleEnum.None)
+                                    {
+                                        <option value="0_0">All</option>
+                                    }
+                                    else if (u == ECCSAModuleEnum.Support)
+                                    {
+                                        foreach (var su in Model.SupportingUnits)
+                                        {
+                                            if (!string.IsNullOrWhiteSpace(su.Name))
+                                            {
+                                                <option value="@((int)@u)_@(su.Value)">@su.Name</option>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)@u)_0">@u.GetDisplayName()</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col col-md-7">
+
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="idTreeView" name="treeMode" asp-for="@Model.TreeView" onchange="changeValue(this)">
+                                        <label class="form-check-label" for="idTreeView">Tree View</label>
+                                    </div>
+                                </div>
+
+
+                                <input type="submit" value="Show Progress" class="col-md-3 btn-sm btn-outline-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+
+                    <hr />
+                    <div class="form-group row">
+                        <div class="col-md-12 table-responsive">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="checkbox" id="showNamechk" checked="false" /> Show Name &nbsp;&nbsp;
+                                        <input type="checkbox" id="showUnitchk" checked="false" /> Show Unit &nbsp;&nbsp;
+                                        <input type="checkbox" id="showAPlanchk" checked="false" /> Show Annual Plan &nbsp;&nbsp;
+                                    </div>
+                                    <div class="col-md-6">
+                                        @if (isSubmitable)
+                                        {
+
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-12 table-responsive">
+
+                                        <table id="example1" class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="2" style="width: 60px;">Code</th>
+                                                    <th rowspan="2" class="nametd" style="width: 300px;">Name</th>
+                                                    <th rowspan="2" class="unittd" style="width: 50px;">Unit</th>
+                                                    <th rowspan="2" class="aplantd" title="Annual Plan [Total Progress]">Annual Plan <br /> [Tot. Prog.]</th>
+                                                    <th colspan="5">Progress Report for @Model.MonthName(Model.CurrentMonth)</th>
+
+                                                    <th rowspan="2"></th>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width: 80px;"> Plan</th>
+                                                    <th style="width: 80px;"> Actual</th>
+                                                    <th>Outcome</th>
+                                                    <th>Cumulative Work done to this month</th>
+                                                    <th>Remark</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tableDetail">
+                                                @{
+                                                    await Template(Model.TheList, "");
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <span style="font-size: larger; margin: 0px; padding: 5px;">Color Legend: </span>
+                            <span style="@Model.StatusStyle(PlanningStatusEnum.Planning) font-size: larger; margin: 0px; padding: 5px;">Planning</span>
+                            <span style="@Model.StatusStyle(PlanningStatusEnum.Submitted) font-size: larger; margin: 0px; padding: 5px;">Submitted</span>
+                            <span style="@Model.StatusStyle(PlanningStatusEnum.Rejected) font-size: larger; margin: 0px; padding: 5px;">Rejected</span>
+                            <span style="@Model.StatusStyle(PlanningStatusEnum.Approved) font-size: larger; margin: 0px; padding: 5px;">Approved</span>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="rejectPlanModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title label label-danger">Reject Progress Report</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="RejectProgress" asp-antiforgery="true">
+                        <input type="hidden" name="Id" id="pId" />
+                        <input type="hidden" name="PlanYear" value="@Model.PlanYear" />
+                        <input type="hidden" name="responsibleUnitFilter" value="@Model.ResponsibleUnitFilter" />
+
+
+                        <input type="hidden" name="treemode" value="@Model.TreeView" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Remark
+                            </label>
+                            <textarea rows="4" name="Remark" id="idRemark" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}
+@section script {
+
+
+    <script>
+
+        $("#showNamechk").on("click", function () {
+            if (this.checked) {
+                $(".nametd").css("display", "");
+            } else {
+
+                $(".nametd").css("display", "none");
+            }
+        });
+        $("#showNamechk").click();
+        $("#showUnitchk").on("click", function () {
+            if (this.checked) {
+                $(".unittd").css("display", "");
+            } else {
+
+                $(".unittd").css("display", "none");
+            }
+        });
+        $("#showUnitchk").click();
+        $("#showAPlanchk").on("click", function () {
+            if (this.checked) {
+                $(".aplantd").css("display", "");
+            } else {
+
+                $(".aplantd").css("display", "none");
+            }
+        });
+        $("#showAPlanchk").click();
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function confirmAction(form, action) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to ' + action + ' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+
+
+
+
+        function editPlan(e) {
+            const id = document.getElementById('pId');
+            const idVal = $(e).attr('data-id');
+            id.value = idVal;
+        }
+
+
+
+        function hideChildren() {
+            const children = document.getElementsByClassName('child');
+            for (var i = 0; i < children.length; i++) {
+                children[i].style.display = 'none';
+            }
+        }
+
+        hideChildren();
+
+        function hideDescendant(e) {
+            console.log(e);
+            const parent = $(e).attr('data-tt');
+            const children = document.getElementsByClassName(parent);
+            for (var i = 0; i < children.length; i++) {
+                const child = children[i];
+                child.style.display = 'none';
+                //console.log(child.id, child, document.getElementsByClassName(child.id).length);
+                if (document.getElementsByClassName(child.id).length > 0) {
+                    $(child).find('i').removeClass('fa-angle-down');
+                    $(child).find('i').addClass('fa-angle-right');
+                    hideDescendant($(child).find('a')[0]);
+                }
+
+            }
+        }
+
+        function showHideChildren(e) {
+            const ank = $(e);
+            let show = true;
+
+            for (let i = 0; i < ank[0].children.length; i++) {
+                const child = ank[0].children[i];
+                if (child.localName == 'i') {
+                    if (child.classList.contains('fa-angle-right')) {
+                        show = true;
+                        child.classList.remove('fa-angle-right');
+                        child.classList.add('fa-angle-down');
+                    } else {
+                        show = false;
+                        child.classList.add('fa-angle-right');
+                        child.classList.remove('fa-angle-down');
+                    }
+                }
+            }
+
+            if (show) {
+                const parent = $(e).attr('data-tt');
+                const children = document.getElementsByClassName(parent);
+                for (var i = 0; i < children.length; i++) {
+                    children[i].style.display = '';
+                }
+            } else {
+                hideDescendant(e);
+            }
+        }
+
+    </script>
+    }

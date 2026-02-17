@@ -1,0 +1,327 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Advocacy.Model.PublicationViewModel
+
+@{
+    ViewData["Title"] = "Publications";
+    Layout = "~/Views/Shared/_AdvocacyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.TitleFull  </h4>
+                        </div>
+                        <div class="col-sm-1">
+
+                            <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Keywords:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Keywords
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Url
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Url
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Funding
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Funding
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.FundingLocal
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    IsPublic
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.IsPublic
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Description
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Description
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.DescriptionLocal
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Remark
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Remark
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.RemarkLocal
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+                                </div>
+                            </div>
+                            <br />
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Publication</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" asp-for="TheModel.Id" />
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" asp-for="TheModel.Title" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <input type="text" name="TitleLocal" asp-for="TheModel.TitleLocal" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <input type="checkbox" name="IsPublic" asp-for="TheModel.IsPublic" class="form-control col-sm-1 col-md-1" />
+                        <label class="col-sm-3 col-form-label">
+                            Is Public
+                        </label>
+                    </div>
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" asp-for="TheModel.Description" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <textarea rows="4" name="DescriptionLocal" asp-for="TheModel.DescriptionLocal" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <textarea rows="4" name="Remark" asp-for="TheModel.Remark" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <textarea rows="4" name="RemarkLocal" asp-for="TheModel.RemarkLocal" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Keywords
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="Keywords" asp-for="TheModel.Keywords" required />
+                    </div>
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Funding
+                        </label>
+                        <input type="text" class="form-control col-sm-8 col-md-9" name="Funding" asp-for="TheModel.Funding" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+
+                        </label>
+                        <input type="text" class="form-control col-sm-8 col-md-9" name="FundingLocal" asp-for="TheModel.FundingLocal" required />
+                    </div>
+
+                    <div class="row form-group" style="margin-bottom:1px;">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Author
+                        </label>
+                        <input type="text" name="Author" asp-for="TheModel.Author" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            
+                        </label>
+                        <input type="text" name="AuthorLocal" asp-for="TheModel.AuthorLocal" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Publication Date
+                        </label>
+                        <input type="date" name="PublicationDate" asp-for="TheModel.PublicationDate" class="form-control col-sm-8 col-md-9" id="startDateId" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Url
+                        </label>
+                        <input type="text" name="Url" maxlength="100" asp-for="TheModel.Url" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Digital
+                        </label>
+                        <input type="file" name="upload" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Digital Cost
+                        </label>
+
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                            <input type="number" min="0" name="DigitalCost" asp-for="TheModel.DigitalCost" class="form-control col-sm-4 col-md-4" required />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Print (URI)
+                        </label>
+                        <input type="text" name="PrintUri" maxlength="100" asp-for="TheModel.PrintUri" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Print Cost
+                        </label>
+
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                            <input type="number" min="0" name="PrintCost" asp-for="TheModel.PrintCost" class="form-control col-sm-4 col-md-4" />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" required>
+                            <option value="1">Active</option>
+                            <option value="0">In-active</option>
+                        </select>
+                    </div>
+
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

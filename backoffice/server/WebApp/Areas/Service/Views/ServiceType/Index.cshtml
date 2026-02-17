@@ -1,0 +1,251 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Service.Model.ServiceTypeViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    @if (Model.RoleLevel == RoleLevelEnum.Admin)
+    {
+        <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+            <div class=" btn-group" role="group" aria-label="Basic example">
+                <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                        data-toggle="modal"
+                        data-target="#editServiceTypeModal"
+                        title="Create Service Type">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                </button>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Name </th>
+                                    <th>Rate</th>
+                                    <th>Amount</th>
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Name </th>
+                                    <th>Rate</th>
+                                    <th>Amount</th>
+                                    <th></th>
+
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+                                    var statusClass = (item.Status == StatusEnum.Inactive ? "danger" : "");
+
+                                    <tr class="@statusClass">
+                                        <td>
+                                            <a asp-controller="ServiceType" asp-action="Detail" asp-route-id="@item.Id" class="title @statusClass">
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </a>
+                                        </td>
+
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.RateBasis)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ServiceCharge)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="ServiceType" asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editServiceTypeModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Create " : "Edit ") Service Type</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveServiceType" asp-antiforgery="true" onsubmit="return validateServiceType()">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="ServiceOwner" id="serviceOwner" value="@Model.TheModel.ServiceOwner" />
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label" style="margin-bottom:1px;">
+                                Name
+                            </label>
+                            <input type="text" placeholder="Name  " maxlength="100" name="NameEng" value="@Model.TheModel.NameEng" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" maxlength="100" name="NameLocal" value="@Model.TheModel.NameLocal" placeholder="ስም  " class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+
+                            <textarea rows="4" maxlength="800" name="DescriptionEng" class="form-control col-sm-8 col-md-9" placeholder="Description" required>@Model.TheModel.DescriptionEng</textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                            </label>
+
+                            <textarea rows="4" maxlength="800" name="DescriptionLocal" class="form-control col-sm-8 col-md-9" placeholder="ማብራርያ" required>@Model.TheModel.DescriptionLocal</textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Rate Basis
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.RateBasis" name="RateBasis" id="rateBasis" onchange="onRateChanged();">
+                                <option value="0"> </option>
+                                <option value="5">Flat</option>
+                                <option value="4">Membership</option>
+
+                            </select>
+                        </div>
+                        <div class="row form-group" id="memberRate" style="display:none;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Members
+                            </label>
+                            <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                                <input type="number" min="0" name="MemberServiceCharge" value="@Model.TheModel.MemberServiceCharge" class="form-control col-sm-4 col-md-4" required />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">Birr</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group member flat " id="otherRate" style="display:none;">
+                            <label class="col-sm-4 col-md-3 col-form-label" id="otherLabel" style="display:none;">
+                                Others
+                            </label>
+                            <label class="col-sm-4 col-md-3 col-form-label" id="flatRate" style="display:none;">
+                                Amount
+                            </label>
+                            <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                                <input type="number" min="0" name="NonMemberServiceCharge" value="@Model.TheModel.NonMemberServiceCharge" class="form-control col-sm-4 col-md-4" required />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">Birr</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="hidden" value="@Model.TheModel.ApprovalRequired" name="ApprovalRequired" id="approvalRequiredHdn" />
+                                <input type="checkbox" asp-for="TheModel.ApprovalRequired" onchange="approvalChanged(this);" /> Approval Required
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="hidden" value="@Model.TheModel.ApprovalAttachmentRequired" name="ApprovalAttachmentRequired" id="approvalAttachmentRequiredHdn" />
+                                <input type="checkbox" asp-for="TheModel.ApprovalAttachmentRequired" onchange="attachmentChanged(this);" title="Attachment is required for approval" /> Attachment Required
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="checkbox"
+                                   asp-for="TheModel.AllowAdditionalAttachments" name="AllowAdditionalAttachments" id="allowAttachemnt" title="Allow Additional Attachments to be added" /> Allow Additional Attachments
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 col-md-3 ">
+                            </div>
+                            <div class="col-sm-7 col-md-8">
+                                <input type="checkbox"
+                                   asp-for="TheModel.AllowOptionalEntries" name="AllowOptionalEntries" id="allowOptionalEntries" title="Allow Optional Requirements to be added" /> Allow Optional Requirements
+                            </div>
+                        </div>
+                        @if (Model.CurrentModule == ECCSAModuleFlag.Arbitration)
+                        {
+                            <div class="row form-group">
+                                <div class="col-sm-4 col-md-3 ">
+                                </div>
+                                <div class="col-sm-7 col-md-8">
+                                    <input type="checkbox"
+                                   asp-for="TheModel.IsArbitration" name="IsArbitration" id="isArbitration" title="Check if it requires two respondents, eg. Arbitration" /> Requires Two Respondents
+                                </div>
+                            </div>
+                        }
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Status
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" id="settingStatus">
+                                <option value="1">Active</option>
+                                <option value="2">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+    <script src="~/js/confirmation.js"></script>
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/serviceTypeValidation.js"></script>
+
+    <script>
+        onRateChanged();
+        function attachmentChanged(e) {
+            document.getElementById('approvalAttachmentRequiredHdn').value = Boolean(e.checked);
+        }
+        function approvalChanged(e) {
+            document.getElementById('approvalRequiredHdn').value = Boolean(e.checked);
+        }
+    </script>
+}

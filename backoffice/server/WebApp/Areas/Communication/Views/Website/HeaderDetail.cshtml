@@ -1,0 +1,268 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.QuickLinkHeaderViewModel
+
+@{
+    ViewData["Title"] = "Website Menu";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Name </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Label
+                                </div>
+                                <div class="col-sm-9">
+                                    @Model.TheModel.Label
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    
+                                </div>
+                                <div class="col-sm-9">
+                                    @Model.TheModel.LabelLocal
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header-actions">
+                    <h4>Quick Links</h4>
+                </div>
+                <table class="table table-bordered table-striped" id="datatblsetting">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Menu</th>
+                            <th>Order</th>
+                            <th>
+                                <button class="btn btn-sm btn-outline-success"
+                                        data-toggle="modal"
+                                        data-target="#theEditLinkModal"
+                                        title="Edit Quick Link"
+                                        onclick="editLink(this)"
+                                        data-title=""
+                                        data-titlelocal=""
+                                        data-id="0"
+                                        data-menuid=""
+                                        data-order="">
+                                    New
+                                </button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.TheModel.QuickLinks.OrderBy(x => x.Order))
+                        {
+                            <tr>
+                                <td> @r.TitleFull  </td>
+                                <td>@r.MenuName</td>
+                                <td>@r.Order</td>
+                                <td>
+                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                        <a onclick="return confirmDelete($('#deleteQuickLink@(r.Id)')[0]);"
+                                       class=" btn btn-sm btn-outline-danger">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                        <form data-parsley-validate novalidate method="post" id="deleteQuickLink@(r.Id)"
+                                          asp-action="DeleteQuickLink" asp-antiforgery="true">
+                                            <input type="hidden" name="menu" value="@Model.TheModel.Id" />
+                                            <input type="hidden" name="id" value="@r.Id" />
+                                        </form>
+                                    </div>
+                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                        <button class="btn btn-sm btn-outline-success"
+                                            data-toggle="modal"
+                                            data-target="#theEditLinkModal"
+                                            title="Edit Quick Link"
+                                            onclick="editLink(this)"
+                                            data-title="@r.Title"
+                                            data-titlelocal="@r.TitleLocal"
+                                            data-id="@r.Id"
+                                            data-menuid="@r.MenuId"
+                                            data-order="@r.Order">
+                                            <i class="fa fa-pen" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Header</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="UpdateHeader" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" name="Name" asp-for="TheModel.Name" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Label
+                            </label>
+                            <input type="text" name="Label" asp-for="TheModel.Label" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="Lable  "/>
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                
+                            </label>
+                            <input type="text" name="Path" asp-for="TheModel.LabelLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="ምልክት  " />
+                        </div>
+                       
+                       
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theEditLinkModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Create/Edit Quick Link</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveQuickLink" asp-antiforgery="true">
+                        <input type="hidden" name="HeaderId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="linkId" value="-1" />
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" id="linkTitle" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="Titel  " />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" name="TitleLocal" id="linkLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="ርዕስ  " />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Order
+                            </label>
+                            <input type="number" name="Order" id="linkOrder" max="100" class="form-control col-sm-9 col-md-8" />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Menu
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" id="menuId"
+                                    asp-items="@(new SelectList(Model.Menus,"Id", "TitleFull",null,"ParentTitleFull"))"
+                                name="MenuId">
+                            </select>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section script {
+    <script>
+       
+        function editLink(e) {
+            const id = document.getElementById('linkId');
+            const title = document.getElementById('linkTitle');
+            const titleLocal = document.getElementById('linkLocal');
+            const orderNo = document.getElementById('linkOrder');
+
+            const idVal =    $(e).attr('data-id');
+            const titleVal = $(e).attr('data-title');
+            const localVal = $(e).attr('data-titlelocal');
+            const orderVal = $(e).attr('data-order');
+            const menuVal =  $(e).attr('data-menuid');
+
+            id.value = idVal;
+            title.value = titleVal;
+            titleLocal.value = localVal;
+            orderNo.value = orderVal;
+
+            $('#menuId').val(menuVal).change();
+        }
+    </script>
+}

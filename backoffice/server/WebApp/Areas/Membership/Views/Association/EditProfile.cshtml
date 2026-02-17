@@ -1,0 +1,43 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.AssociationViewModel
+
+<link href="~/vendor/combotree/style.css" rel="stylesheet" />
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.BusinessProfile.Id == Guid.Empty ? "New Info" : "Edit Info") </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate novalidate method="post"
+          asp-action="SaveProfile" asp-antiforgery="true">
+        <input type="hidden" asp-for="BusinessProfile.Id" />
+        <input type="hidden" asp-for="BusinessProfile.AssociationId" />
+        <input type="hidden" asp-for="TheModel.Id" />
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Profile Type
+            </label>
+            <select class="custom-select col-sm-8 col-md-9" asp-for="BusinessProfile.ProfileAttribureId"
+                    asp-items="@(new SelectList(Model.ProfileAttribures,"Id", "Name"))"></select>
+        </div>
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Value
+            </label>
+            <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="BusinessProfile.AttributeValue" />
+        </div>
+
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+
+
+    
+</div>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="02/14/2022 21:22:18" ReportInfo.Modified="05/31/2023 12:43:00" ReportInfo.CreatorVersion="2021.4.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="SupportLetter" ReferenceName="SupportLetter" DataType="System.Int32" Enabled="true">
+      <Column Name="EmbassyName" DataType="System.String"/>
+      <Column Name="EmbassyAddress" DataType="System.String"/>
+      <Column Name="FullName" DataType="System.String"/>
+      <Column Name="DestinationCountry" DataType="System.String"/>
+      <Column Name="Signature" DataType="System.String"/>
+      <Column Name="AuthorizedBy" DataType="System.String"/>
+      <Column Name="AuthorizerTitle" DataType="System.String"/>
+      <Column Name="Watermark" DataType="System.String"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="888.3">
+      <TextObject Name="Text8" Left="75.6" Top="349.65" Width="633.15" Height="330.75" Text="[SupportLetter.Watermark]" HorzAlign="Center" VertAlign="Center" Angle="30" Font="Times New Roman, 36pt" TextFill.Color="LightGray"/>
+      <TextObject Name="Text5" Left="37.8" Top="264.6" Width="576.45" Height="66.15" Text="[SupportLetter.EmbassyName]&#13;&#10;Addis Ababa" Font="Times New Roman, 16pt, style=Bold" TextOutline.Width="14" TextOutline.DrawBehind="true" TextRenderType="HtmlParagraph"/>
+      <TextObject Name="Text7" Left="37.8" Top="349.65" Width="652.05" Height="463.05" Text="Dear Sirs:&#13;&#10;&#13;&#10;The Ethiopian Chamber of Commerce and Sectorial Associations present its compliments to  [SupportLetter.EmbassyName] and has the honor to request the latter to issue entry visa to &lt;b&gt;[SupportLetter.FullName]&lt;/b&gt;, who is going to  [SupportLetter.DestinationCountry] for Business trip.&#13;&#10;                                                                                                              &#13;&#10;The Ethiopian Chamber of Commerce and Sectorial Associations avails itself of this opportunity to renew to Royal Embassy of Saudi Arabia the assurances of its highest consideration.                                &#13;&#10;&#13;&#10;&lt;b&gt;Sincerely Yours&lt;/b&gt; &#13;&#10;&#13;&#10;&#13;&#10;&lt;b&gt;[SupportLetter.AuthorizedBy]&lt;/b&gt;&#13;&#10;&lt;b&gt;[SupportLetter.AuthorizerTitle]&lt;/b&gt;&#13;&#10;" HorzAlign="Justify" Font="Times New Roman, 14pt" TextOutline.Width="8" TextRenderType="HtmlParagraph" ParagraphFormat.LineSpacing="28.35" ParagraphFormat.LineSpacingType="Exactly"/>
+      <LineObject Name="Line1" Left="37.8" Top="313.74" Width="122.85" Border.Width="2"/>
+    </ReportTitleBand>
+    <PageFooterBand Name="PageFooter1" Top="892.3" Width="718.2"/>
+  </ReportPage>
+</Report>

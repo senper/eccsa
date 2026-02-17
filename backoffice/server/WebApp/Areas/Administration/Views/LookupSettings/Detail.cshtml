@@ -1,0 +1,267 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.LookupSettingsViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index")" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <h4>@Model.TheModel.Name</h4>
+                        </div>
+                        <div class="col-sm-4">
+                            @if (Model.TheModel.LookupValues?.Count <= 0)
+                            {
+                                <a onclick="return confirmDelete($('#deleteRecipient'));"
+                               class=" btn btn-sm btn-outline-danger float-right">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </a>
+                            }
+                            @if (!Model.TheModel.IsHierarchical)
+                            {
+                                <span class=" float-right">&nbsp;&nbsp;&nbsp;</span>
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                                <form data-parsley-validate novalidate method="post" id="deleteRecipient"
+                                  asp-action="Delete" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Name:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Name
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-6">
+                            @if (!Model.TheModel.IsHierarchical)
+                            {
+                                <h6 class="m-0 font-weight-bold">
+                                    Lookup Values <button data-toggle="modal"
+                                    data-target="#theValueModal"
+                                    title="Add"
+                                    data-name=""
+                                    data-status=""
+                                    data-idValue=""
+                                    class=" btn btn-outline-success btn-sm editLookupValue">
+                                        <i class="fa fa-plus "></i>
+                                    </button>
+                                </h6>
+                            }
+                        </div>
+                    </div> <br/>
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            @foreach (var item in Model.TheModel.LookupValues)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Status)
+                                    </td>
+                                    <td>
+                                        @if (!Model.TheModel.IsHierarchical)
+                                        {
+                                            <div class="btn-group " role="group" aria-label="Basic example">
+                                                <button data-toggle="modal"
+                                                data-target="#theValueModal"
+                                                title="Edit"
+                                                data-name="@item.Name"
+                                                data-status="@((int)item.Status)"
+                                                data-idValue="@item.Id"
+                                                class=" btn btn-outline-success btn-sm editLookupValue">
+                                                    <i class="fa fa-pen "></i>
+                                                </button>
+                                                <a onclick="return confirmDelete($('#deleteLookupValue@(item.Id)'));"
+                                           class=" btn btn-sm btn-outline-danger float-right">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteLookupValue@(item.Id)"
+                                              asp-action="DeleteLookupValue" asp-antiforgery="true">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="hidden" name="lookupTypeId" value="@item.LookupTypeId" />
+                                                </form>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (!Model.TheModel.IsHierarchical)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="idTitle">Edit Lookup</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                        <input type="hidden" name="Id" asp-for="TheModel.Id" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" name="Name" maxlength="100" asp-for="TheModel.Name" class="form-control col-sm-7 col-md-8" required>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Value Based
+                            </label>
+                            <select name="Status" class="form-select-sm col-sm-7 col-md-8" asp-for="TheModel.ValueSourceType" required
+                                    asp-items="@(Html.GetEnumSelectList<LookupValueTypeEnum>())"></select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Status
+                            </label>
+                            <select name="Status" class="form-select-sm col-sm-7 col-md-8" asp-for="TheModel.Status" required
+                                asp-items="@(Html.GetEnumSelectList<StatusEnum>())"></select>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theValueModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="idTitle">Edit Lookup Value</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveLookupValue" asp-antiforgery="true">
+                        <input type="hidden" name="Id" id="lookupValueId" />
+                        <input type="hidden" name="LookupTypeId" asp-for="TheModel.Id" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" name="Name" id="lookupValueName" maxlength="100"  class="form-control col-sm-7 col-md-8" required>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Value
+                            </label>
+                           
+                            <input type="text" name="Value" maxlength="50"  class="form-control col-sm-7 col-md-8" required>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Status
+                            </label>
+                            <select name="Status" class="form-control col-sm-7 col-md-8" id="lookupValueStatus" required
+                                asp-items="@(Html.GetEnumSelectList<StatusEnum>())"></select>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+<script type="text/javascript">
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    $(".editLookupValue").on("click", function(){
+        $("#lookupValueId").val($(this).attr("data-idvalue"));
+        $("#lookupValueName").val($(this).attr("data-name"));
+        $("#lookupValueStatus").val($(this).attr("data-status"));
+    })
+
+</script>
+}

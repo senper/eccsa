@@ -1,0 +1,146 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Membership
+@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IndividualViewModel
+
+<link href="~/vendor/combotree/style.css" rel="stylesheet" />
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.LegalDocument.Id == Guid.Empty ? "Create New Member" : "Edit Member Info") </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+          asp-action="SaveLegalDocument" asp-antiforgery="true">
+        <input type="hidden" asp-for="LegalDocument.Id" />
+        <input type="hidden" asp-for="LegalDocument.IndividualId" />
+        <input type="hidden" asp-for="TheModel.Id" />
+
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Document Type
+            </label>
+            @if (Model.LegalDocument.Id == Guid.Empty)
+            {
+                <select class="custom-select col-sm-8 col-md-9" asp-for="LegalDocument.LegalDocumentTypeId"
+                        asp-items="@(new SelectList(Model.LegalDocumentTypes, "Id", "Name"))"></select>
+            }
+            else
+            {
+                <input type="hidden" asp-for="LegalDocument.LegalDocumentTypeId" />
+               @* <span>@Model.LegalDocument.LegalDocumentType.Name</span>*@
+            }
+        </div>
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Title
+            </label>
+           @* <input type="text" maxlength="100" class="form-control col-sm-8 col-md-8" asp-for="LegalDocument.Document" />*@
+        </div>
+       
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">Upload</label>
+            <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" />
+        </div>
+
+
+
+
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+
+
+    
+</div>
+<script>
+
+
+        let SampleJSONData = [
+            {
+                id: 0,
+                title: 'Horse'
+            }, {
+                id: 1,
+                title: 'Birds',
+                isSelectable: false,
+                subs: [
+                    {
+                        id: 10,
+                        title: 'Pigeon',
+                        isSelectable: false
+                    }, {
+                        id: 11,
+                        title: 'Parrot'
+                    }, {
+                        id: 12,
+                        title: 'Owl'
+                    }, {
+                        id: 13,
+                        title: 'Falcon'
+                    }
+                ]
+            }, {
+                id: 2,
+                title: 'Rabbit'
+            }, {
+                id: 3,
+                title: 'Fox'
+            }, {
+                id: 5,
+                title: 'Cats',
+                subs: [
+                    {
+                        id: 50,
+                        title: 'Kitty'
+                    }, {
+                        id: 51,
+                        title: 'Bigs',
+                        subs: [
+                            {
+                                id: 510,
+                                title: 'Cheetah'
+                            }, {
+                                id: 511,
+                                title: 'Jaguar'
+                            }, {
+                                id: 512,
+                                title: 'Leopard'
+                            }
+                        ]
+                    }
+                ]
+            }, {
+                id: 6,
+                title: 'Fish'
+            }
+        ];
+   
+    let url = `individual/getTree`;
+    
+    
+        var comboTree1, comboTree2;
+
+        jQuery(document).ready(function ($) {
+
+            loadLocation();
+            jQuery.get(url, function (data) {
+                SampleJSONData = data;
+                console.log(SampleJSONData);
+
+                comboTree2 = $('#justAnotherInputBox').comboTree({
+                    source: SampleJSONData,
+                    isMultiple: false
+                });
+            });
+            
+        });
+
+</script>

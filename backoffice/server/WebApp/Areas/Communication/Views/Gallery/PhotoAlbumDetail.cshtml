@@ -1,0 +1,186 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.PhotoAlbumViewModel
+
+@{
+    ViewData["Title"] = "Photo Album";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("PhotoAlbums",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Title </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            Title:
+                        </div>
+                        <div class="col-sm-9">
+                            @Model.TheModel.Title
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            Description:
+                        </div>
+                        <div class="col-sm-9">
+                            @Model.TheModel.Description
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <table class="table table-bordered table-striped" id="datatblsetting">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>
+                                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                                      asp-action="@("AddImage")" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                    <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                    <input type="button" onclick="$('#selectfile').click()" id="selectFilebtn" class="btn btn-outline-success btn-sm" name="Select file" value="New" />
+                                    <input type="file" multiple name="image" id="selectfile" hidden onchange="this.form.submit()" accept="image/png, image/gif, image/jpeg">
+                                </form>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.ProfileImages)
+                        {
+                            <tr>
+                                <td> <img src="/@r" width="100px" /> </td>
+                                <td>@r</td>
+                                <td>
+                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                        <a onclick="return confirmDelete($('#deleteImage@(Model.ProfileImages.IndexOf(r))')[0]);"
+                                       class=" btn btn-sm btn-outline-danger">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                        <form data-parsley-validate novalidate method="post" id="deleteImage@(Model.ProfileImages.IndexOf(r))"
+                                          asp-action="RemoveImage" asp-antiforgery="true">
+                                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            <input type="hidden" name="fileName" value="@(r)" />
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Resource</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SavePhotoAlbum" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="OwnerModule" value="@Model.CurrentModule" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" @(Model.ProfileImages.Count > 0 ? "readonly" : "")
+                               value="@Model.TheModel.Title" maxlength="50" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+                            <textarea rows="4" name="Description" asp-for="TheModel.Description" maxlength="800" class="form-control col-sm-9 col-md-8" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function confirmation(form, text) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to ' + text + ' ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+
+</script>
+}

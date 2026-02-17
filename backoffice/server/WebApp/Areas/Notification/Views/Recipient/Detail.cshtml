@@ -1,0 +1,248 @@
+﻿@using ECCSA.BackOffice.Server.Model.Membership
+@model ECCSA.BackOffice.Server.WebApp.Areas.Notification.Model.RecipientViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area, module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <h4>@Model.TheModel.Name</h4>
+                        </div>
+                        <div class="col-sm-4">
+                            <a onclick="return confirmDelete($('#deleteRecipient'));"
+                               class=" btn btn-sm btn-outline-danger float-right">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                            <span class=" float-right">&nbsp;&nbsp;&nbsp;</span>
+                            <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                            <form data-parsley-validate novalidate method="post" id="deleteRecipient"
+                                  asp-action="Delete" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                <input type="hidden" name="module" value="@Model.TheModel.Owner" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Company:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.CompanyName
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Position:
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Position)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Email:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Email
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Office Tel.:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.OfficeTel
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Mobile:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.MobileNo
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Category:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.StakeholderType
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Sector:
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Sector)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Business Interest:
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.BusinessInterest)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Website:
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.Website)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle">Edit Recipient  </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Owner" asp-for="TheModel.Owner" />
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Category
+                        </label>
+                        <select name="StakeholderType" asp-for="TheModel.StakeholderType"
+                                asp-items="@(Html.GetEnumSelectList<StakeholderTypeEnum>())"></select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sector
+                        </label>
+
+                        <select name="SectorId" class="custom-select col-sm-8 col-md-9" asp-for="TheModel.SectorId"
+                                asp-items="@(new SelectList(Model.Sectors,"Value", "Name"))"></select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" name="Name" maxlength="100" asp-for="TheModel.Name" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Position
+                        </label>
+                        <input type="text" name="Position" maxlength="100" asp-for="TheModel.Position" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Company
+                        </label>
+                        <input type="text" name="CompanyName" maxlength="100" asp-for="TheModel.CompanyName" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" name="Email" maxlength="100" asp-for="TheModel.Email" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Mobile
+                        </label>
+                        <input type="text" name="MobileNo" maxlength="20" asp-for="TheModel.MobileNo" class="form-control col-sm-8 col-md-9" required id="editNotificationMobileNo">
+                        <div id="phone_error" style="color:red;display:none ;background-size:80%; ">Please enter a valid phone number</div>
+
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Office Tel.
+                        </label>
+                        <input type="text" name="OfficeTel" maxlength="20" asp-for="TheModel.OfficeTel" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Business Interest
+                        </label>
+                        <input type="text" name="BusinessInterest" maxlength="255" asp-for="TheModel.BusinessInterest" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Website
+                        </label>
+                        <input type="text" name="Website" maxlength="200" asp-for="TheModel.Website" class="form-control col-sm-8 col-md-9">
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary" onclick="return validateForm();">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script src="~/js/confirmation.js"></script>
+    <script src="~/js/validation.js"></script>
+
+<script type="text/javascript">
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+        function validateForm() {
+            return is_validate_mobile("editNotificationMobileNo");
+        }
+
+</script>
+}

@@ -1,0 +1,36 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Models.BaseViewModel
+@using ECCSA.BackOffice.Server.Model.Security
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<User> UserManager
+
+@{   
+    var userProfile = await UserManager.FindByNameAsync(User.Identity.Name);
+}
+<a class="nav-link collapsed" href="#" data-toggle="collapse" arial-controls="userControl" data-target="#userControl" aria-expanded="true">
+    <img class="img-profile rounded-circle"
+         src="~/img/undraw_profile.svg">
+    <span class="mr-2 d-none d-lg-inline small">@userProfile.FullName</span>
+
+</a>
+<!-- Dropdown - User Information -->
+<div id="userControl" class="dropdown-menu administration dropdown-menu-right shadow animated--grow-in"
+     aria-labelledby="userDropdown" data-parent="#accordionSidebar">
+    <a class="dropdown-item" asp-area="Administration" asp-controller="UserAdministration" asp-action="Profile" asp-route-module="@Model.CurrentModule">
+        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+        Profile
+    </a>
+    <a class="dropdown-item" asp-area="Administration" asp-controller="UserAdministration" asp-action="ChangePassword" asp-route-module="@Model.CurrentModule">
+        <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+        Change Password
+    </a>
+    <a class="dropdown-item" asp-area="Administration" asp-controller="UserAdministration" asp-action="LoginHistory" asp-route-module="@Model.CurrentModule">
+        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+        Login History
+    </a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+        Logout
+    </a>
+</div>

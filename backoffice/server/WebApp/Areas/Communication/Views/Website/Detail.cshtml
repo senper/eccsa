@@ -1,0 +1,329 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.WebsiteViewModel
+
+@{
+    ViewData["Title"] = "Website Menu";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.TitleFull </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Path
+                                </div>
+                                <div class="col-sm-9">
+                                    @Model.TheModel.Path
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Parent
+                                </div>
+                                <div class="col-sm-9">
+                                    @Model.TheModel.ParentTitleFull
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Q.Link Header
+                                </div>
+                                <div class="col-sm-9">
+                                    @(Model.QuickLinkHeaders.FirstOrDefault(h => h.Id == Model.TheModel.HeaderId)?.LabelFull)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Show On Main Menu
+                                </div>
+                                <div class="col-sm-9">
+                                    @(Model.TheModel.ShowOnMainMenu ? "Yes" : "No" )
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @if (!Model.TheModel.ParentId.HasValue)
+        {
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header-actions">
+                        <h4>Sub Menus</h4>
+                    </div>
+                    <table class="table table-bordered table-striped" id="subMenu">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Path</th>
+                            <th>Order</th>
+                            <th>
+                                <button class="btn btn-sm btn-outline-success"
+                                        data-toggle="modal"
+                                        data-target="#theEditMenuModal"
+                                        title="Edit Menu"
+                                        onclick="editMenu(this)"
+                                        data-title=""
+                                        data-titlelocal=""
+                                        data-id="0"
+                                        data-path=""
+                                        data-header=""
+                                        data-headerlocal=""
+                                        data-defaultlink=""
+                                        data-order="0">
+                                    New
+                                </button>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var r in Model.TheModel.Children)
+                        {
+                            <tr>
+                                <td> @r.TitleFull </td>
+                                <td>@r.Path</td>
+                                <td>@r.Order</td>
+                                <td>
+
+                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                        <a onclick="return confirmDelete($('#deleteMenu@(r.Id)')[0]);"
+                                           class=" btn btn-sm btn-outline-danger">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                        <form data-parsley-validate novalidate method="post" id="deleteMenu@(r.Id)"
+                                              asp-action="DeleteMenu" asp-antiforgery="true">
+                                            <input type="hidden" name="menuId" value="@r.Id"/>
+                                            <input type="hidden" name="parentId" value="@Model.TheModel.Id"/>
+                                        </form>
+                                    </div>
+
+                                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                        <button class="btn btn-sm btn-outline-success"
+                                                data-toggle="modal"
+                                                data-target="#theEditMenuModal"
+                                                title="Edit Menu"
+                                                onclick="editMenu(this)"
+                                                data-title="@r.Title"
+                                                data-titlelocal="@r.TitleLocal"
+                                                data-id="@r.Id"
+                                                data-path="@r.Path"
+                                                data-order="@r.Order">
+                                            <i class="fa fa-pen" aria-hidden="true"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Menu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="UpdateMenu" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Order" value="@Model.TheModel.Order" />
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" asp-for="TheModel.Title" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" name="TitleLocal" asp-for="TheModel.TitleLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Q. Link Header
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" id="linkId" asp-for="TheModel.HeaderId"
+                                asp-items="@(new SelectList(Model.QuickLinkHeaders,"Id", "LabelFull"))"
+                                name="HeaderId">
+                            </select>
+                        </div>
+
+                        <div class="row form-group" >
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Path
+                            </label>
+                            <input type="text" name="Path" asp-for="TheModel.Path" maxlength="100" class="form-control col-sm-9 col-md-8" />
+                        </div>
+                        
+                        <div class="row form-group" >
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Show On Main Menu
+                            </label>
+                            <input type="checkbox"  name="ShowOnMainMenu"asp-for="TheModel.ShowOnMainMenu" maxlength="10"  />
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theEditMenuModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Menu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SubMenuSave" asp-antiforgery="true">
+                        <input type="hidden" name="ParentId" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="Id" id="id" value="-1" />
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" id="title" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" name="TitleLocal" id="titleLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                      
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Path
+                            </label>
+                            <input type="text" name="Path" id="path" maxlength="100" class="form-control col-sm-9 col-md-8" />
+                        </div>
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Order
+                            </label>
+                            <input type="number" name="Order" id="order" max="100" class="form-control col-sm-9 col-md-8" />
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section script {
+    <script>
+        function editMenu(e) {
+            const id = document.getElementById('id');
+            const title = document.getElementById('title');
+            const titleLocal = document.getElementById('titleLocal');
+            //const header = document.getElementById('linkHeader');
+            //const headerLocal = document.getElementById('linkHeaderLocal');
+            const path = document.getElementById('path');
+            const defaultHeader = document.getElementById('linkLocal');
+            const orderNo = document.getElementById('order');
+
+            const idVal = $(e).attr('data-id');
+            const titleVal = $(e).attr('data-title');
+            const localVal = $(e).attr('data-titlelocal');
+            //const headerVal = $(e).attr('data-header');
+            //const headerLocalVal = $(e).attr('data-headerlocal');
+            const pathVal = $(e).attr('data-path');
+            const defaultVal = $(e).attr('data-defaultlink');
+            const orderVal = $(e).attr('data-order');
+
+
+            id.value = idVal;
+            title.value = titleVal;
+            titleLocal.value = localVal;
+            //header.value = headerVal;
+            //headerLocal.value = headerLocalVal;
+            path.value = pathVal;
+            orderNo.value = orderVal;
+        }
+       
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+    </script>
+}

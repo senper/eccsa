@@ -1,0 +1,251 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/css/Treemap.css" />
+<link rel="stylesheet" type="text/css" href="~/css/nv-d3/nv.d3.css" />
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <!-- Content Row -->
+
+
+    <div class="row">
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Active Associations
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model.AssociationsCount.ToString("G"))</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-city fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                               Active Individual Members
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model.Members.ToString("G"))</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-address-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                               Active Applicants
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model.Applicants.ToString("G"))</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-address-card fa-2x text-gray-300"></i>
+                        </div>
+                        @*<div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Active Applicants
+                            </div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@(Model.Applicants.ToString("N"))</div>
+                                </div>
+                                <div class="col">
+                                    <div class="progress progress-sm mr-2">
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                             style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Requests Card Example -->
+        @* <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+            <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+            Issues
+            </div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+            </div>
+            <div class="col-auto">
+            <i class="fas fa-comments fa-2x text-gray-300"></i>
+            </div>
+            </div>
+            </div>
+            </div>
+            </div>*@
+    </div>
+
+    @if(!Model.IsMemberUser) {
+    <!-- Content Row -->
+
+    <div class="row">
+
+
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Members Distribution</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                             aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div id="chartTreeMap">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+
+        <!-- Content Column -->
+        <div class="col-lg-6 mb-4">
+
+            <!-- Project Card Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary"> @Model.CurrentPeriodName Performance </h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var p in @Model.Performances)
+                    {
+                        <h4 class="small font-weight-bold">
+                            @p.Name <span class="float-right">@p.Value%</span>
+                        </h4>
+                        <div class="progress mb-4">
+                            <div class="progress-bar" role="progressbar" style="width: @p.BarWidth%; background-color: @p.Color"
+                             aria-valuenow="@p.Value" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Color System -->
+
+
+        </div>
+
+        <div class="col-lg-6 mb-4">
+
+            <!-- Illustrations -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Business Information </h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless table-hover table-responsive-md">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        @if (Model.BusinessInformation == null)
+                        {
+                            <tr><td colspan="3">No Data</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var er in Model.BusinessInformation.OrderByDescending(x => x.Year).ThenByDescending(x => x.Month))
+                            {
+                                <tr>
+                                    <td>@er.Year</td>
+                                    <td>@er.Month</td>
+                                    <td>@er.Value</td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+            </div>
+
+            <!-- Approach -->
+
+
+        </div>
+    </div>
+    }
+
+</div>
+
+
+@section script {
+<script src="~/vendor/nv-d3/d3.v3.js"></script>
+<script src="~/vendor/nv-d3/nv.d3.js"></script>
+<script src="~/js/chartConfig.js"></script>
+
+<script>
+    GetMemberships();
+
+    function GetMemberships() {
+        $('#chartTreeMap').html("");
+        d3.json("Membership/Dashboard/GetMemberships", function (error, data) {
+            //console.log(data);
+            if (!error) {
+                var editeddata = d3.nest().key(function (d) { return d.region; }).key(function (d) { return d.subregion; }).entries(data.$values);
+                mainTreeMap("chartTreeMap", { title: "Memberships" }, { key: "Ethiopia", values: editeddata });
+            }
+        });
+    }
+</script>
+
+
+
+
+}

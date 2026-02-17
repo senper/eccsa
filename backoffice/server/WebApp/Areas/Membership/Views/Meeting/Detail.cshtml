@@ -1,0 +1,743 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.MeetingViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+    var openForRegistration = (Model.TheModel.Status == MeetingStatusEnum.ReadyForRegistration ||
+                       Model.TheModel.Status == MeetingStatusEnum.ReadyForParticipation) &&
+                      Model.TheModel.RegistrationDeadline >= DateTime.Today && Model.IsUserOrAdmin;
+    var openForParticipation = (Model.TheModel.Status == MeetingStatusEnum.ReadyForParticipation) &&
+                            Model.TheModel.RegistrationDeadline <= DateTime.Today && Model.IsUserOrAdmin;
+    var openMinuteSigning = Model.TheModel.Status == MeetingStatusEnum.ReadyForMinuteVoting &&
+    Model.TheModel.MinuteDeadline >= DateTime.Today && Model.IsUserOrAdmin;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <h4>@Model.TheModel.Title</h4>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Venue: <strong>@Model.TheModel.Venue</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            Date: <strong>@Model.TheModel.Date.ToString("yyyy-MM-dd")</strong>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-5">
+                            Status: <strong> @Model.TheModel.Status</strong>
+                        </div>
+                        <div class="col-sm-7">
+                            @if (Model.TheModel.Status != MeetingStatusEnum.Closed && Model.IsUserOrAdmin)
+                            {
+                                <form data-parsley-validate novalidate method="post" id="deleteContact@(Model.Guid2String(@Model.TheModel.Id))"
+                                  asp-action="ChangeStatus" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+
+                                    <select class="custom-select col-sm-7 col-md-8"
+                                        asp-items="@(Html.GetEnumSelectList<MeetingStatusEnum>())"
+                                        name="status" required>
+                                    </select>
+                                    <input type="submit" class="btn btn-sm btn-outline-warning" value="Change" />
+                                </form>
+                            }
+                        </div>
+                    </div><div class="row">
+                        <div class="col-sm-12">
+                            Agenda: <strong> @Model.TheModel.Agenda</strong>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="margin-top: 1px" />
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab0Active" id="participants-tab" data-toggle="tab" href="#participants" role="tab" aria-controls="participants" aria-selected="true">Participants</a>
+                </li>
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab1Active" id="nominees-tab" data-toggle="tab" href="#nominees" role="tab" aria-controls="nominees" aria-selected="true">Nominees</a>
+                </li>
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab2Active" id="attendance-tab" data-toggle="tab" href="#attendance" role="tab" aria-controls="attendance" aria-selected="true">Attendance</a>
+                </li>
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab3Active " id="email-tab" data-toggle="tab" href="#emails" role="tab" aria-controls="emails" aria-selected="false">Emails</a>
+                </li>
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab4Active" id="artifact-tab" data-toggle="tab" href="#artifact" role="tab" aria-controls="artifact" aria-selected="false">Artifacts</a>
+                </li>
+                <li class="nav-item " role="presentation">
+                    <a class="nav-link @Model.Tab5Active" id="guests-tab" data-toggle="tab" href="#guests" role="tab" aria-controls="guests" aria-selected="false">Guests</a>
+                </li>
+            </ul>
+            <div class="tab-content " id="myTabContent" style="padding-left: 10px;padding-right: 10px;">
+                <div class="tab-pane @Model.Tab0Active " id="participants" role="tabpanel" aria-labelledby="participants-tab">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>Association</th>
+                                <th>FullName</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Minute Status</th>
+
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Association</th>
+                                <th>FullName</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Minute Status</th>
+
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            @foreach (var item in Model.TheModel.Participants)
+                            {
+
+                                <tr>
+                                    <td>
+
+                                        @Html.DisplayFor(modelItem => item.Association)
+
+                                    </td>
+                                    <td>@item.FullName</td>
+                                    <td>
+                                        @item.Mobile
+                                    </td>
+                                    <td>
+                                        @item.Email
+                                    </td>
+                                    <td>
+                                        @item.MinuteStatus.GetDisplayName()
+                                        @if (@item.FullName.Length > 2 && @openForParticipation)
+                                        {
+                                            <div class="col-md-6 btn-group pull-left" role="group" aria-label="Basic example">
+                                                <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+                                                    <form method="get" asp-action="PrintMeetingCard">
+                                                        <input type="hidden" name="Id" value="@item.Id" />
+                                                        <input type="hidden" name="meetingId" value="@item.MeetingId" />
+                                                        <div class="btn-group pull-left" role="group" aria-label="Basic example">
+
+                                                            <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                                                                Badge
+                                                            </button>
+                                                        </div>
+                                                    </form>
+
+                                                </div>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="tab-pane @Model.Tab1Active" id="nominees" role="tabpanel" aria-labelledby="nominees-tab">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Name</th>
+                                <th rowspan="2">Position</th>
+                                <th colspan="3">Votes</th>
+                                <th rowspan="2"></th>
+                            </tr>
+                            <tr>
+
+                                <th style="width:140px !important;">Yea</th>
+                                <th style="width:140px !important;">Nay</th>
+                                <th style="width:140px !important;">Abstain</th>
+
+                            </tr>
+                            @if (@openForParticipation)
+                            {
+                                <form method="post"
+                                  asp-action="SaveNominee" asp-antiforgery="true">
+                                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                                    <input type="hidden" name="MeetingId" value="@Model.TheModel.Id" />
+                                <tr>
+                                    <th><input type="text" maxlength="200" name="Name" class="form-control" required /> </th>
+
+                                    <th><input type="text" maxlength="200" name="Position" class="form-control" required /></th>
+                                    <th><input type="number" min="0" name="YeaVotes" class="form-control" required /></th>
+                                    <th><input type="number" min="0" name="NayVotes" class="form-control" required /></th>
+                                    <th><input type="number" min="0" name="AbstainVotes" class="form-control" required /></th>
+                                    <th>
+                                        <input type="submit" value="Add" class="btn btn-outline-primary" />
+                                    </th>
+                                </tr>
+                                </form>
+                            }
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model.TheModel.Nominees)
+                            {
+                                var sId = Model.Guid2String(item.Id);
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.Name) </td>
+                                    <td>@item.Position</td>
+                                    <td>@item.YeaVotes </td>
+                                    <td>@item.NayVotes</td>
+                                    <td>@item.AbstainVotes</td>
+                                    <td>
+                                        @if (openForParticipation)
+                                        {
+                                            <a onclick="return confirmAction($('#deleteNominee@(sId)')[0], 'Delete');"
+                                       class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deleteNominee@(sId)"
+                                          asp-action="DeleteNominee" asp-antiforgery="true">
+                                                <input type="hidden" name="Id" value="@item.Id" />
+                                                <input type="hidden" name="meetingId" value="@item.MeetingId" />
+
+
+
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="tab-pane @Model.Tab2Active " id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+
+                                <th>Date</th>
+                                <th style="width:100px !important;">No</th>
+                                <th>Association</th>
+                                <th></th>
+                            </tr>
+
+                            @if (@openForParticipation)
+                            {
+                                <form method="post"
+                                  asp-action="SaveAttendance" asp-antiforgery="true">
+
+                                    <input type="hidden" name="MeetingId" value="@Model.TheModel.Id" />
+                                <tr>
+                                    <th><input type="hidden" value="@DateTime.Today" name="AttendaceDate" class="form-control" required /></th>
+                                    <th><input type="text" maxlength="3" name="No" class="form-control" required /></th>
+                                    <th>
+                                        <select name="ParticipantId"
+                                            asp-items="@(new SelectList(Model.TheModel.Participants.Where(p=> !string.IsNullOrEmpty(p.FullName)),"Id", "Association"))">
+                                        </select>
+                                    </th>
+
+                                    <th>
+                                        <input type="submit" value="Add" class="btn btn-outline-primary" />
+                                    </th>
+                                </tr>
+                                </form>
+                            }
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model.TheModel.Attendances)
+                            {
+                                var sId = Model.Guid2String(item.Id);
+                                <tr>
+                                    <td>@item.AttendaceDate.ToString("yyyy-MM-dd") </td>
+                                    <td>@item.No</td>
+                                    <td>@item.Participant.FullName </td>
+                                    <td>
+                                        @if (openForParticipation)
+                                        {
+                                            <a onclick="return confirmAction($('#deleteNominee@(sId)')[0], 'Delete');"
+                                       class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deleteNominee@(sId)"
+                                          asp-action="DeleteNominee" asp-antiforgery="true">
+                                                <input type="hidden" name="Id" value="@item.Id" />
+                                                <input type="hidden" name="meetingId" value="@item.MeetingId" />
+
+
+
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="tab-pane @Model.Tab3Active  " id="emails" role="tabpanel" aria-labelledby="email-tab">
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form data-parsley-validate novalidate method="post"
+                                  asp-action="CreateEmail" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                <div class="row form-group">
+                                    <div class="col-sm-12">
+                                        <input type="submit" value="Create Email"
+                                               onclick="return confirmAction(this.form, 'Create Email');"
+                                               class="btn btn-warning btn-sm">
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Recipients</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Recipients</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            @foreach (var item in Model.TheModel.Emails)
+                            {
+
+                                <tr>
+                                    <td>
+                                        <a asp-controller="Email" asp-area="Notification" asp-action="Detail" asp-route-id="@item.Id" class="title">
+                                            @Html.DisplayFor(modelItem => item.Subject)
+                                        </a>
+                                    </td>
+                                    <td>@item.Status</td>
+                                    <td>
+                                        @item.CreateStamp.ToString("yyyy-MM-dd")
+                                    </td>
+                                    <td>
+                                        @item.Recipients.Count
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            <a class=" btn btn-sm  btn-outline-info" asp-controller="Email" asp-area="Notification" asp-action="Detail" asp-route-id="@item.Id">
+                                                <i class="fa fa-info" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="tab-pane @Model.Tab4Active fade" id="artifact" role="tabpanel" aria-labelledby="artifact-tab">
+                    <br />
+                    <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Attachment</th>
+                                <th>
+                                    <a class="title" data-toggle="modal"
+                                       data-target="#artifactModal"
+                                       title="Create Artifact"
+                                       data-id="@Guid.Empty"
+                                       data-description=""
+                                       data-title=""
+                                       onclick="editArtifact(this);">
+                                        <i class="fa fa-plus "></i> Create
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var i in Model.TheModel.Artifacts)
+                            {
+
+                                <tr>
+                                    <td> @i.Title </td>
+
+                                    <td> @i.Description </td>
+                                    <td>
+                                        @if (i.RelativePath.Length > 1)
+                                        {
+                                            <a class="title" data-toggle="modal"
+                                       data-target="#dialog"
+                                       title="Attachment"
+                                       data-src="@i.RelativePath"
+                                       onclick="previewPdf(this);">
+                                                Preview
+                                            </a>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            <button class="btn btn-sm btn-outline-info" data-toggle="modal"
+                                                data-target="#artifactModal"
+                                                title="Edit"
+                                                data-id="@i.Id"
+                                                data-description="@i.Description"
+                                                data-title="@i.Title"
+                                                onclick="editArtifact(this);">
+                                                <i class="fa fa-pen "></i>
+                                            </button>
+                                            <a onclick="return confirmAction($('#deleteArtifact@(i.Id)')[0], 'Delete');"
+                                           class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="deleteArtifact@(i.Id)"
+                                              asp-action="DeleteArtifact" asp-antiforgery="true" asp-route-id="@i.Id">
+                                                <input type="hidden" name="id" value="@i.Id" />
+                                                <input type="hidden" name="meetingId" value="@i.MeetingId" />
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane @Model.Tab5Active" id="guests" role="tabpanel" aria-labelledby="guests-tab">
+                    <table class="table table-bordered" id="dataTableGuests" width="100%" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Code</th>
+                                <th>Title</th>
+                                <th>Full Name</th>
+                                <th>Position</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                            </tr>
+
+                            @if (@openForParticipation || @openForRegistration)
+                            {
+                                <form method="post"
+                                  asp-action="SaveDistingueshedGuest" asp-antiforgery="true">
+                                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                                    <input type="hidden" name="MeetingId" value="@Model.TheModel.Id" />
+                                <tr>
+                                    <th style="max-width:60px !important;"><input type="text" maxlength="10" name="OrderNo" class="form-control" required /> </th>
+                                    <th></th>
+                                    <th><input type="text" maxlength="50" name="Title" class="form-control" required /></th>
+                                    <th><input type="text" maxlength="200" name="FullName" class="form-control" required /></th>
+                                    <th><input type="text" maxlength="50" name="Position" class="form-control" required /></th>
+                                    <th><input type="text" maxlength="200" name="Email" class="form-control" required /></th>
+                                    <th><input type="text" maxlength="50" name="Mobile" class="form-control" required /></th>
+                                    <th>
+                                        <input type="submit" value="Add" class="btn btn-outline-primary" />
+                                    </th>
+                                </tr>
+                                </form>
+                            }
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model.TheModel.DistinguishedGuests)
+                            {
+                                var sId = Model.Guid2String(item.Id);
+                                <tr>
+                                    <td>@item.OrderNo</td>
+                                    <td>@item.Code</td>
+                                    <td>@item.Title</td>
+                                    <td>@Html.DisplayFor(modelItem => item.FullName) </td>
+
+                                    <td>@item.Position</td>
+                                    <td>@item.Email </td>
+                                    <td>@item.Mobile</td>
+
+                                    <td>
+                                        @if (openForParticipation)
+                                        {
+                                            <a onclick="return confirmAction($('#deleteGuest@(sId)')[0], 'Delete');"
+                                       class=" btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </a>
+                                            <form data-parsley-validate novalidate
+                                          method="post" id="deleteGuest@(sId)"
+                                          asp-action="DeleteDistingueshedGuest"
+                                          asp-antiforgery="true">
+                                                <input type="hidden" name="Id" value="@item.Id" />
+                                                <input type="hidden" name="meetingId" value="@Model.TheModel.Id" />
+                                                <input type="hidden"  name="Code" value="@item.Code" />
+                                                <input type="hidden" name="Title" value="@item.Title" />
+                                                <input type="hidden" name="FullName" value="@item.FullName" />
+                                                <input type="hidden" name="Position" value="@item.Position" />
+                                                <input type="hidden" name="Email" value="@item.Email" />
+                                                <input type="hidden" name="Mobile" value="@item.Mobile" />
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Meeting</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <div class="row form-group">
+
+                        <label class="col-sm-5 col-md-4 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" id="statusId"
+                                asp-items="@(Html.GetEnumSelectList<MeetingStatusEnum>())"
+                                name="Type" asp-for="TheModel.Status" required>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" asp-for="TheModel.Title" maxlength="100" class="form-control col-sm-7 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Date
+                        </label>
+                        <input type="date" class="form-control col-sm-7 col-md-8" name="Date" asp-for="TheModel.Date" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Venue
+                        </label>
+                        <textarea rows="4" name="Address" id="addressId" maxlength="200" asp-for="TheModel.Venue" class="form-control col-sm-7 col-md-8" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Registration Deadline
+                        </label>
+                        <input type="date" class="form-control col-sm-7 col-md-8" name="RegistrationDeadline" asp-for="TheModel.RegistrationDeadline" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Minute Deadline
+                        </label>
+                        <input type="date" class="form-control col-sm-7 col-md-8" name="MinuteDeadline" asp-for="TheModel.MinuteDeadline" required />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="artifactModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Meeting Artifact</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SaveArtifact" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="artifactId" />
+                    <input type="hidden" name="MeetingId" value="@Model.TheModel.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" id="titleId" maxlength="100" class="form-control col-sm-7 col-md-8" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" id="descriptionId" maxlength="600" class="form-control col-sm-7 col-md-8" required></textarea>
+                    </div>
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Attach
+                        </label>
+                        <input type="file" name="Attachment" class="form-control col-sm-8 col-md-8" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="participantModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Meeting Participant</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveParticipant" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="participantId" />
+                    <input type="hidden" name="MeetingId" value="@Model.TheModel.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Full Name
+                        </label>
+                        <input type="text" name="FullName" id="fullNameId" maxlength="100" class="form-control col-sm-7 col-md-8" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" rows="4" name="Email" id="emailId" maxlength="200" class="form-control col-sm-7 col-md-8" required />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="width:920px !important;">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewTitle">Preview Document</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <iframe id="frame" style="width:900px; height:600px;"></iframe>
+                </div>
+                <br />
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section script {
+
+<script>
+    function previewPdf(e) {
+        const srcVal = $(e).attr('data-src');
+        $("#frame").attr("src", srcVal);
+    }
+
+    function editArtifact(e) {
+        const id = document.getElementById('artifactId');
+        const title = document.getElementById('titleId');
+        const description = document.getElementById('descriptionId');
+
+        const idVal = $(e).attr('data-id');
+        const titleVal = $(e).attr('data-title');
+        const descriptionVal = $(e).attr('data-description');
+
+
+        id.value = idVal;
+        title.value = titleVal;
+        description.value = descriptionVal;
+    }
+    function editParticipant(e) {
+        $("#participantId").val($(e).attr('data-id'));
+        $("#fullNameId").val($(e).attr('data-fullname'));
+        $("#emailId").val($(e).attr('data-email'));
+    }
+
+    function confirmAction(form, msg) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to ' + msg + ' ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

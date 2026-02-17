@@ -1,0 +1,56 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IndividualViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Detail </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+
+    <div class="row ">
+        <label class="col-sm-5 col-md-4 col-form-label" ></label>
+        <img src="@Model.PhotoPath" alt="Photo" style="max-height: 170px; max-width: 170px; min-height: 170px; min-width: 170px; " />
+    </div>
+    <div class="row ">
+        <label class="col-sm-5 col-md-4 col-form-label">
+            Name
+        </label>
+        @Model.Staff.Title   @Model.Staff.Name
+    </div>
+
+    <div class="row ">
+        <label class="col-sm-5 col-md-4 col-form-label">
+            Position
+        </label>
+        @Model.Staff.Title
+    </div>
+    <div class="row ">
+        <label class="col-sm-5 col-md-4 col-form-label">
+            Email
+        </label>
+        @Model.Staff.Email
+    </div>
+    <div class="row ">
+        <label class="col-sm-5 col-md-4 col-form-label">
+            Mobile
+        </label>
+        @Model.Staff.Mobile
+    </div>
+
+    <div class="row ">
+        <label class="col-sm-5 col-md-4 col-form-label">
+            Start / End Date
+        </label>
+        @Model.Staff.StartDate.ToShortDateString()    @Model.Staff.EndDate.ToShortDateString()
+    </div>
+
+    <div class="row ">
+        <label class="col-sm-5 col-md-4 col-form-label">
+            Status:
+        </label>
+        @Model.Staff.Status
+
+    </div>
+
+</div>

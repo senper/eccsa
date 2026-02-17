@@ -1,0 +1,166 @@
+﻿@using ECCSA.BackOffice.Server.Model.ExternalData;
+@using System.Data;
+@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.InfoViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Index">
+                <input type="hidden" name="infoTypeId" value="@Model.InfoTypeId" />
+                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                <div class="btn-group pull-left" role="group" aria-label="Basic example">
+                    Dataset Period &nbsp;&nbsp;<select name="StartDate"
+                    asp-for="@Model.StartDate" required>
+                    <option></option>
+                        @foreach(var dt in @Model.ExternalDataType.DataPeriods)
+                        {
+                            if (dt.StartDate.Year < 2000) continue;
+                            <option value="@dt.StartDate.Date.ToString("yyyy-MM-dd")">@dt.StartDate.Date.ToString("yyyy-MM-dd") - @dt.EndDate.Date.ToString("yyyy-MM-dd")</option>
+                        }
+                    </select>
+                    <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6 btn-group pull-left" role="group" aria-label="Basic example">
+            <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#theModal"
+                    title=@Model.Title >
+                    <i class="fa fa-file-excel-o"></i> Import
+                </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    @foreach (var dc in Model.ExternalDataType.MetaData)
+                                    {
+                                        if (!dc.ShowInGrid) continue;
+                                        <th> @dc.Caption </th>
+                                    }
+                                    
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    @foreach (var dc in Model.ExternalDataType.MetaData)
+                                    {
+                                        if (!dc.ShowInGrid) continue;
+                                        <th> @dc.Caption </th>
+                                    }
+
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (DataRow dr in Model.TheData.Rows)
+                                {
+
+                                    <tr>
+                                        @foreach (var dc in Model.ExternalDataType.MetaData)
+                                        {
+                                            if (!dc.ShowInGrid) continue;
+
+                                            var rwVal = dr[dc.ColumnName];
+                                            if(dc.DataType == DataTypeEnum.Date) {
+                                                <td>  @(((DateTime)rwVal).ToString("yyyy-MM-dd"))</td>
+                                            }else
+                                            {
+                                                 <td>@rwVal </td>
+                                            }
+
+                                           
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Import Data    </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="UploadExcel" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.ExternalDataType.Id" />
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input type="date" name="startDate" class="form-control col-sm-8 col-md-8" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" name="endDate" class="form-control col-sm-8 col-md-8" />
+                    </div>
+                    
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">File</label>
+                        <input type="file" name="formFile" placeholder="@Model.ExternalDataType.Caption" class="form-control-file form-control col-sm-8 col-md-8" />
+                    </div>
+                    
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+
+
+    <script>
+
+       
+
+       
+    </script>
+}

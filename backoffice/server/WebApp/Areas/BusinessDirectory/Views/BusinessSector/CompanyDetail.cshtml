@@ -1,0 +1,337 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.BusinessDirectory.Model.CompanyViewModel
+
+@{
+    ViewData["Title"] = "Business Sector Company";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<div class="container-fluid">
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Detail","BusinessSector",new { Area ="BusinessDirectory", id=@Model.SectorId})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <img src="@Model.LogoPath" alt="Logo" style="max-height: 90px; max-width: 90px; min-height: 30px; min-width: 30px; " />
+                        </div>
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.Name </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <button data-toggle="modal"
+                                    data-target="#EditCompanyModal"
+                                    title="Edit"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-4 d-flex justify-content-end">
+                                    Telephone:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Telephone
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 d-flex justify-content-end">
+                                    Mobile:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Mobile
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 d-flex justify-content-end">
+                                    Fax:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Fax
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 d-flex justify-content-end">
+                                    Email:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Email
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 d-flex justify-content-end">
+                                    PoBox:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.PoBox
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 d-flex justify-content-end">
+                                    Web:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Web
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+
+
+    <div class="row">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-9"> Sectors </div>
+
+                        <div class="col-2 btn-group" role="group" aria-label="Basic example">
+                            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                                    data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Add New Business Sector">
+                                <i class="fas fa-plus fa-sm text-white-50"></i> Add New
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th> Sector</th>
+                                    <th>Sub Sector</th>
+
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th> Sector</th>
+                                    <th>Sub Sector</th>
+
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheModel.BusinessSectors)
+                                {
+                                    var c = item.BusinessSector;
+
+                                    <tr>
+                                        <td>
+                                            @c.ParentSector.Name
+
+
+                                        </td>
+                                        <td>@c.Name</td>
+
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a onclick="return confirmDelete($('#deleteCompanySector@(Model.Guid2String(item.Id))')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post"
+                                                  id="deleteCompanySector@(Model.Guid2String(item.Id))"
+                                                  asp-action="DeleteMembership" asp-antiforgery="true">
+                                                    <input type="hidden" name="sectorId" value="@item.SectorId" />
+                                                    <input type="hidden" name="companyId" value="@item.CompanyId" />
+                                                    <input type="hidden" name="fromCompany" value="true" />
+
+                                                </form>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="EditCompanyModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New @Model.Name Business Sector </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="SaveCompany" asp-antiforgery="true">
+                    <input type="hidden" name="Id" asp-for="TheModel.Id" />
+                    <input type="hidden" name="sectorId" value="@Model.SectorId" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" maxlength="100" name="Name" class="form-control col-sm-8 col-md-9" asp-for="TheModel.Name" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            Phone No.
+                        </label>
+                        <input type="text" maxlength="100" name="Telephone" asp-for="TheModel.Telephone" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            Mobile
+                        </label>
+                        <input type="text" maxlength="100" class="form-control  col-sm-8 col-md-9" name="Mobile" asp-for="TheModel.Mobile" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            Fax
+                        </label>
+                        <input type="text" maxlength="100" name="Fax" asp-for="TheModel.Fax" class="form-control col-sm-8 col-md-9" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" maxlength="100" name="Email" asp-for="TheModel.Email" id="labelRequirement" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            PoBox
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="PoBox" asp-for="TheModel.PoBox" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            Web
+                        </label>
+                        <input type="text" maxlength="100" name="Web" asp-for="TheModel.Web" class="form-control col-sm-8 col-md-9" />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-2 col-form-label">
+                            Logo
+                        </label>
+                        <input type="file" name="logo" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Member of    </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="AddMembership" asp-antiforgery="true">
+                    <input type="hidden" name="companyId" value="@Model.TheModel.Id" />
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sector
+                        </label>
+                        <select class="custom-select "  name="sectorId"
+                                asp-items="@Model.SelectSource">
+                            
+                        </select>
+                    </div>
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section script {
+
+<script src="/js/comboTreePlugin.js" type="text/javascript"></script>
+
+<script>
+
+            document.getElementById('select-all').onclick = function() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    }
+            function associate(chkId, e){
+
+                const chkBox = document.getElementById(chkId);
+                chkBox.value = e.value;
+
+            }
+</script>
+<script>
+
+     function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

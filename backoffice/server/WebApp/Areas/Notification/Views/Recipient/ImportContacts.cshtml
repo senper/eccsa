@@ -1,0 +1,219 @@
+﻿@using ECCSA.BackOffice.Server.Model.Membership
+@model ECCSA.BackOffice.Server.WebApp.Areas.Notification.Model.RecipientViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area, module=Model.CurrentModule, stakeholderType = StakeholderTypeEnum.Individual})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="row " style="margin-left:15px;margin-bottom:10px;">
+                        <div class="col-md-6">
+                            <form method="post" enctype="multipart/form-data" asp-action="ImportFile">
+                                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                <input type="file" name="file" onchange="this.form.submit()" />
+                            </form>
+
+                             <a id="filename" asp-action="DownLoadImportTemplate" asp-route-type="import-template" >
+                                                Download Template
+                                            </a>
+                        </div>
+                        <div class="col-md-6 ">
+                            <button type="button" onclick="confirm($('#importSavefrm')[0], 'Save Import')" class="float-right btn btn-sm btn-outline-success">
+                                <i class="fas fa-file-import"></i> Save Import
+                            </button>
+
+                        </div>
+                    </div>
+                    <form method="post" id="importSavefrm" asp-action="SaveImport">
+                        <input type="hidden" name="module" value="@Model.CurrentModule" />
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th>Company</th>
+                                        <th>Name</th>
+                                        <th>Position</th>
+                                        <th>Sector</th>
+                                        <th>Import Sector value</th>
+                                        <th>Import Subsector value</th>
+                                        <th>Business Interest</th>
+                                        <th>Office Tel.</th>
+                                        <th>Email</th>
+                                        <th>Mobile</th>
+                                        <th>Website</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>Company</th>
+                                        <th>Name</th>
+                                        <th>Position</th>
+                                        <th>Sector</th>
+                                        <th>Import Sector value</th>
+                                        <th>Import Subsector value</th>
+                                        <th>Business Interest</th>
+                                        <th>Office Tel.</th>
+                                        <th>Email</th>
+                                        <th>Mobile</th>
+                                        <th>Website</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    @foreach (var item in Model.TempList)
+                                    {
+
+                                        <tr>
+                                            <td>
+                                                @(item.CompanyName)
+                                            </td>
+                                            <td>@item.Name</td>
+                                            <td>@item.Position</td>
+                                            <td>
+                                                @if (item.SectorId == null)
+                                                {
+                                                    <select name="@item.Id" class="custom-select col-sm-8 col-md-9" asp-for="TheModel.SectorId"
+                                                    asp-items="@(new SelectList(Model.GroupedSectors,"Id", "Name", item.SectorId, "Parent"))"></select>
+                                                }
+                                                else
+                                                {
+                                                    @(item.Sector)
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.ImportSectorName
+                                            </td>
+                                            <td>
+                                                @item.ImportSubsectorName
+                                            </td>
+                                            <td>@item.BusinessInterest</td>
+                                            <td>@item.OfficeTel</td>
+                                            <td>@item.Email</td>
+                                            <td>@item.MobileNo</td>
+                                            <td>@item.Website</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> New Recipient    </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                    <input type="hidden" name="Owner" value="@Model.CurrentModule" />
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Category
+                        </label>
+                        <select name="StakeholderType" asp-for="@Model.StakeholderType"
+                                asp-items="@(Html.GetEnumSelectList<StakeholderTypeEnum>())"></select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sector
+                        </label>
+
+                        <select name="SectorId" class="custom-select col-sm-8 col-md-9" asp-for="TheModel.SectorId"
+                                asp-items="@(new SelectList(Model.Sectors,"Value", "Name"))"></select>
+
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" name="Name" maxlength="100" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Company
+                        </label>
+                        <input type="text" name="CompanyName" maxlength="100" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" name="Email" maxlength="100" class="form-control col-sm-8 col-md-9" required>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Mobile
+                        </label>
+                        <input type="text" name="MobileNo" maxlength="20" class="form-control col-sm-8 col-md-9" required id="editImportContactsMobileNo">
+                        <div id="phone_error" style="color:red;display:none ;background-size:80%; ">Please enter a valid phone number</div>
+
+                    </div>
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" onclick="return validateForm();"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+<script>
+    function confirm(form, msg) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to '+msg+' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function validateForm() {
+            return is_validate_mobile("editImportContactsMobileNo");
+        }
+</script>
+}

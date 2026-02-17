@@ -1,0 +1,156 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.QuickLinkHeaderViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Website Management";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @if (Model.IsUserOrAdmin)
+        {
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Quick Link Header "
+                data-id="-1"
+                data-status="@((int)StatusEnum.Active)"
+                onclick="addEdit(this)">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th> Name</th>
+                                    <th>Label</th>
+                                   
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th> Name</th>
+                                    <th>Label</th>
+                                   
+
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList.OrderBy(m=>m.Name))
+                                {
+
+
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.LabelFull)
+                                        </td>
+                                       
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="HeaderDetail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+                                              
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1"
+     role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Root Menu </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="CreateHeader" asp-antiforgery="true">
+                        <input type="hidden" name="Id"  />
+
+
+                        <div class="row form-group" >
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" name="Name" maxlength="100" class="form-control col-sm-9 col-md-8" placeholder="Name  " required />
+                        </div>
+                       
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Label
+                            </label>
+                            <input type="text" name="Label" maxlength="100" class="form-control col-sm-9 col-md-8" placeholder="Label  "/>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                
+                            </label>
+                            <input type="text" name="LabelLocal" maxlength="100" class="form-control col-sm-9 col-md-8" placeholder="ምልክት  " />
+                        </div>
+                        
+                       
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

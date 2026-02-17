@@ -1,0 +1,13 @@
+﻿using ECCSA.BackOffice.Server.Model.$$Schema$$;
+using ECCSA.BackOffice.Server.Model.Common;
+using System;
+
+namespace ECCSA.BackOffice.Server.Persistence.DTO.$$Schema$$
+{
+    $$dto$$
+
+    
+    
+    public record $$Model$$Payload($$Model$$ PayLoad);
+    
+}

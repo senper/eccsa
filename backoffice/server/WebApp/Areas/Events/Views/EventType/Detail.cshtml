@@ -1,0 +1,175 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Events.Model.EventTypeViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","EventType",new { Area ="Events", module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-10">
+
+                            <h4>  @Model.TheModel.Title </h4>
+                        </div>
+                        <div class="col-sm-2">
+                            @if (Model.TheModel.Events.Count == 0)
+                            {
+                                <a onclick="return confirmDelete($('#deleteEventType')[0]);"
+                                   class=" btn btn-sm btn-outline-danger float-right">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </a>
+                                <form data-parsley-validate novalidate method="post" id="deleteEventType"
+                                      asp-action="DeleteEventType" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.EventTypeId" />
+                                    
+                                </form>
+                            }
+                            <button data-toggle="modal"
+                                    data-target="#editEventTypeModal"
+                                    title="Edit"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Description
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Description
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editEventTypeModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">@(Model.TheModel.EventTypeId == Guid.Empty? "Create " :"Edit ") Event Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveEventType" asp-antiforgery="true">
+                    <input type="hidden" name="EventTypeId" value="@Model.TheModel.EventTypeId" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" name="Title" value="@Model.TheModel.Title" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" maxlength="800" name="Description" id="description" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.Description </textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" value="2" asp-for="TheModel.Status" name="Status" id="eventTypeStatus">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+
+
+    $("#datatblquestion").treetable({ expandable: false });
+    <script>
+
+
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function confirmation(form, text) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to ' + text + ' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+
+    </script>
+}

@@ -1,0 +1,317 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.MemberUserAdministrationViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+@{
+    var TIN = Model.TheModel.TIN;
+}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Members","UserAdministration",new { Area ="Administration", module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-10">
+
+                            <h4>  @Model.TheModel.FullName </h4>
+                        </div>
+                        <div class="col-sm-2">
+                            @if (!Model.TheModel.Disabled)
+                            {
+                                <a onclick="return confirmation($('#deleteUser')[0], 'deactivate user');" title="deactivate user"
+                               class=" btn btn-sm btn-outline-danger float-right">
+                                    <i class="fa fa-ban" aria-hidden="true"></i>
+                                </a>
+                                <form data-parsley-validate novalidate method="post" id="deleteUser"
+                                  asp-action="DisableUser" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                </form>
+                            }
+                            else
+                            {
+                                <a onclick="return confirmation($('#activateUser')[0], 'Activate user');" title="Activate user"
+                               class=" btn btn-sm btn-outline-success float-right">
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                </a>
+                                <form data-parsley-validate novalidate method="post" id="activateUser"
+                                  asp-action="EnableUser" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                </form>
+                            }
+
+                            <a data-toggle="modal" data-target="#resetModal" title="Reset Password"
+                               class=" btn btn-sm btn-outline-warning float-right">
+                                <i class="fa fa-key" aria-hidden="true"></i>
+                            </a>
+                            <a data-toggle="modal" data-target="#editModal" title="Edit Profile"
+                               class=" btn btn-sm btn-outline-primary float-right">
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            Full Name: <strong>@(Model.TheModel.FullName)</strong><br />
+                            User Name: <strong>@(Model.TheModel.UserName)</strong><br />
+                            Association: <strong>@(Model.TheModel.Association)</strong><br />
+                            Status: <strong>@(Model.TheModel.Disabled ? "Inactive" : "Active")</strong><br />
+                        </div>
+                        <div class="col-md-6">
+                            Mobile: <strong>@(Model.TheModel.MobileNo)</strong><br />
+                            Email: <strong>@(Model.TheModel.Email)</strong><br />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+
+                    <h4>Login History</h4> Login History
+
+
+                    <table class="table table-bordered table-striped dataTable" id="userHistory" style="margin-top: 5px; margin-left: 5px;">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time </th>
+                                @* <th>IP Address</th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var h in Model.UserLoginHistories)
+                            {
+                                <tr>
+                                    <td>@h.Date.ToString("yyyy-MM-dd")</td>
+                                    <td>@h.Time.ToString("hh: mm: ss tt")</td>
+                                    @* <td>@h.IPAddress</td>*@
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-6 ">
+            <div class="card" style="margin-top: 10px">
+                <div class="card-body ">
+                    <button data-toggle="modal" data-target="#AddRoleModal"
+                            class="addRole d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-plus fa-sm "></i> Change Roles
+                    </button>
+              
+            <table class="table card-body table-bordered table-striped" id="userRoles" style="margin-top: 5px; margin-left: 5px;">
+                <thead>
+                    <tr>
+                        <th>Role </th>
+
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.TheModel.UserRoles)
+                    {
+                        <tr>
+                            <td>@s.Role.Name</td>
+                            <td class="text-center">
+                                <form data-parsley-validate novalidate method="post" id="RemoveUserRole"
+                                  asp-action="RemoveUserRole" asp-antiforgery="true">
+                                    <input type="hidden" name="userId" value="@Model.TheModel.Id" />
+                                    <input type="hidden" name="roleId" value="@s.RoleId" />
+                                </form>
+                                <a onclick="return confirmDelete($('#RemoveUserRole')[0]);"
+                               class=" btn btn-sm btn-outline-danger ">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddRoleModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Change Role </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="SaveUserRole" asp-antiforgery="true">
+                    <input type="hidden" name="userId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Members" value="true" />
+
+                    <div class="row form-group">
+                        <div class="col-12">
+                            <label class="col-form-label">
+                                Roles
+                            </label>
+                            <div class="row">
+                                @foreach (var r in Model.Roles.OrderBy(s => s.Name))
+                                {
+                                    <div class="col-6">
+                                        <input type="checkbox" name="roles" value="@(r.Id)"
+                                           @(Model.TheModel.UserRoles.Any(s => s.RoleId == r.Id) ? "Checked" : "") /> @(r.Name)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Edit User Profile </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="SaveUserProfile" asp-antiforgery="true">
+                    <input type="hidden" value="@Model.TheModel.Id" name="Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Full Name
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" name="FullName" value="@Model.TheModel.FullName" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Mobile
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" id="userMobileNo" name="MobileNo" value="@Model.TheModel.MobileNo" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            User Name
+                        </label>
+                        <input type="text" class="form-control col-sm-7 col-md-8" name="UserName" value="@Model.TheModel.UserName" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" class="form-control col-sm-7 col-md-8" id="userEmail" name="Email" value="@Model.TheModel.Email" required />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" onclick="return validateForm();"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="resetModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle"> Reset User Password </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="changePasswordfrm" data-parsley-validate method="post" asp-action="ResetPasswordChange">
+                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" name="NewPassword" id="newPassword" class="form-control" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" name="ConfirmPassword" id="confirmPassword" class="form-control" required />
+                            </div>
+                            <input type="submit"
+                                   onclick="return validateResetForm();"
+                                   class="btn btn-warning"
+                                   value="Reset password" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+<script src="~/js/confirmation.js"></script>
+<script src="~/js/validation.js"></script>
+
+<script type="text/javascript">
+    function validateForm() {
+        return is_validate_mobile("userMobileNo") && is_validate_email('userEmail');
+    }
+
+    function validateResetForm() {
+        if(!isPassword("newPassword") || !isPassword("confirmPassword")){
+            return false;
+        }
+        if($("#newPassword").val() == $("#confirmPassword").val()){
+            return confirmation($("#changePasswordfrm")[0], "reset password");
+        } else {
+            $.alert({
+                    icon: 'fa fa-bell',
+                    title: 'Information!',
+                    content: 'New Password & Confirm Password are different'
+                });
+                return false;
+        }
+    }
+</script>
+}

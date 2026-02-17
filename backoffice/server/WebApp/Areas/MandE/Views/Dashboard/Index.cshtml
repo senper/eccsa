@@ -1,0 +1,375 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.DashboardViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+    var canChangePeriod = @Model.IsAdmin;
+}
+
+<link type="text/css" rel="stylesheet" href="~/css/Treemap.css" />
+<link rel="stylesheet" type="text/css" href="~/css/nv-d3/nv.d3.css" />
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <!-- Content Row -->
+
+
+    <div class="row">
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-4 col-md-5 mb-5">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase">
+                                Current Period
+                            </div>
+
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.MonthFullName(@Model.Configuration.CurrentMonth.ToString()) @Model.Configuration.CurrentYear E.C.
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                @if (@canChangePeriod && @Model.PlanYears.Count > 0)
+                {
+                    <div class="card-footer">
+                        <div class="row">
+
+
+                            <div class="text-xs text-primary text-uppercase" style="padding-left: 0px;">
+                                @if (@Model.Configuration.CurrentMonth <= 9 && Model.IsAdmin)
+                                {
+                                    <a onclick="return confirm($('#replan')[0]);"
+                                       class="text-xs float-left edit btn btn-outline-warning btn-sm">
+                                        Revise Plan
+                                    </a>
+                                    <form data-parsley-validate novalidate method="post" id="replan"
+                                          asp-action="Replan" asp-antiforgery="true">
+                                    </form>
+                                }
+                                @if (Model.IsAdmin)
+                                {
+                                    <a onclick="return confirm($('#move2NextMonth')[0]);"
+                                       class="text-xs float-right edit btn btn-outline-primary btn-sm" title="Change Current Period to @Model.NextPeriodName">
+                                        Change to @Model.NextPeriodName
+                                    </a>
+                                    <form data-parsley-validate novalidate method="post" id="move2NextMonth"
+                                          asp-action="ChangeCurrentPeriod" asp-antiforgery="true">
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-4 col-md-4 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Planning Year
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Configuration.PlanYear Ver. @Model.Configuration.VersionNo</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="text-xs text-primary text-uppercase">
+                            @if (Model.IsAdmin)
+                            {
+                                if (Model.PlanPhase == PlanningPhaseEnum.Planning || Model.PlanPhase == PlanningPhaseEnum.PrePlanning)
+                                {
+                                    <a onclick="return confirm($('#closePlanning')[0]);"
+                                       class="text-xs float-left edit btn btn-outline-primary btn-sm" title="Close Planning Phase">
+                                        Close Planning Phase
+                                    </a>
+                                    <form data-parsley-validate novalidate method="post" id="closePlanning"
+                                          asp-action="ClosePlanning" asp-antiforgery="true">
+                                    </form>
+                                }
+                                @if (@canChangePeriod)
+                                {
+                                    <button data-toggle="modal" data-target="#changePlanYearModal" title="Change Plan Year" class=" text-xs text-uppercase float-right edit btn btn-outline-success btn-sm">
+                                        Change Plan Year
+                                    </button>
+                                }
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-3 mb-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase">
+                                Closed Years
+                            </div>
+
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @if (Model.Configuration.ClosedYears.Count == 0)
+                                {
+                                    <text>  No Closed Period </text>
+                                }
+                                else if (Model.Configuration.ClosedYears.Count == 1)
+                                {
+                                    <text>  @Model.Configuration.ClosedYears.Min() E.C. </text>
+                                }
+                                else
+                                {
+                                    <text>  @Model.Configuration.ClosedYears.Min() - @Model.Configuration.ClosedYears.Max() E.C. </text>
+
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                @if (@canChangePeriod && @Model.PlanYears.Count > 0 && false)
+                {
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="text-xs text-primary text-uppercase" style="padding-left: 0px;">
+                                <button data-toggle="modal" data-target="#closeYearModal" title="Close Year" class=" text-xs text-uppercase float-right edit btn btn-outline-success btn-sm">
+                                    Close Year
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Plan Performance</h6>
+
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th> Name</th>
+                                    <th>Unit</th>
+                                    <th>Plan</th>
+                                    <th>Actual</th>
+                                    <th>Progress</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+
+                                    <tr>
+                                        <td>
+                                            @item.NameWithCode
+                                        </td>
+                                        <td>@item.UnitName</td>
+                                        <td>@item.PlanAmountName</td>
+                                        <td>@item.AnnualProgress</td>
+                                        <td>@item.AnnualProgress</td>
+                                    </tr>
+
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    
+    <div class="row">
+
+
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Financial Performance</h6>
+
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable1" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th> Name</th>
+                                    <th>Plan</th>
+                                    <th>Actual</th>
+                                    <th>Progress</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (@Model.List != null)
+                                {
+                                    @foreach (var item in Model.List)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @item.FinancialItem.NameWithCode
+                                            </td>
+                                            <td>@item.AnnualPlan</td>
+                                            <td>@item.AnnualActual</td>
+                                            <td>@item.AnnualProgress</td>
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+@if (@canChangePeriod)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="changePlanYearModal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Change Plan Year</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                          asp-action="ChangePlanYear" asp-antiforgery="true">
+
+                        <div class="row form-group">
+                            <label class="col-sm-6 col-md-6 col-form-label">
+                                To Year
+                            </label>
+                            <input type="number" min="2015" max="@DateTime.Today.Year + 1" name="planYear" class="form-control col-sm-6 col-md-6" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-6 col-md-6 col-form-label">
+                                Copy From Year
+                            </label>
+                            <select name="templateYear" class="form-control col-sm-6 col-md-6">
+                                <option value="0"></option>
+                                @foreach (var year in Model.AllPlanYears)
+                                {
+                                    <option value="@year">@year</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="closeYearModal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Close Current Progress Year</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                          asp-action="ClosePeriod" asp-antiforgery="true">
+
+                        <div class="row form-group">
+                            Are you sure you want close the current period?
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}
+
+@section script {
+    <script src="~/vendor/nv-d3/d3.v3.js"></script>
+    <script src="~/vendor/nv-d3/nv.d3.js"></script>
+    <script src="~/js/chartConfig.js"></script>
+
+    <script>
+        function confirm(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to change current Period ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+
+
+
+
+}

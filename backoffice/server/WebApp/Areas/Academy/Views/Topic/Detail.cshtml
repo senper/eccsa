@@ -1,0 +1,378 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.TopicViewModel
+
+@{
+    ViewData["Title"] = "Topic Detail";
+    Layout = "~/Views/Shared/_AcademyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Topic",new { Area ="Academy"})" class="btn btn-sm btn-outline-info">
+            <i class="fa fa-angle-double-left "></i> back</a>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="m-0 font-weight-bold">@Model.TheModel.Code - @Model.TheModel.NameEng </h6>
+                        </div>
+                        <div class="col-6">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("Edit", new { Id=Model.TheModel.Id })"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Code: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Code)</strong><br />
+                            Name: <strong>@Html.DisplayFor(modelItem => Model.TheModel.NameEng)</strong><br />
+                            Description: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Decription)</strong><br />
+                            Status: <strong>@Model.GetStatusText(Model.TheModel.Status)</strong><br />
+                        </div>
+                        <div class="col-sm-6">
+                            Category: <strong>
+                                @(Model.TheModel.Category.Code + " - " + Model.TheModel.Category.NameEng )
+                            </strong><br />
+                        </div>
+                    </div>
+                    <hr style="margin-top: 1px" />
+                    <div class="row">
+                        <div class="col-12">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab0Active" id="resources-tab" data-toggle="tab" href="#resources" role="tab" aria-controls="resources" aria-selected="true">Resources</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab1Active" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab2Active" id="trainings-tab" data-toggle="tab" href="#trainings" role="tab" aria-controls="trainings" aria-selected="false">Active Trainings</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane    @Model.Tab0Active" id="resources" role="tabpanel" aria-labelledby="resources-tab">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditResource", new { Id=Guid.Empty, topicId=Model.TheModel.Id })"
+                                                    class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Type</th>
+                                                <th>Content</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Type</th>
+                                                <th>Content</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.Resources)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Description)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ResourceType)
+                                                    </td>
+                                                    <td>
+                                                        @if (item.ResourceType == ECCSA.BackOffice.Server.Model.Academy.ResourceType.Attachment)
+                                                        {
+                                                            <a id="filename" asp-action="DownLoadFile" asp-route-id="@item.Id" asp-route-type="Resouce"
+                                                               asp-route-fileName="@(item.ResourceContent)">
+                                                                @(item.ResourceContent)
+                                                            </a>
+                                                        }
+                                                        else if (item.ResourceType == ECCSA.BackOffice.Server.Model.Academy.ResourceType.Link)
+                                                        {
+                                                            <a href="@item.ResourceContent"
+                                                               target="_blank">
+                                                                @(item.ResourceContent)
+                                                            </a>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @Model.GetStatusText(item.Status)
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                                            @if (Model.IsUserOrAdmin)
+                                                            {
+                                                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditResource", new { Id=@item.Id, topicId=Model.TheModel.Id })"
+                                                                    class="edit btn btn-outline-success btn-sm">
+                                                                    <i class="fa fa-pen "></i>
+                                                                </button>
+                                                                @if (item.ResourceDeliveries?.Count <= 0)
+                                                                {
+                                                                    <a onclick="return confirmDelete($('#deleteResource@(item.Id)')[0]);"
+                                                                   class=" btn btn-sm btn-outline-danger">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                    </a>
+                                                                    <form data-parsley-validate novalidate method="post" id="deleteResource@(item.Id)"
+                                                                      asp-action="DeleteResource" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                                    </form>
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane   @Model.Tab1Active" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            @if (Model.IsUserOrAdmin)
+                                            {
+                                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditSetting", new { Id=Guid.Empty, topicId=Model.TheModel.Id })"
+                                                    class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                                    <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>ስም</th>
+                                                <th>Type</th>
+                                                <th>Value</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>ስም</th>
+                                                <th>Type</th>
+                                                <th>Value</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.TopicSettings)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.SettingVariable.NameEng)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.SettingVariable.NameLocal)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.SettingVariable.DataType)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.SettingValue)
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                                            @if (Model.IsUserOrAdmin)
+                                                            {
+                                                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditSetting", new { Id=@item.Id, topicId=Model.TheModel.Id  })"
+                                                                    class="edit btn btn-outline-success btn-sm">
+                                                                    <i class="fa fa-pen "></i>
+                                                                </button>
+                                                                <a onclick="return confirmDelete($('#deleteSetting@(item.Id)')[0]);"
+                                                               class=" btn btn-sm btn-outline-danger">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+                                                                <form data-parsley-validate novalidate method="post" id="deleteSetting@(item.Id)"
+                                                                  asp-action="DeleteSetting" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                                </form>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane   @Model.Tab2Active" id="trainings" role="tabpanel" aria-labelledby="trainings-tab">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            @if (Model.IsUserOrAdmin)
+                                            {
+                                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("Edit", "Training", new { Id=Guid.Empty, topicId=Model.TheModel.Id })"
+                                                    class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                                    <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Schedule</th>
+                                                <th>Instructor</th>
+                                                <th>Instruction Media</th>
+                                                <th>Member Fee</th>
+                                                <th>Non-Member Fee</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Schedule</th>
+                                                <th>Instructor</th>
+                                                <th>Instruction Media</th>
+                                                <th>Member Fee</th>
+                                                <th>Non-Member Fee</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.Trainings)
+                                            {
+                                            <tr>
+                                                <td>
+                                                    <a asp-controller="Training" asp-action="Detail" title="Detail" asp-route-id="@item.Id">
+                                                        @(item.StartDate.ToString("yyyy-MM-dd"))
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    @(item.EndDate.ToString("yyyy-MM-dd"))
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Schedule)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Instructor)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.InstructionMedia)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.MemberFee)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.NonMemberFee)
+                                                </td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+@section script {
+
+    <script src="~/js/confirmation.js"></script>
+    <script src="~/js/validation.js"></script>
+    <script>
+
+        onRateChanged();
+        function onRateChanged() {
+
+
+            const rateBasis = document.getElementById('rateBasis');
+            const val = Number(rateBasis.value);
+
+            const memberId = document.getElementById('memberRate');
+            const otherId = document.getElementById('otherRate');
+
+            const flatLabelId = document.getElementById('flatRate');
+            const otherLabelId = document.getElementById('otherLabel');
+            memberId.style.display = 'none';
+            otherId.style.display = 'none';
+            flatLabelId.style.display = 'none';
+            otherLabelId.style.display = 'none';
+            if (val === 5) {
+                otherId.style.display = '';
+                flatLabelId.style.display = '';
+            } else if (val === 4) {
+                memberId.style.display = '';
+                otherId.style.display = '';
+                otherLabelId.style.display = '';
+            }
+        }
+
+        function validateForm() {
+            return is_validate_mobile("editRegistrationMobileNo");
+        }
+    </script>
+    <script>
+        $('.edit').on('click', function () {
+
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

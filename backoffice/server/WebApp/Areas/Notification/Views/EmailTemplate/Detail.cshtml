@@ -1,0 +1,81 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Notification.Model.EmailTemplateViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area, module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-8">
+
+                            <h4>  @Model.TheModel.Name </h4>
+                        </div>
+                        <div class="col-sm-4">
+                           
+                                <a onclick="return confirmDelete($('#deleteTemplate'));"
+                                   class=" btn btn-sm btn-outline-danger float-right">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </a>
+                                <form data-parsley-validate novalidate method="post" id="deleteTemplate"
+                                      asp-action="DeleteEventType" asp-antiforgery="true">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                    
+                                </form>
+                            
+                            <button data-toggle="modal"
+                                    data-target="#editEventTypeModal"
+                                    title="Edit"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                   
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+@section script {
+
+
+    <script>
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+    </script>
+}

@@ -1,0 +1,109 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Surveying.Model.SurveyViewModel
+
+@{
+    ViewData["Title"] = "Survey Setting";
+    Layout = "~/Views/Shared/_MembershipLayout.cshtml";
+}
+
+<div class="container-fluid">
+
+    
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class=" btn-group" role="group" aria-label="Basic example">
+            @*<button class="edit d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                        data-toggle="modal"
+                        data-target="#AddEditModal"
+                        title="Add New Association"
+                        data-url="@Url.Action("Edit", new { Id=Guid.Empty })">
+                    <i class="fa fa-file-excel-o"></i> Import From Excel
+                </button>*@
+
+
+            <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#editSurveySettingModal"
+                    title="Create Setting"
+                    >
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Responses</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title </th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Responses</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList)
+                                {
+
+                                    <tr >
+                                        <td>
+                                            <a asp-controller="Survey" asp-action="Detail" asp-route-id="@item.Id" class="title">
+                                                @Html.DisplayFor(modelItem => item.Title)
+                                            </a>
+                                        </td>
+                                      
+                                        <td>
+                                             @item.StartDate.ToString("yyyy-MM-dd")
+                                        </td>
+                                        <td>
+                                            @item.EndDate.ToString("yyyy-MM-dd")
+                                        </td>
+                                        <td>
+                                            @item.ResponseCount
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                               
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="Survey" asp-action="Detail" asp-route-id="@item.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+@section script {
+
+}

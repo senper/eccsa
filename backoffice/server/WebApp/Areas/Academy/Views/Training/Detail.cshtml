@@ -1,0 +1,476 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.TrainingViewModel
+@using ECCSA.BackOffice.Server.Model.Academy
+
+@{
+    ViewData["Title"] = "Training Detail";
+    Layout = "~/Views/Shared/_AcademyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","Training",new { Area ="Academy", status = Model.TheModel?.Status})" class="btn btn-sm btn-outline-info">
+            <i class="fa fa-angle-double-left "></i> back
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="m-0 font-weight-bold">@Model.TheModel.StartDate.ToString("yyyy-MM-dd") - @Model.TheModel.EndDate.ToString("yyyy-MM-dd")</h6>
+                        </div>
+                        <div class="col-6">
+
+                            @if (Model.TheModel.Registrations?.Count <= 0)
+                            {
+                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("Edit", new { Id = Model.TheModel.Id })"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Date: <strong>From @Model.TheModel.StartDate.ToString("yyyy-MM-dd") to @Model.TheModel.EndDate.ToString("yyyy-MM-dd")</strong><br />
+                            Topic: <strong>@($"{Model.TheModel.Topic.Code} - {Model.TheModel.Topic.NameEng}")</strong><br />
+                            Instructor: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Instructor)</strong><br />
+                            Status: <strong>@Html.DisplayFor(modelItemm => Model.TheModel.Status)</strong>
+                            <button data-toggle="modal" data-target="#editStatusModal"
+                                    class=" editStatus btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                            <br />
+                        </div>
+                        <div class="col-sm-6">
+                            Session(s): <strong>@(Model.TheModel.HasMorning ? "Morning" : "") 
+                                @(Model.TheModel.HasAfternoon ? "Afternoon" : "") @(Model.TheModel.HasEvening ? "Evening" : "")</strong><br />
+                            Address: <strong>@Html.DisplayFor(modelItem => Model.TheModel.Schedule)</strong><br />
+                            Instruction Media: <strong>@Html.DisplayFor(modelItem => Model.TheModel.InstructionMedia)</strong><br />
+                            Training Cost: <strong>@Html.DisplayFor(modelItem => Model.TheModel.ServiceCharge)</strong><br />
+                            @if (Model.TheModel.ServiceTypeId.HasValue)
+                            {
+                                <span>
+                                    Service Type:
+                                    <a href="@Url.Action("Detail", "ServiceType", new {area="Service", id=Model.TheModel.ServiceTypeId})"> Go To Service Type </a><br />
+                                </span>
+                            }
+                            @if (Model.TheModel.Registrations.Count > 0 &&
+                            Model.TheModel.Status == TrainingStatus.Completed)
+                            {
+                                if (Model.TheModel.SurveyId != null && Model.TheModel.SurveyId.HasValue)
+                                {
+                                    <span>
+
+                                        <a href="@Url.Action("Detail", "Survey", new {area="Surveying", id=Model.TheModel.SurveyId})">View Training Evaluation </a><br />
+                                    </span>
+
+                                }
+                                else
+                                {
+                                    if (@Model.SurveySettings.Count > 0)
+                                    {
+                                        <button class="card-header-action btn btn-outline-success btn-sm float-right"
+                                            id="newbtn"
+                                            data-toggle="modal"
+                                            data-target="#editSurveyModal"
+                                            title="Create Survey">
+                                            Create Training Evaluation
+                                        </button>
+                                    }else
+                                    {
+                                        <label class="text text-danger">No Survey Setting</label>
+                                    }
+                                }
+
+                            }
+                        </div>
+                    </div>
+                    <hr style="margin-top: 1px" />
+                    <div class="row">
+                        <div class="col-12">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab0Active" id="requests-tab" data-toggle="tab" href="#requests" role="tab" aria-controls="requests" aria-selected="true">Requests</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab1Active" id="registrations-tab" data-toggle="tab" href="#registrations" role="tab" aria-controls="registrations" aria-selected="true">Registrations</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab2Active" id="sponsors-tab" data-toggle="tab" href="#sponsors" role="tab" aria-controls="sponsors" aria-selected="false">Sponsors</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane  @Model.Tab0Active" id="requests" role="tabpanel" aria-labelledby="requests-tab">
+                                    <br />
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Service Type</th>
+                                                <th>TrackingNo </th>
+                                                <th>TIN</th>
+                                                <th>Name</th>
+                                                <th>Mobile</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Service Type</th>
+                                                <th>TrackingNo </th>
+                                                <th>TIN</th>
+                                                <th>Name</th>
+                                                <th>Mobile</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.Requests)
+                                            {
+
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ServiceType.Name)
+                                                    </td>
+
+                                                    <td>
+                                                        <a asp-controller="ServiceRequest" asp-action="Detail"  asp-area="Service" asp-route-id="@item.Id" class="title">
+                                                            @Html.DisplayFor(modelItem => item.TrackingNo)
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.TIN)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.FullName)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.MobileNo)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.RequestStatus)
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                            <a class=" btn btn-sm  btn-outline-info" asp-controller="ServiceRequest" asp-action="Detail" asp-area="Service" asp-route-id="@item.Id">
+                                                                <i class="fa fa-info" aria-hidden="true"></i>
+                                                            </a>
+
+                                                        </div>
+
+
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane  @Model.Tab1Active" id="registrations" role="tabpanel" aria-labelledby="registrations-tab">
+                                    <br />
+                                    @*@if (Model.TheModel.Status == TrainingStatus.OpenForRegistration)
+                                        {
+                                        <div class="row">
+                                        <div class="col-12">
+                                        <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditRegistration", new { Id = Guid.Empty, trainingId = Model.TheModel.Id })"
+                                        class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                        <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                                        </button>
+                                        </div>
+                                        </div>
+                                        <br />
+                                        }*@
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Full Name</th>
+                                                <th>Email</th>
+                                                <th>Mobile No</th>
+                                                <th>Registration Date</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Full Name</th>
+                                                <th>Email</th>
+                                                <th>Mobile No</th>
+                                                <th>Registration Date</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.Registrations)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.FullName)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.EmailAddress)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.MobileNo)
+                                                    </td>
+                                                    <td>
+                                                        @(item.RegistrationDate.ToString("yyyy-MM-dd"))
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.RegistrationStatus)
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                                            @*@if (Model.TheModel.Status == TrainingStatus.OpenForRegistration && Model.UserId == item.CreatedBy)
+                                                                {
+                                                                <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditRegistration", "Training", new { Id = @item.Id, trainingId = Model.TheModel.Id })"
+                                                                class="edit btn btn-outline-success btn-sm">
+                                                                <i class="fa fa-pen "></i>
+                                                                </button>
+                                                                }*@
+                                                            <a class=" btn btn-sm  btn-outline-info" asp-action="RegistrationDetail" asp-controller="Training" asp-route-id="@item.Id" asp-route-trainingId="@Model.TheModel.Id">
+                                                                <i class="fa fa-info" aria-hidden="true"></i>
+                                                            </a>
+                                                            @*@if (Model.TheModel.Status == TrainingStatus.OpenForRegistration && item.ResourceDeliveries?.Count <= 0 && Model.UserId == item.CreatedBy)
+                                                                {
+                                                                <a onclick="return confirmDelete($('#deleteRegistration@(item.Id)')[0]);"
+                                                                class=" btn btn-sm btn-outline-danger">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </a>
+                                                                <form data-parsley-validate novalidate method="post" id="deleteRegistration@(item.Id)"
+                                                                asp-action="DeleteRegistration" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                                <input type="hidden" name="id" value="@item.Id" />
+                                                                </form>
+                                                                }*@
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane  @Model.Tab2Active" id="sponsors" role="tabpanel" aria-labelledby="sponsors-tab">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditSponsor", new { Id=Guid.Empty, trainingId=Model.TheModel.Id })"
+                                                    class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>ስም</th>
+                                                <th>Email</th>
+                                                <th>Mobile</th>
+                                                <th>Reference No</th>
+                                                <th>Attachment</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>ስም</th>
+                                                <th>Email</th>
+                                                <th>Mobile</th>
+                                                <th>Reference No</th>
+                                                <th>Attachment</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.TrainingSponsors)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Sponsor.NameEng)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Sponsor.NameLocal)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Sponsor.Email)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Sponsor.Mobile)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ReferenceNo)
+                                                    </td>
+                                                    <td>
+                                                        <a id="filename" asp-action="DownLoadFile" asp-route-id="@item.Id" asp-route-type="Sponsors-attachment"
+                                                       asp-route-fileName="@(item.Attachment)">
+                                                            @(item.Attachment)
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        @Model.GetStatusText(item.Status)
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                                            <button data-toggle="modal" data-target="#AddEditModal" data-url="@Url.Action("EditSponsor", new { Id=@item.Id, trainingId=Model.TheModel.Id  })"
+                                                                class="edit btn btn-outline-success btn-sm">
+                                                                <i class="fa fa-pen "></i>
+                                                            </button>
+                                                            <a onclick="return confirmDelete($('#deleteSponsor@(item.Id)')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+                                                            <form data-parsley-validate novalidate method="post" id="deleteSponsor@(item.Id)"
+                                                              asp-action="DeleteSponsor" asp-antiforgery="true" asp-route-id="@item.Id">
+                                                                <input type="hidden" name="id" value="@item.Id" />
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editSurveyModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="surveyTitle">  Post Training Evaluation </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="TrainingId" value="@Model.TheModel.Id" />
+                    
+                   
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Survey 
+                        </label>
+                         <select name="SettingId"  class="col-sm-8 col-md-8 form-control"
+                    asp-items="@(new SelectList(Model.SurveySettings, "Id", "Name"))"></select>
+                    </div>
+                    
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" name="EndDate" value="@DateTime.Today.AddDays(30)"  class="form-control col-sm-8 col-md-8" required />
+                    </div>
+                   
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="AddEditModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editStatusModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Change Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="ChangeTrainingStatus" asp-antiforgery="true">
+                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" name="status" id="statusChangeInput"
+                                asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.Model.Academy.TrainingStatus>())" required></select>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+
+<script>
+    $('#statusChangeInput').val("@((int)Model.TheModel.Status)");
+
+    $('.edit').on('click', function () {
+
+        var url = $(this).attr('data-url');
+        $($(this).attr('data-target')).find(".modal-content").html("");
+
+        $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+            $(item).html("");
+
+            if (url && url.length > 0) {
+                $(item).load(url);
+            }
+        });
+    });
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

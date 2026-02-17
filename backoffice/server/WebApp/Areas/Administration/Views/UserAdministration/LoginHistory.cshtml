@@ -1,0 +1,67 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.UserAdministrationViewModel
+@{
+    ViewData["Title"] = "Change Password";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Login History</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-bordered table-striped dataTable" id="userHistory" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Time </th>
+                                                   @* <th>IP Address</th>*@
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach(var h in Model.UserLoginHistories)
+                                                {
+                                                <tr>
+                                                    <td>@h.Date.ToString("yyyy-MM-dd")</td>
+                                                    <td>@h.Time.ToString("hh: mm: ss tt")</td>
+                                                    @*<td>@h.IPAddress</td>*@
+                                                </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+<script src="~/js/confirmation.js"></script>
+<script src="~/js/validation.js"></script>
+
+<script type="text/javascript">
+    function validateForm() {
+        if(!isPassword("oldPassword") || !isPassword("newPassword") || !isPassword("confirmPassword")){
+            return false;
+        }
+        if($("#newPassword").val() == $("#confirmPassword").val()){
+            return confirmation($("#changePasswordfrm")[0], "change password");
+        } else {
+            $.alert({
+                    icon: 'fa fa-bell',
+                    title: 'Information!',
+                    content: 'New Password & Confirm Password are different'
+                });
+                return false;
+        }
+    }
+</script>
+}

@@ -1,0 +1,361 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.FooterMenuViewModel
+
+@{
+    ViewData["Title"] = "Footer Menu";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="m-0 font-weight-bold">Footer Menu Contact Us</h6>
+                        </div>
+                        <div class="col-6">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form data-parsley-validate method="post"
+                          asp-action="SaveFooterContact" asp-antiforgery="true">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Address
+                                    </label>
+                                    <input type="text" value="@Model.TheModel.ContactUs.Address" name="Address" maxlength="100" id="Address" class="form-control col-sm-9 col-md-8" required />
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Location
+                                    </label>
+                                    <input type="text" value="@Model.TheModel.ContactUs.Location" name="Location" maxlength="100" id="Location" class="form-control col-sm-9 col-md-8" required />
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Phone No
+                                    </label>
+                                    <input type="text" value="@Model.TheModel.ContactUs.PhoneNo" name="PhoneNo" id="PhoneNo" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Address Local
+                                    </label>
+                                    <input type="text" value="@Model.TheModel.ContactUs.AddressLocal" name="AddressLocal" id="AddressLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Location Local
+                                    </label>
+                                    <input type="text" value="@Model.TheModel.ContactUs.LocationLocal" name="LocationLocal" id="LocationLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-sm-4 col-md-3 col-form-label">
+                                        Email
+                                    </label>
+                                    <input type="email" value="@Model.TheModel.ContactUs.Email" name="Email" id="Email" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                                </div>
+                            </div>
+                        </div>
+                        @if (Model.IsUserOrAdmin)
+                        {
+                            <div class="row form-group">
+                                <div class="col-sm-12">
+                                    <input type="submit" value="Save"
+                                       class="btn btn-primary">
+
+                                </div>
+                            </div>
+                        }
+                    </form>
+                    <hr style="margin-top: 1px" />
+                    <div class="row">
+                        <div class="col-12">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab0Active" id="usefullLinks-tab" data-toggle="tab" href="#usefullLinks" role="tab" aria-controls="usefullLinks" aria-selected="true">Useful Links</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link @Model.Tab1Active" id="importantLinks-tab" data-toggle="tab" href="#importantLinks" role="tab" aria-controls="importantLinks" aria-selected="false">Important Links</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane    @Model.Tab0Active" id="usefullLinks" role="tabpanel" aria-labelledby="usefullLinks-tab">
+                                    <br />
+                                    @if (Model.IsUserOrAdmin)
+                                    {
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <button data-toggle="modal" data-target="#theModal"
+                                                    data-modaltitle="Add Useful Link"
+                                                    data-usefulLink="true"
+                                                    data-title=""
+                                                    data-local=""
+                                                    data-path=""
+                                                    onclick="edit(this)"
+                                                    class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                                    <i class="fas fa-plus fa-sm text-white-50"></i> Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <br />
+                                    }
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Title Local</th>
+                                                <th>Path</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Title Local</th>
+                                                <th>Path</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.UsefulLinks)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Title)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.TitleLocal)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Path)
+                                                    </td>
+                                                    <td>
+                                                        <div class=" btn-group" role="group" aria-label="Basic example">
+                                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                                <button class="btn btn-sm btn-outline-success"
+                                                                    data-toggle="modal" data-target="#theModal"
+                                                                    data-modaltitle="Edit Useful Link"
+                                                                    data-usefulLink="true"
+                                                                    data-title="@item.Title"
+                                                                    data-local="@item.TitleLocal"
+                                                                    data-path="@item.Path"
+                                                                    onclick="edit(this)">
+                                                                    <i class="fa fa-pen" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                            <a onclick="return confirmDelete($('#deleteUsefulLink@(Model.FindIndex(item, true))')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+                                                            <form data-parsley-validate novalidate method="post" id="deleteUsefulLink@(Model.FindIndex(item, true))"
+                                                              asp-action="DeleteFooterLink" asp-antiforgery="true">
+                                                                <input type="hidden" name="Title" value="@item.Title" />
+                                                                <input type="hidden" name="TitleLocal" value="@item.TitleLocal" />
+                                                                <input type="hidden" name="Path" value="@item.Path" />
+                                                                <input type="hidden" name="isUsefulLink" id="deleteULisUsefulLink" value="true" />
+                                                            </form>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane   @Model.Tab1Active" id="importantLinks" role="tabpanel" aria-labelledby="importantLinks-tab">
+                                    <br />
+                                    @if (Model.IsUserOrAdmin)
+                                    {
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <button data-toggle="modal" data-target="#theModal"
+                                                    data-modaltitle="Add Important Link"
+                                                    data-usefulLink="false"
+                                                    data-title=""
+                                                    data-local=""
+                                                    data-path=""
+                                                    onclick="edit(this)"
+                                                    class="edit d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                                    <i class="fas fa-plus fa-sm text-white-50"></i> Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <br />
+                                    }
+                                    <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Title Local</th>
+                                                <th>Path</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Title Local</th>
+                                                <th>Path</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.TheModel.ImportantLinks)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Title)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.TitleLocal)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Path)
+                                                    </td>
+                                                    <td>
+                                                        <div class=" btn-group" role="group" aria-label="Basic example">
+                                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                                <button class="btn btn-sm btn-outline-success"
+                                                                    data-toggle="modal" data-target="#theModal"
+                                                                    data-modaltitle="Edit Important Link"
+                                                                    data-usefulLink="false"
+                                                                    data-title="@item.Title"
+                                                                    data-local="@item.TitleLocal"
+                                                                    data-path="@item.Path"
+                                                                    onclick="edit(this)">
+                                                                    <i class="fa fa-pen" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                            <a onclick="return confirmDelete($('#deleteImportantLink@(Model.FindIndex(item, false))')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+                                                            <form data-parsley-validate novalidate method="post" id="deleteImportantLink@(Model.FindIndex(item, false))"
+                                                              asp-action="DeleteFooterLink" asp-antiforgery="true">
+                                                                <input type="hidden" name="Title" value="@item.Title" />
+                                                                <input type="hidden" name="TitleLocal" value="@item.TitleLocal" />
+                                                                <input type="hidden" name="Path" value="@item.Path" />
+                                                                <input type="hidden" name="isUsefulLink" id="deleteILisUsefulLink" value="false" />
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1"
+     role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle"> </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="SaveFooterLink" asp-antiforgery="true">
+                        <input type="hidden" name="isUsefulLink" id="isUsefulLink" />
+                        <input type="hidden" name="Old.Title" id="oldTitle" />
+                        <input type="hidden" name="Old.TitleLocal" id="oldTitleLocal" />
+                        <input type="hidden" name="Old.Path" id="oldPath" />
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" maxlength="100" id="flTitle" class="form-control col-sm-9 col-md-8" required placeholder="Title  " />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title Local
+                            </label>
+                            <input type="text" name="TitleLocal" maxlength="100" id="flTitleLocal" class="form-control col-sm-9 col-md-8" required placeholder="ርዕስ  " />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Path
+                            </label>
+                            <input type="text" name="Path" id="flPath" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section script {
+<script>
+
+    function edit(e) {
+
+        const modaltitleInput = document.getElementById('modalTitle');
+        const usefulLinkInput = document.getElementById('isUsefulLink');
+        const oldTitleInput = document.getElementById('oldTitle');
+        const oldTitleLocalInput = document.getElementById('oldTitleLocal');
+        const oldPathInput = document.getElementById('oldPath');
+        const titleInput = document.getElementById('flTitle');
+        const titleLocalInput = document.getElementById('flTitleLocal');
+        const pathInput = document.getElementById('flPath');
+        const modaltitleVal = $(e).attr('data-modaltitle');
+        const usefulLinkVal = $(e).attr('data-usefulLink');
+        const titleVal = $(e).attr('data-title');
+        const localVal = $(e).attr('data-local');
+        const pathVal = $(e).attr('data-path');
+
+        modaltitleInput.innerHTML = modaltitleVal;
+        usefulLinkInput.value = usefulLinkVal;
+        oldTitleInput.value = titleVal;
+        oldTitleLocalInput.value = localVal;
+        oldPathInput.value = pathVal;
+        titleInput.value = titleVal;
+        titleLocalInput.value = localVal;
+        pathInput.value = pathVal;
+    }
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

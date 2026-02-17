@@ -1,0 +1,211 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.NewsletterViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Newsletter ";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+         <div class="col-md-5" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Index">
+                <div class="btn-group pull-left" role="group" aria-label="Basic example">
+                    Search By &nbsp;&nbsp;<select name="TopicId" asp-for="@Model.TopicId"
+                        asp-items="@(new SelectList(Model.Topics,"Id", "Name"))">
+                                                  
+                        <option value="@Guid.Empty"></option>
+                    </select>
+                    <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+        @if (Model.IsUserOrAdmin && Model.TopicId != Guid.Empty)
+        {
+            <a class="nav-link btn btn-sm btn-outline-primary shadow-sm" href="@Url.Action("Subscribers","Newsletter",new { Area ="Communication" , topicId = Model.TopicId} )">
+                <i class="fas fa-address-card"></i>
+                <span>Subscribers</span>
+            </a>
+            
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New News "
+                data-id="@Guid.Empty"
+                data-status="@((int)StatusEnum.Active)"
+                onclick="addEdit(this)">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Topic</th>
+                                    
+                                    <th>Pub. Date</th>
+                                    <th>Subscribers</th>
+                                    <th>Delivered</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                     <th>Topic</th>
+                                    
+                                    <th>Pub. Date</th>
+                                    <th>Subscribers</th>
+                                    <th>Delivered</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+
+
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.TitleFull)
+                                        </td>
+                                          <td>
+                                            @(i.IssueDate.ToLongDateString())
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.SubscribersCount)
+                                        </td>
+                                      <td>
+                                            @Html.DisplayFor(modelItem => i.Dissiminations.Count)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+                                                @if (i.Dissiminations.Count == 0)
+                                                {
+                                                    <a onclick="return confirmDelete($('#deleteNews@(i.Id)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    </a>
+                                                    <form data-parsley-validate novalidate
+                                                  method="post"
+                                                  id="deleteNews@(i.Id)"
+                                                  asp-action="Delete" asp-antiforgery="true" asp-route-id="@i.Id">
+                                                        <input type="hidden" name="id" value="@i.Id" />
+
+                                                    </form>
+                                                }
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin && Model.TopicId != Guid.Empty)
+{
+    <div class="modal fade" tabindex="-1"
+     role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Newsletter </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Guid.Empty" />
+                        <input type="hidden" name="TopicId" value="@Model.TopicId" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Title
+                            </label>
+                            <input type="text" name="Title" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                ርዕስ 
+                            </label>
+                            <input type="text" name="TitleLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required />
+                        </div>
+                         <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Brief
+                            </label>
+                            <textarea rows="4" name="Brief" id="Brief" maxlength="800" class="form-control col-sm-9 col-md-8" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                አጭር መግለጫ 
+                            </label>
+                            <textarea rows="4" name="BriefLocal" id="BriefLocal" maxlength="800" class="form-control col-sm-9 col-md-8" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Issue Date
+                            </label>
+                            <input type="date" name="IssueDate" min="@DateTime.Today.AddMonths(-2)" max="@DateTime.Today" class="form-control col-sm-9 col-md-8" id="startDateId" required />
+                        </div>
+                        
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">Document</label>
+                            <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" required />
+                        </div>
+                      
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

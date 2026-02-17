@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/02/2021 05:18:37" ReportInfo.Modified="09/26/2023 11:25:57" ReportInfo.CreatorVersion="2023.3.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="Badge" ReferenceName="Badge" DataType="System.Int32" Enabled="true">
+      <Column Name="Code" DataType="System.String"/>
+      <Column Name="MembershipNo" DataType="System.String"/>
+      <Column Name="FullName" DataType="System.String"/>
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="TitleName" DataType="System.String"/>
+      <Column Name="Zone" DataType="System.String"/>
+      <Column Name="Woreda" DataType="System.String"/>
+      <Column Name="HouseNo" DataType="System.String"/>
+      <Column Name="PhoneNumber" DataType="System.String"/>
+      <Column Name="Email" DataType="System.String"/>
+      <Column Name="LicenseNo" DataType="System.String"/>
+      <Column Name="Sector" DataType="System.String"/>
+      <Column Name="AssociationName" DataType="System.String"/>
+      <Column Name="ExpiryDate" DataType="System.String"/>
+      <Column Name="DateIssued" DataType="System.String"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" LeftMargin="9.9" TopMargin="9.9" RightMargin="0" BottomMargin="0" Columns.Count="2" Columns.Width="95" Columns.Positions="0,95" Watermark.Font="Arial, 60pt" FirstPageSource="15">
+    <DataBand Name="Data1" Width="359.1" Height="502.55">
+      <TextObject Name="Name" Left="103.95" Top="151.2" Width="255.15" Height="47.25" Border.Lines="Bottom" CanShrink="true" Text="[Badge.FullName]" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text11" Width="179.55" Height="18.9" Text="M #" HorzAlign="Right" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Code" Left="179.55" Width="179.55" Height="18.9" CanShrink="true" Text="[Badge.Code]" WordWrap="false" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text13" Top="132.3" Width="103.95" Height="66.15" Text="Holder Name&#13;&#10;ባለመታወቂያ ስም" VertAlign="Center" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text14" Top="198.45" Width="85.05" Height="47.25" Text="Title ኃላፊነት" VertAlign="Center" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text15" Left="85.05" Top="217.35" Width="274.05" Height="28.35" Border.Lines="Bottom" CanShrink="true" Text="[Badge.TitleName]" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text16" Left="94.5" Top="28.35" Width="264.6" Height="103.95" Border.Lines="Bottom" CanShrink="true" Text="[Badge.CompanyName]" HorzAlign="Center" VertAlign="Bottom" WordWrap="false" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text17" Top="28.35" Width="94.5" Height="103.95" Text="Trade Name&#13;&#10;የንግድ ስም" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text18" Top="255.15" Width="330.75" Height="18.9" Text="Business Address የድርጅቱ አድራሻ" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text19" Left="113.4" Top="292.95" Width="245.7" Height="18.9" Border.Lines="Bottom" Text="[Badge.Zone]    " Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text20" Top="321.3" Width="56.7" Height="28.35" Text="W. ወረዳ" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text21" Left="56.7" Top="321.3" Width="113.4" Height="28.35" Border.Lines="Bottom" Text="[Badge.Woreda]" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text22" Left="170.1" Top="330.75" Width="75.6" Height="18.9" Text="H.No ቤ.ቁ." Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text23" Left="245.7" Top="311.85" Width="113.4" Height="18.9" Border.Lines="Bottom" Text="[Badge.HouseNo]" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text24" Top="359.1" Width="85.05" Height="18.9" Text="Tel.No ስ.ቁ." Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text25" Left="85.05" Top="359.1" Width="274.05" Height="18.9" Border.Lines="Bottom" Text="[Badge.PhoneNumber]" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text26" Top="387.45" Width="113.4" Height="18.9" Text="Lic.No ፈቃድ .ቁ." Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlParagraph"/>
+      <TextObject Name="Text27" Left="122.85" Top="387.45" Width="236.25" Height="18.9" Border.Lines="Bottom" Text="[Badge.LicenseNo]" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text28" Top="415.8" Width="122.85" Height="18.9" Text="Sector የሥራ መስክ" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text29" Left="122.85" Top="415.8" Width="236.25" Height="18.9" Border.Lines="Bottom" Text="[Badge.Sector]" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text30" Top="444.15" Width="170.1" Height="18.9" Text="Issue Date የተሰጠበት ቀን" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text31" Left="189" Top="444.15" Width="170.1" Height="18.9" Border.Lines="Bottom" Text="[Badge.DateIssued]" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text32" Top="472.5" Width="179.55" Height="18.9" Text="Expiry Date የሚያበቃበት ቀን" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text33" Left="189" Top="472.5" Width="170.1" Height="18.9" Border.Lines="Bottom" Text="[Badge.ExpiryDate]" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+      <TextObject Name="Text34" Top="292.95" Width="113.4" Height="18.9" Text="Zone ዞን/ክ.ከ" Font="Abyssinica SIL, 9.75pt" TextRenderType="HtmlTags"/>
+    </DataBand>
+  </ReportPage>
+</Report>

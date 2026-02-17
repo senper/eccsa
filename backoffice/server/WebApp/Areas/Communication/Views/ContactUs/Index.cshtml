@@ -1,0 +1,98 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.ContactUsViewModel
+@{
+    ViewData["Title"] = "Contact Us List";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        <form data-parsley-validate method="get"
+              asp-action="Index" asp-antiforgery="true">
+            <input type="date" asp-for="@Model.Date" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" class="form-control" onchange="this.form.submit()" />
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+                                    <tr>
+                                        <td>
+                                            @(i.Date.ToString("yyyy-MM-dd"))
+                                        </td>
+                                        <td>
+                                            <a asp-controller="ContactUs" asp-action="Detail"
+                                           asp-route-id="@i.Id" asp-route-date="@Model.Date" class="title">@Html.DisplayFor(modelItem => i.Name)</a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Email)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info"
+                                                asp-controller="ContactUs" asp-action="Detail" asp-route-id="@i.Id"
+                                                asp-route-date="@Model.Date">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+                                                <a onclick="return confirmDelete($('#delete@(i.Id)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="delete@(i.Id)"
+                                                  asp-action="Delete" asp-antiforgery="true" asp-route-id="@i.Id">
+                                                    <input type="hidden" name="id" value="@i.Id" />
+                                                    <input type="hidden" name="date" value="@Model.Date" />
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+</script>
+}

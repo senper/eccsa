@@ -1,0 +1,51 @@
+﻿@model ECCSA.BackOffice.Server.Model.Common.Servicing.ExportAgreement
+<div class="modal-header">
+    <h5 class="modal-title">Export Agreement Detail</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            Agreement No: <strong>@(Model.AgreementNo)</strong><br />
+            Consignee: <strong>@(Model.Consignee)</strong><br />
+            Country: <strong>@(Model.Country)</strong><br />
+            County Of Destination: <strong>@(Model.CountyOfDestination)</strong><br />
+            Port Of Departure: <strong>@(Model.PortOfDeparture)</strong><br />
+            Term Of Delivery: <strong>@(Model.TermOfDelivery)</strong><br />
+        </div>
+        <div class="col-md-6">
+            License No: <strong>@(Model.LicenseNo)</strong><br />
+            Type Of Carriage: <strong>@(Model.TypeOfCarriage)</strong><br />
+            City: <strong>@(Model.City)</strong><br />
+            Port Of Destination: <strong>@(Model.PortOfDestination)</strong><br />
+            Name Of Carrier: <strong>@(Model.NameOfCarrier)</strong><br />
+            Address: <strong>@(Model.Address)</strong><br />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <strong>Commodities</strong>
+            <table class="table table-bordered" width="100%" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th>HS Code</th>
+                        <th>Name </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.Commodities)
+                    {
+                        <tr>
+                            <td>@u.HSCode</td>
+                            <td>@u.Name</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

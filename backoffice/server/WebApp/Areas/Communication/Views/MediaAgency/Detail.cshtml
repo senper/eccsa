@@ -1,0 +1,292 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.MediaAgencyViewModel
+
+@{
+    ViewData["Title"] = "Media Agencies";
+    Layout = "~/Views/Shared/_CommunicationLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.Name  </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @if (Model.IsUserOrAdmin)
+                            {
+                                <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Type:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.MediaType
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Ownership
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.OwnershipType
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Representative
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.RepresentativeName
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Responsible Person
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.ResponsiblePersonnel
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Email
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Email
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Mobile - Phone
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Mobile @Model.TheModel.Telephone
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Url
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Url
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Description
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Description
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Remark
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Remark
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+                                </div>
+                            </div>
+                            <br />
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+
+</div>
+
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Media Agency</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true" onsubmit="return validateMediaAgency()">
+                        <input type="hidden" name="Id" asp-for="TheModel.Id" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" id="nameId" name="Name" asp-for="TheModel.Name" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group" style="padding: 10px;">
+                            <label class="col-sm-4 col-md-3 col-form-label" style="padding: 1px;">
+                                Media Type
+                            </label>
+                            <div class="col col-md-3" style="padding-left: 20px;">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="idBroadcast" name="BroadcastMedia" asp-for="TheModel.BroadcastMedia" title="TV, Radio (FM/AM/SW)">
+                                    <label class="form-check-label" for="idBroadcast">Broadcast</label>
+                                </div>
+                            </div>
+                            <div class="col col-md-3" style="padding-left: 20px;">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="idPrint" name="PrintMedia" asp-for="TheModel.PrintMedia" />
+                                    <label class="form-check-label" for="idPrint">Print</label>
+                                </div>
+                            </div>
+                            <div class="col col-md-3" style="padding-left: 20px;">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="idDigital" name="DigitalMedia" asp-for="TheModel.DigitalMedia" title="website, facebook, twitter,...">
+                                    <label class="form-check-label" for="idDigital">Digital</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row form-group">
+
+                            <label class="col-sm-5 col-md-4 col-form-label">
+                                Ownership Type
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.OwnershipType"
+                                asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.Model.Communication.MediaAgencyOwnershipType>())"
+                                name="OwnershipType" required>
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Description
+                            </label>
+                            <textarea rows="4" name="Description" asp-for="TheModel.Description" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Remark
+                            </label>
+                            <textarea rows="4" name="Remark" asp-for="TheModel.Remark" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Rep. Name
+                            </label>
+                            <input type="text" id="repNameId" maxlength="100" class="form-control col-sm-8 col-md-9" name="RepresentativeName" asp-for="TheModel.RepresentativeName" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Contact Person
+                            </label>
+                            <input type="text" id="idpername" maxlength="100" class="form-control col-sm-8 col-md-9" name="ResponsiblePersonnel" asp-for="TheModel.ResponsiblePersonnel" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Email
+                            </label>
+                            <input type="email" id="idemail" class="form-control col-sm-8 col-md-9" name="email"  asp-for="TheModel.Email" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Mobile
+                            </label>
+                            <input type="tel"  id="idmobile" class="form-control col-sm-8 col-md-9" name="Mobile" asp-for="TheModel.Mobile" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Telephone
+                            </label>
+                            <input type="tel" class="form-control col-sm-8 col-md-9" name="Telephone" asp-for="TheModel.Telephone" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Url
+                            </label>
+                            <input type="url" id="idurl" class="form-control col-sm-8 col-md-9" name="Url" asp-for="TheModel.Url" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Status
+                            </label>
+                            <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" required>
+                                <option value="1">Active</option>
+                                <option value="0">In-active</option>
+                            </select>
+                        </div>
+
+
+
+
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+      <script src="~/js/validation.js"></script>
+    <script src="~/js/mediaAgencyValidation.js"></script>
+    <script>
+        
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

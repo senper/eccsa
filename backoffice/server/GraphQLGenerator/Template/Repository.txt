@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using ECCSA.BackOffice.Server.Model.Common;
+using ECCSA.BackOffice.Server.Persistence.DTO;
+using ECCSA.BackOffice.Server.Model.$$Schema$$;
+using ECCSA.BackOffice.Server.Persistence.Context;
+using ECCSA.BackOffice.Server.Persistence.DTO.$$Schema$$;
+using Microsoft.EntityFrameworkCore;
+
+namespace ECCSA.BackOffice.Server.Persistence.Repositories.$$Schema$$
+{
+    public class $$Model$$Repository 
+    {
+        private readonly EccsaContext _context;
+        private readonly EccsaUserContext _userContext;
+        public $$Model$$Repository(EccsaContext context, EccsaUserContext userContext)
+        {
+            _context = context;
+            _userContext = userContext;
+        }
+
+        public IQueryable<$$Model$$> $$Models$$(Guid userId)
+        {
+            // var user = _userContext.Users.FirstOrDefault(u => u.Id == userId);
+            return _context.$$Models$$_$$Include$$;
+        }
+
+        public async Task<$$Model$$> $$Model$$ById($$PK$$ id, Guid userId)
+        {
+            // var user = _userContext.Users.FirstOrDefault(u => u.Id == userId);
+            return await _context.$$Models$$_$$Include$$.FirstOrDefaultAsync(i => i.Id == id);
+        }
+        public async Task<$$Model$$Payload> Create(GenericInput<Create$$Model$$Input> input)
+        {
+            $$Model$$ data = new()
+            {
+                $$CreateMapp$$
+            };
+            await _context.$$Models$$.AddAsync(data);
+           var val = await _context.SaveChangesAsync();
+           return new $$Model$$Payload(data);
+        }
+
+        public async Task<$$Model$$Payload> Update(GenericInput<Update$$Model$$Input> data)
+        {
+            var tmp = await  _context.$$Models$$.FirstOrDefaultAsync(r => r.Id == data.PayLoad.Id);
+            if (tmp == null) throw new KeyNotFoundException("Exchange Rate not found");
+            $$UpdateMapp$$
+            _context.$$Models$$.Update(tmp);
+            await _context.SaveChangesAsync();
+            return new $$Model$$Payload(tmp);
+
+        }
+
+        public async Task Delete($$Model$$ data)
+        {
+            var tmp = await _context.$$Models$$.FirstOrDefaultAsync(r => r.Id == data.Id);
+            if (tmp == null) throw new KeyNotFoundException("Exchange Rate not found");
+            _context.$$Models$$.Remove(tmp);
+            await _context.SaveChangesAsync();
+        }
+    }
+}

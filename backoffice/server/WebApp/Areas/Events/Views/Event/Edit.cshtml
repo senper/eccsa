@@ -1,0 +1,85 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Events.Model.EventViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "New " : "Edit ")@Model.TheModel.EventType.Title  </h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+          asp-action="Save" asp-antiforgery="true">
+        <input type="hidden" name="Id" asp-for="TheModel.Id" />
+        <input type="hidden" name="EventTypeId" asp-for="TheModel.EventTypeId" />
+
+
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Event Type
+            </label>
+            <label class="col-sm-8 col-md-8 col-form-label">
+                @Model.TheModel.EventType.Title
+            </label>
+
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Title
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.Title" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                 
+            </label>
+            <input type="text" class="form-control col-sm-8 col-md-8" asp-for="TheModel.TitleLocal" placeholder="ርዕስ" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Description
+            </label>
+            <textarea rows="5" class="form-control col-sm-8 col-md-9" asp-for="TheModel.Description" ></textarea>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                 
+            </label>
+            <textarea rows="5" class="form-control col-sm-8 col-md-9" asp-for="TheModel.DescriptionLocal" placeholder="መግለጫ"></textarea>
+        </div>
+       
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Start Date
+            </label>
+            <input type="date" class="form-control col-sm-4 col-md-4" asp-for="TheModel.StartDate" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                End Date
+            </label>
+            <input type="date" class="form-control col-sm-4 col-md-4" asp-for="TheModel.EndDate" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">Banner</label>
+            <input asp-for="Photo" class="form-control-file form-control col-sm-8 col-md-8" />
+        </div>
+
+
+
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+
+
+
+</div>
+<script>
+
+
+
+</script>

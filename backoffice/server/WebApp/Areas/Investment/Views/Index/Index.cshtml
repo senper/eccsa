@@ -1,0 +1,314 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Investment.Model.BusinessViewModel
+
+@{
+    ViewData["Title"] = "Business Interests";
+    Layout = "~/Views/Shared/_InvestmentLayout.cshtml";
+}
+
+<div class="container-fluid">
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        <div class="col-md-8" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Index">
+                <div class="btn-group pull-left col-md-8" role="group" aria-label="Basic example">
+                    Search By &nbsp;&nbsp;
+                    <input type="text" maxlength="20" class="col-md-8" name="SearchTerm" asp-for="@Model.SearchTerm" placeholder="Name, Sector, Profile,..." />
+                    <button onclick="this.form.submit()" class="col-md-1 d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+        <div class="col-md-2 btn-group pull-left" role="group" aria-label="Basic example">
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#theModal"
+                    title="Add New Dialog">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                   @* <div class="row" style="padding: 10px;">
+                        <div class="col-md-6">
+                            <button class="btn-outline-disabled" disabled>Generate Card</button>
+                        </div>
+                    </div>*@
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                   @* <th><input asp-for="@Model.TheModel.Selected" name="all" /></th>*@
+                                    <th>Name</th>
+                                    <th>Sector</th>
+                                    <th>Email</th>
+                                    <th>Telephone</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                   @* <th></th>*@
+                                    <th>Name</th>
+                                    <th>Sector</th>
+                                    <th>Email</th>
+                                    <th>Telephone</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+
+                                    <tr>
+                                       @* <td>
+                                            <input asp-for="@Model.TheModel.Selected" value="@i.Id" />
+                                        </td>*@
+                                        <td>
+                                            <a asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id" class="title">@Html.DisplayFor(modelItem => i.Name)</a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Sector)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Email)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Telephone)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Create Business Interest</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Guid.Empty" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" name="Name" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Sector
+                        </label>
+                        <input type="text" name="Sector" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Profile
+                        </label>
+                        <textarea rows="4" name="Profile" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Country
+                        </label>
+                        <input type="text" name="Country" maxlength="50" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Address
+                        </label>
+                        <textarea rows="2" name="Address" maxlength="100" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" maxlength="50" class="form-control col-sm-8 col-md-9" name="Email" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Telephone
+                        </label>
+                        <input type="text" maxlength="50" class="form-control col-sm-8 col-md-9" name="Telephone" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            TINo
+                        </label>
+                        <input type="text" maxlength="20" class="form-control col-sm-4 col-md-4" name="TINo" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Contact Person
+                        </label>
+                        <input type="text" maxlength="50" class="form-control col-sm-8 col-md-9" name="ContactPerson" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Products/Services
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="Products" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Est. Year
+                        </label>
+                        
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                        <input type="number" max="@DateTime.Today.Year" class="form-control col-sm-4 col-md-4" name="YearOfEstablishment" required />
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2">G.C</span>
+                        </div>
+                    </div>
+                    </div>
+                    
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Working Capital
+                        </label>
+                        <div class="input-group col-sm-7 col-md-8" style="padding-left: 0px; padding-right: 0px;">
+                            <input type="number" class="form-control col-sm-4 col-md-4" name="WorkingCapital" required />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">1,000 Birr</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function addEdit(e) {
+        const id = document.getElementById("id");
+        const name = document.getElementById("nameId");
+        const description = document.getElementById("descriptionId");
+        const remark = document.getElementById("remarkId");
+
+        const repname = document.getElementById("repNameId");
+
+
+        const pername = document.getElementById("idpername");
+
+        const email = document.getElementById("idemail");
+        const mobile = document.getElementById("idmobile");
+
+        const telephone = document.getElementById("idtelephone");
+        const url = document.getElementById("idurl");
+
+
+        const broadcast = document.getElementById("idBroadcast");
+
+        const print = document.getElementById("idPrint");
+        const digital = document.getElementById("idDigital");
+
+
+        const idVal = $(e).attr('data-id');
+        const nameVal = $(e).attr("data-name");
+        const descriptionVal = $(e).attr("data-description");
+        const mediatypeVal = Number($(e).attr("data-mediatype"));
+        const ownershipVal = $(e).attr("data-ownership");
+        const repnameVal = $(e).attr("data-repname");
+
+        const pernameVal = $(e).attr("data-pername");
+
+        const emailVal = $(e).attr("data-email");
+        const mobileVal = $(e).attr("data-mobile");
+
+        const telephoneVal = $(e).attr("data-telephone");
+        const urlVal = $(e).attr("data-url");
+        const remarkVal = $(e).attr("data-remark");
+        const statusVal = $(e).attr("data-status");
+
+        id.value = idVal;
+        name.value = nameVal;
+        description.value = descriptionVal;
+        remark.value = remarkVal;
+
+        repname.value = repnameVal;
+        pername.value = pernameVal;
+        email.value = emailVal;
+        mobile.value = mobileVal;
+        telephone.value = telephoneVal;
+        url.value = urlVal;
+        $('#ownershipId').val(ownershipVal).change();
+        $('#statusId').val(statusVal).change();
+
+        const digitalType = Number(@((int)ECCSA.BackOffice.Server.Model.Communication.MediaTypeFlag.Digital));
+        const broadcastType = Number(@((int)ECCSA.BackOffice.Server.Model.Communication.MediaTypeFlag.Broadcast));
+        const printType = Number(@((int)ECCSA.BackOffice.Server.Model.Communication.MediaTypeFlag.Print));
+
+        broadcast.checked = (mediatypeVal & broadcastType) == broadcastType;
+        print.checked = (mediatypeVal & printType) == printType;
+        digital.checked = (mediatypeVal & digitalType) == digitalType;
+    }
+</script>
+}

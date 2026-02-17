@@ -1,0 +1,101 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.ContactUsViewModel
+
+@{
+    ViewData["Title"] = "Contact Us";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index","ContactUs",new { Area =Model.Area, date=Model.Date})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4>  @Model.TheModel.Name </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            Name:
+                        </div>
+                        <div class="col-sm-9">
+                            @Model.TheModel.Name
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            Date:
+                        </div>
+                        <div class="col-sm-9">
+                            @Model.TheModel.Date.ToString("yyyy-MM-dd")
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            Email:
+                        </div>
+                        <div class="col-sm-9">
+                            @Model.TheModel.Email
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            Message:
+                        </div>
+                        <div class="col-sm-9">
+                            @Model.TheModel.Message
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function confirmation(form, text) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to ' + text + ' ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+
+</script>
+}

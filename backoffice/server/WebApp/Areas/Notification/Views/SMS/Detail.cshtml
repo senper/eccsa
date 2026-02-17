@@ -1,0 +1,368 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Membership
+@model ECCSA.BackOffice.Server.WebApp.Areas.Notification.Model.SMSViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area, module=Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <h4>@Model.TheModel.Message</h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <a onclick="return confirmAction($('#deleteMessage'), 'Delete');"
+                               class=" btn btn-sm btn-outline-danger float-right">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                            <span class=" float-right">&nbsp;&nbsp;&nbsp;</span>
+                            <button data-toggle="modal" data-target="#theModal"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                            <form data-parsley-validate novalidate method="post" id="deleteMessage"
+                                  asp-action="Delete" asp-antiforgery="true">
+                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                <input type="hidden" name="module" value="@Model.TheModel.Owner" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    Status: <strong>@Model.TheModel.Status</strong>
+                                    @if (Model.TheModel.Status == MessageStatus.Draft)
+                                    {
+                                        <a onclick="$('#statusinput').val('@MessageStatus.Submitted');return confirmAction($('#statusChangefrm'), 'Submit');"
+                                       class=" btn btn-sm btn-outline-warning">
+                                            Submit
+                                        </a>
+                                    }
+                                    else if (Model.TheModel.Status == MessageStatus.Submitted)
+                                    {
+
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+
+                                            <a onclick="$('#statusinput').val('@MessageStatus.Draft');return confirmAction($('#statusChangefrm'), 'set status to Draft');"
+                                           class=" btn btn-sm btn-outline-info">
+                                                Set as Draft
+                                            </a>
+                                            <a onclick="$('#statusinput').val('@MessageStatus.Processed');return confirmAction($('#statusChangefrm'), 'set status to Processed');"
+                                           class=" btn btn-sm btn-outline-warning ">
+                                                Set as Processed
+                                            </a>
+                                        </div>
+                                    }
+                                    else if (Model.TheModel.Status == MessageStatus.Processed)
+                                    {
+                                        <a onclick="$('#statusinput').val('@MessageStatus.Submitted');return confirmAction($('#statusChangefrm'), 'Submit');"
+                                       class=" btn btn-sm btn-outline-warning ">
+                                            Set as Submit
+                                        </a>
+                                    }
+                                    <form data-parsley-validate novalidate method="post" id="statusChangefrm"
+                                          asp-action="ChangeStatus" asp-antiforgery="true">
+                                        <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                        <input type="hidden" name="module" value="@Model.TheModel.Owner" />
+                                        <input type="hidden" id="statusinput" name="status" />
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    @if (Model.TheModel.Status == MessageStatus.Draft)
+                    {
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <strong>Recipient Source</strong>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <form data-parsley-validate novalidate method="get"
+                                          asp-action="Detail">
+                                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            <div class="row form-group">
+                                                <label class="col-sm-4 col-md-3 col-form-label">
+                                                    Category
+                                                </label>
+                                                <select class="col-sm-8 col-md-6" name="stakeholderType" asp-for="@Model.StakeholderType" onchange="this.form.submit()"
+                                                    asp-items="@(Html.GetEnumSelectList<StakeholderTypeEnum>())"></select>
+                                            </div>
+                                            <div class="row form-group">
+                                                <label class="col-sm-4 col-md-3 col-form-label">
+                                                    Sector
+                                                </label>
+
+                                                <select class="custom-select col-sm-8 col-md-9" asp-for="@Model.SectorId" onchange="this.form.submit()"
+                                                    asp-items="@(new SelectList(Model.Sectors,"Value", "Name"))"></select>
+
+                                            </div>
+                                        </form>
+                                    </div> <div class="col-sm-4">
+                                        <form method="post" asp-action="AddRecipents" asp-antiforgery="false">
+                                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            <input type="hidden" name="selectedList" id="addSelectList" value="" />
+                                            <input type="hidden" name="stakeholderType" value="@Model.StakeholderType" />
+                                            <input type="hidden" name="sectorId" value="@Model.SectorId" />
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <button title="Add To Recipients" id="addSelectedbtn" disabled class=" btn btn-sm  btn-outline-info addRecipent"
+                                                    onclick="this.form.submit()">
+                                                    Add Selected
+                                                </button>
+                                            </div>
+                                        </form>
+                                        <input id="checkAllAdd" type="checkbox" onclick="checkAllChangeAdd(this)" /> Check/Uncheck All
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="table-responsive">
+                                    <table class="table table-bordered dataTable" width="100%" cellpadding="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Company Name</th>
+                                                <th>Mobile</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Company Name</th>
+                                                <th>Mobile</th>
+                                                <th>Select</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            @foreach (var item in Model.RecipientsSource)
+                                            {
+
+                                                <tr>
+                                                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                                                    <td>@item.CompanyName</td>
+                                                    <td>@item.MobileNo</td>
+                                                    <td>
+                                                        @if (Model.TheModel.Recipients.Any(r => r.Address == item.MobileNo))
+                                                        {
+                                                            <span>Already Added</span>
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <input class="addReceipent" onclick="addReceipentChange(this)" value="@item.Id" type="checkbox" />
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                    }
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong>Recipients</strong><br />
+                            @if (Model.TheModel.Status == MessageStatus.Draft)
+                            {
+                                <form method="post" asp-action="RemoveRecipents" asp-antiforgery="false">
+                                    <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                    <input type="hidden" name="selectedList" id="removeSelectedList" value="" />
+                                    <input type="hidden" name="stakeholderType" value="@Model.StakeholderType" />
+                                    <input type="hidden" name="sectorId" value="@Model.SectorId" />
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button title="Remove To Recipients" id="removeSelectedbtn" disabled class=" btn btn-sm  btn-outline-warning  "
+                                            onclick="this.form.submit()">
+                                            Remove Selected
+                                        </button>
+                                    </div>
+                                </form>
+                                <input id="checkAllRemove" type="checkbox" onclick="checkAllChangeRemove(this)" /> <span>Check / Uncheck All</span>
+                                <br />
+
+                                <br />
+                            }
+                            <div class="table-responsive">
+                                <table class="table table-bordered dataTable" id="recipenttbl" width="100%" cellpadding="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Address</th>
+                                            <th>Status</th>
+                                            <th>Label</th>
+                                            <th>Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Address</th>
+                                            <th>Status</th>
+                                            <th>Label</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody id="recipentsbody">
+                                        @{
+                                            var count = 0;
+                                        }
+                                        @foreach (var item in Model.TheModel.Recipients)
+                                        {
+                                            count++;
+                                            <tr id="recipient@(count)">
+                                                <td>@Html.DisplayFor(modelItem => item.Address)</td>
+                                                <td>@item.Status</td>
+                                                <td>@item.Label</td>
+                                                <td>
+                                                    @if (Model.TheModel.Status == MessageStatus.Draft)
+                                                    {
+                                                        <input class="removeReceipent" onclick="removeReceipentChange(this)" value="@item.Address" type="checkbox" />
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr />
+                            @if (Model.TheModel.Status == MessageStatus.Submitted)
+                            {
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <form data-parsley-validate novalidate method="post"
+                                          asp-action="SendSMS" asp-antiforgery="true">
+                                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            <div class="row form-group">
+                                                <div class="col-sm-12">
+                                                    <input type="submit" value="Send SMS"
+                                                       onclick="return confirmAction(this.form, 'Send SMS');"
+                                                       class="btn btn-warning">
+
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="idTitle">Edit Message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Owner" asp-for="TheModel.Owner" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Message
+                        </label>
+                        <textarea rows="5" name="Message" maxlength="150" asp-for="TheModel.Message" class="form-control col-sm-8 col-md-9"></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section script {
+    <script type="text/javascript">
+        function confirmAction(form, msg) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to ' + msg + ' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+
+        var addReceipentChange = function (element) {
+            var addSelectList = $("#addSelectList");
+            var text = element.value + ";"
+            if (addSelectList.val().indexOf(element.value) > -1) {
+                var newVal = addSelectList.val().replace(text, "");
+                addSelectList.val(newVal);
+            }
+            if (element.checked) {
+                var newVale = addSelectList.val() + text;
+                addSelectList.val(newVale);
+            }
+            if ($("#addSelectList").val().trim().length > 0) {
+                $("#addSelectedbtn").removeAttr("disabled");
+            } else {
+                $("#addSelectedbtn").attr("disabled", "disabled");
+            }
+        }
+
+        var checkAllChangeAdd = function (element) {
+            $(".addReceipent").each(function (index) {
+                this.checked = element.checked;
+                addReceipentChange(this);
+            });
+        };
+
+
+        var removeReceipentChange = function (element) {
+            var removeSelectList = $("#removeSelectedList");
+            var text = element.value + ";"
+            if (removeSelectList.val().indexOf(element.value) > -1) {
+                var newVal = removeSelectList.val().replace(text, "");
+                removeSelectList.val(newVal);
+            }
+            if (element.checked) {
+                var newVale = removeSelectList.val() + text;
+                removeSelectList.val(newVale);
+            }
+            if ($("#removeSelectedList").val().trim().length > 0) {
+                $("#removeSelectedbtn").removeAttr("disabled");
+            } else {
+                $("#removeSelectedbtn").attr("disabled", "disabled");
+            }
+        }
+
+        var checkAllChangeRemove = function (element) {
+            $(".removeReceipent").each(function (index) {
+                this.checked = element.checked;
+                removeReceipentChange(this);
+            });
+        };
+    </script>
+    }

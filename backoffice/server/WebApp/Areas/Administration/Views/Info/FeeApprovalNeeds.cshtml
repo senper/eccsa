@@ -1,0 +1,123 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Administration.Model.FeeApprovalNeedsViewModel
+
+@{
+    ViewData["Title"] = "Fee Changes";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+
+
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class=" btn-group" role="group" aria-label="Basic example">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Chamber/Association </th>
+                                    <th>Proposed Registration Fee </th>
+                                    <th>Proposed Renewal Fee </th>
+                                    <th>Current Registration Fee </th>
+                                    <th>Current Renewal Fee </th>
+                                    <th>Proposed Date </th>
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Chamber/Association </th>
+                                    <th>Proposed Registration Fee </th>
+                                    <th>Proposed Renewal Fee </th>
+                                    <th>Current Registration Fee </th>
+                                    <th>Current Renewal Fee </th>
+                                    <th>Proposed Date </th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var item in Model.TheList.OrderByDescending(s => s.DateProposed))
+                                {
+
+                                    <tr>
+                                        <td>
+                                            <a asp-area="Membership" asp-controller="Association" asp-action="Detail" asp-route-id="@item.Id" class="title">
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ProposedRegistrationFee)
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ProposedRenewalFee)
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.RegistrationFee)
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.RenewalFee)
+                                        </td>
+                                        <td>
+                                            @(item.DateProposed?.ToString("yyyy-MM-dd HH:mm tt"))
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <a onclick="return confirm($('#approveFee@(item.Id)')[0], 'Approve Fee Proposed by @(item.NameEng) Registration: @(item.ProposedRegistrationFee) Renewal: @(item.ProposedRenewalFee)');"
+                                               class=" btn btn-sm btn-outline-warning">
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="approveFee@(item.Id)"
+                                                  asp-action="FeeApprove" asp-antiforgery="true">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                </form>
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+@section script {
+<script>
+    function confirm(form, msg) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to '+msg+' ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+</script>
+}

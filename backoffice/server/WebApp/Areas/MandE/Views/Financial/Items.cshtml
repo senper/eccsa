@@ -1,0 +1,327 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@using ECCSA.BackOffice.Server.Model.Common.Planning
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.FinancialItemViewModel
+
+@{
+    ViewData["Title"] = "Planning";// = Model.PageTitle;
+    Layout = Model.LayoutPage;
+}
+@{
+    async Task Template(List<FinancialItem> items, string parentCode)
+    {
+        foreach (var ind in items)
+        {
+            var hasChildren = Model.HasChildren(ind.Id);
+            var labelSubPlan = Model.AreAllLabelChildren(ind.Id);
+
+            var style = hasChildren ? "" : "";
+            var statusCss = ind.Status == StatusEnum.Inactive ? "danger" : "";
+            var parent_tt = string.IsNullOrEmpty(parentCode) ? "root" : $"child";
+            <tr class=" @parent_tt @parentCode @statusCss" id="@ind.Code">
+                <td>
+                    @if (hasChildren)
+                    {
+                        <a data-tt="@ind.Code" onclick="showHideChildren(this);" class="title"><i class="fas fa-angle-right"></i>@ind.Code </a>
+                    }
+                    else
+                    {
+                        @ind.Code
+                    }
+                </td>
+                <td>@ind.Name</td>
+                <td>@ind.Status</td>
+                <td>
+                    <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                        <button data-toggle="modal"
+                        data-target="#createRootModal"
+                        title="Edit"
+                        data-id="@ind.Id"
+                        data-code="@ind.Code"
+                        data-name="@ind.Name"
+                        data-parent="@(ind.ParentId.HasValue? ind.ParentId.Value: Guid.Empty)"
+                        onclick="editName(this);"
+                        class=" float-right edit btn btn-outline-success btn-sm">
+                            <i class="fa fa-pen "></i>
+                        </button>
+
+                       
+                    </div>
+                </td>
+            </tr>
+            @if (@hasChildren)
+            {
+                var children = Model.GetSubItems(ind.Id);
+                await Template(children, ind.Code);
+            }
+        }
+
+    }
+}
+<div class="container-fluid">
+    @if (Model.RoleLevel == RoleLevelEnum.Admin)
+    {
+        <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+            <div class=" btn-group" role="group" aria-label="Basic example">
+                <button class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#createRootModal"
+                    data-id="@Guid.Empty"
+                        data-code=""
+                        data-name=""
+                        data-parent="@Guid.Empty"
+                        onclick="editName(this);"
+                    title="Create Plan Headers">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Create Item
+                </button>
+            </div>
+        </div>
+    }
+
+
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <h4 for="yearfrom" class="col-sm-8 col-form-label">Financial Items </h4>
+                    <hr />
+                    <form data-parsley-validate method="get" id="filterfomr" class="row g-3"
+                          asp-action="Items" asp-antiforgery="true">
+
+                        <div class="col col-md-1">
+                            <label class="form-label-sm" style="text-align: right;" for="responsibleUnitFilterId">Show</label>
+                        </div>
+                        <div class="col col-md-2">
+                            
+                        </div>
+                        <div class="col col-md-7">
+
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="idshowActive" name="ShowActive" asp-for="@Model.ShowActive" >
+                                        <label class="form-check-label" for="idshowActive"> Active</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="idshowInactive" name="ShowInactive" asp-for="@Model.ShowInactive" >
+                                        <label class="form-check-label" for="idshowInactive"> Inactive</label>
+                                    </div>
+                                </div>
+
+                                <input type="submit" value="Show" class="col-md-3 btn-sm btn-outline-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                    <div class="form-group row">
+                        <div class="col-sm-12 table-responsive">
+
+                            <table id="example1" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px; max-width:50px !important;">#</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th style="width: 80px; max-width:50px !important;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableDetail">
+                                    @{
+                                        await Template(Model.RootPlans, "");
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+   
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="createRootModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit Financial Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="CreateLabel" asp-antiforgery="true">
+                        <input type="hidden" name="Id" id="id" />
+                      
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="20" name="Code" id="codeId" class="form-control col-sm-4 col-md-4" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="250" name="Name" id="nameId" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label" for="parentId">
+                                Parent
+                            </label>
+                            <select name="ParentId" id="parentId"
+                                class="form-select col-sm-8 col-md-9"
+                                asp-items="@(new SelectList(Model.Parents,"Id", "NameWithCode"))">
+                                <option value="@Guid.Empty"></option>
+                            </select>
+
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label" for="statusId">
+                                Status
+                            </label>
+                            <select name="Status" id="statusId"
+                                    class="form-select col-sm-4 col-md-3"
+                                asp-items="Html.GetEnumSelectList<StatusEnum>()">
+                               
+                            </select>
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+
+
+<script>
+
+    function isLabelChanged(e){
+        console.log(e);
+        
+        const input = document.getElementById(e.id.replace('hp', 'im'));
+        const hidden = document.getElementById('hdisLabel');
+        const checked = Boolean( e.checked);
+        hidden.value = checked;
+    }
+
+    function editName(e){
+        const id = document.getElementById('id');
+        const code = document.getElementById('codeId');
+        const name = document.getElementById('nameId');
+
+        const idVal = $(e).attr('data-id');
+        const codeVal = $(e).attr('data-code');
+        const nameVal = $(e).attr('data-name');
+        const parentVal= $(e).attr('data-parent');
+
+        id.value = idVal;
+        code.value = codeVal;
+        name.value = nameVal;
+        $('#parentId').val(parentVal).change();
+    }
+
+    
+
+    function hideChildren(){
+         const children = document.getElementsByClassName('child');
+         for(var i = 0; i < children.length; i++){
+             children[i].style.display='none';
+         }
+    }
+    hideChildren();
+    function hideDescendant(e){
+        console.log(e);
+        const parent = $(e).attr('data-tt');
+        const children = document.getElementsByClassName(parent);
+        for(var i = 0; i < children.length; i++){
+             const child = children[i];
+             child.style.display='none';
+             //console.log(child.id, child, document.getElementsByClassName(child.id).length);
+             if(document.getElementsByClassName(child.id).length > 0){
+                 $(child).find('i').removeClass('fa-angle-down');
+                 $(child).find('i').addClass('fa-angle-right');
+                 hideDescendant($(child).find('a')[0]);
+             }
+
+         }
+    }
+
+    function showHideChildren(e) {
+        const ank = $(e);
+        let show = true;
+
+       for (let i = 0; i < ank[0].children.length; i++)
+       {
+                const child = ank[0].children[i];
+                if (child.localName == 'i') {
+                    if (child.classList.contains('fa-angle-right')) {
+                        show = true;
+                        child.classList.remove('fa-angle-right');
+                        child.classList.add('fa-angle-down');
+                    } else {
+                        show = false;
+                        child.classList.add('fa-angle-right');
+                        child.classList.remove('fa-angle-down');
+                    }
+                }
+       }
+
+        if(show)
+        {
+            const parent = $(e).attr('data-tt');
+            const children = document.getElementsByClassName(parent);
+            for(var i = 0; i < children.length; i++)
+            {
+             children[i].style.display='';
+            }
+        }
+        else
+        {
+            hideDescendant(e);
+        }
+    }
+
+         function confirmDelete(form)
+     {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+</script>
+}

@@ -1,0 +1,32 @@
+﻿using ECCSA.BackOffice.Server.Model.$$Schema$$;
+using ECCSA.BackOffice.Server.Persistence.Repositories.$$Schema$$;
+using System.Threading.Tasks;
+using System.Linq;
+using System;
+using HotChocolate;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+
+namespace ECCSA.BackOffice.Server.API.GraphQL.Queries
+{
+    public partial class Query
+    {
+        
+        public IQueryable<$$Model$$> $$Models$$(
+                [Service] IHttpContextAccessor contextAccessor
+               ,[Service] $$Model$$Repository  $$Repository$$
+        )
+        {
+                var userId = Guid.Parse(contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                return $$Repository$$.$$Models$$(userId);
+        }
+    
+        public async Task<$$Model$$> $$Model$$ById(Guid id,
+                [Service] IHttpContextAccessor contextAccessor
+               ,[Service] $$Model$$Repository  $$Repository$$)
+        {
+                var userId = Guid.Parse(contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                return await $$Repository$$.$$Model$$ById(id, userId);
+        }
+    }
+}

@@ -1,0 +1,57 @@
+﻿
+using ECCSA.BackOffice.Server.Model.$$Schema$$;
+using ECCSA.BackOffice.Server.Persistence.DTO;
+using ECCSA.BackOffice.Server.Persistence.DTO.$$Schema$$;
+using ECCSA.BackOffice.Server.Persistence.Repositories.$$Schema$$;
+using HotChocolate;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Threading.Tasks;
+
+namespace ECCSA.BackOffice.Server.API.GraphQL.Mutations
+{
+    public partial class Mutation
+    {
+        public async Task<$$Model$$Payload> Create$$Model$$(
+                 Create$$Model$$Input data
+               , [Service] IHttpContextAccessor contextAccessor
+               , [Service] $$Model$$Repository  $$Repository$$
+             // , [Service] I$$Model$$EventSender eventSender 
+       )
+        {
+            var userId = Guid.Parse(contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var data2 = new GenericInput<Create$$Model$$Input>(data, userId);
+            var val = await $$Repository$$.Create(data2);
+            // await eventSender.SendAsync(data.TypeId, val);
+            return val;
+        }
+
+        public async Task<$$Model$$Payload> Update$$Model$$(
+            Update$$Model$$Input data
+            , [Service] IHttpContextAccessor contextAccessor
+            , [Service] $$Model$$Repository  $$Repository$$
+         //, [Service] I$$Model$$EventSender eventSender
+        )
+        {
+            var userId = Guid.Parse(contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var data2 = new GenericInput<Update$$Model$$Input>(data, userId);
+            var val = await $$Repository$$.Update(data2);
+            // await eventSender.SendAsync(data.ExchangeRateTypeId, val);
+            return val;
+
+        }
+
+        public async Task Delete$$Model$$($$Model$$ data
+        , [Service] $$Model$$Repository  $$Repository$$
+            // , [Service] I$$Model$$EventSender eventSender
+            )
+        {
+           await $$Repository$$.Delete(data );
+            //await eventSender.SendAsync(data.ExchangeRateTypeId, val);
+            //return val;
+        }
+    }
+    
+}

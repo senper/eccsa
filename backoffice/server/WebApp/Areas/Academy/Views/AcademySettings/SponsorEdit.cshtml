@@ -1,0 +1,66 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Academy.Model.SponsorViewModel
+
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.TheModel.Id == Guid.Empty ? "Add" : "Edit") Sponsor</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form data-parsley-validate method="post"
+          asp-action="@(Model.TheModel.Id == Guid.Empty ? "CreateSponsor" : "UpdateSponsor")" asp-antiforgery="true">
+        <input type="hidden" asp-for="TheModel.Id" />
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Name
+            </label>
+            <input type="text" class="form-control col-sm-7 col-md-8" asp-for="TheModel.NameEng"  required />
+        </div>
+        <div class="row form-group" style="display:none;">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                ስም
+            </label>
+            <input type="text" class="form-control col-sm-7 col-md-8" asp-for="TheModel.NameLocal" placeholder="ስም  " />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Email
+            </label>
+            <input type="email" class="form-control col-sm-7 col-md-8" asp-for="TheModel.Email" id="sponserEmail" />
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Mobile
+            </label>
+            <input type="text" class="form-control col-sm-7 col-md-8" asp-for="TheModel.Mobile" id="sponserMobileNo" />
+            <div id="phone_error" style="color:red;display:none ;background-size:80%; ">Please enter a valid phone number</div>
+        </div>
+        <div class="row form-group">
+            <label class="col-sm-4 col-md-3 col-form-label">
+                Status
+            </label>
+            <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.Status" required>
+                <option value="1">Active</option>
+                <option value="2">Inactive</option>
+            </select>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+                <input type="submit" value="Save" onclick="return validateForm();"
+                       class="btn btn-primary">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+@section script {
+
+
+<script type="text/javascript">
+
+    
+
+</script>
+}

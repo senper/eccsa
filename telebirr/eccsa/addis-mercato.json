@@ -1,0 +1,9 @@
+{
+    "name":"Ethiopian Chamber of Commerece",
+    "code":220185,
+    "id":"677194033a2342658ceb1db29c7caa6f",
+    "key":"e3b25848db634596ab421e3d5515f6a4",
+    "public":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhxuHPN7/a+gskJEWBDBHq9Z5jMMTadiJm7uNBFYNIBk2fMFgxbjf/oqUit7OmpL3uihj0cMrKhfTmTQgHqvq5ZOGdYEPiA/nsGB2CrRQSRDNBrpbUZhLWwAeSHlbExSewPYgRGRSZv/wlyXbq16GmlhUYaiXNPJtcH954sB8GwEJmPLu2pvxaT03s1ScxerN041vuHHjrMSg7xGXnaviP90WLP/k/QHfkx1t8sFISTVGIW0F6QRFoOw5/1y/C7IdzGHZAyuHKQsKEMOk/YG6mgdjHYMDfwMh4MuTrfsVM76tDZYBT+aN8hxj+l2qvmLLz8dHKDW6ux0yBPqVx5ilQwIDAQAB",
+    "h5":"http://196.188.120.3:11443/ammapi/service-openup/toTradeWebPay",
+    "payment":"http://196.188.120.3:11443/ammapi/service-openup/toTradeMobilePaywith"
+}

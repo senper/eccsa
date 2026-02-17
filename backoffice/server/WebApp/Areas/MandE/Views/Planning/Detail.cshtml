@@ -1,0 +1,533 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+
+@model ECCSA.BackOffice.Server.WebApp.Areas.MandE.Model.PlanViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+    var m = Model.TheModel;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+
+        <a href="@Url.Action("Index","Planning",new { Area ="MandE", subSystem=Model.CurrentSubsystem})" class="btn btn-outline-info">
+            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+            back
+        </a>
+
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-11">
+
+                            <h4 style="@Model.StatusStyle(@Model.TheModel.Status)">  @Model.TheModel.NameWithCode </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            @{
+                                var editable = Model.PlanPhase == PlanningPhaseEnum.Planning && ( Model.TheModel.Status == PlanningStatusEnum.Planning || Model.TheModel.Status == PlanningStatusEnum.Rejected);
+                            }
+                            @if (Model.RoleLevel == RoleLevelEnum.Admin
+                            && editable)
+                            {
+
+                                <button data-toggle="modal"
+                                    data-target="#planModal"
+                                    title="Edit"
+                                    class=" float-right edit btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Parent
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.TheModel.ParentPlan == null?"": Model.TheModel.ParentPlan.NameWithCode)
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Target
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.PlanAmount &nbsp; @Model.TheModel.UnitName
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Expected Result
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.ExpectedResult
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Estimated Budget
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.EstimatedBudgetName
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    From Donor | Chamber
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.FromDonorName | @Model.TheModel.FromChamberName
+                                </div>
+                            </div>
+
+                            @if (Model.TheModel.Status == PlanningStatusEnum.Rejected)
+                            {
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Remark
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.Remark
+                                    </div>
+                                </div>
+                            }
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <hr />
+
+    <form data-parsley-validate novalidate method="post"
+          asp-action="SavePlan"
+          onsubmit="return validatePlan()"
+          asp-antiforgery="true">
+        <input type="hidden" value="@Model.TheModel.Id" name="id" />
+        <input type="hidden" value="@Model.CurrentSubsystem" name="Subsystem" />
+        <input type="hidden" value="@m.PlanAmount" name="PlanAmount" />
+        <div class="row">
+            <div class="col-12">
+
+                @if (@Model.IsUserOrAdmin && Model.PlanPhase == PlanningPhaseEnum.Planning && 
+                     (Model.TheModel.Status == PlanningStatusEnum.Planning || 
+                      Model.TheModel.Status == PlanningStatusEnum.Rejected))
+                {
+                    <input type="submit" value="Save" title="Save Monthly Plan" class="btn btn-primary btn-sm" />
+                }
+                <span id="labeldiv" class="alert-warning"> </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        Quarter I
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">Hamle (Jul)</div>
+                            <div class="col-md-1 p-0">
+                                    <input type="checkbox" class="" asp-for="@m.Month01.HasPlan" id="hp01" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month01.Disable value="@m.Month01.Plan" name="Month01.Plan" id="im01" />
+                                <input type="hidden" value="@m.Month01.HasPlan" name="Month01.HasPlan" id="hd01" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" title="Planned activities for the month" @m.Month01.Disable id="ta01" name="Month01.PlanText">@m.Month01.PlanText</textarea>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                            <div class="col-md-3">Nehase (Aug)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class=" " asp-for="@m.Month02.HasPlan" id="hp02" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month02.Disable value="@m.Month02.Plan" name="Month02.Plan" id="im02" />
+                                <input type="hidden" value="@m.Month02.HasPlan" name="Month02.HasPlan" id="hd02" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" title="Planned activities for the month" @m.Month02.Disable id="ta02" name="Month02.PlanText">@m.Month02.PlanText</textarea>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                            <div class="col-md-3">Meskerem (Sep)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class="" asp-for="@m.Month03.HasPlan" name="Month03.HasPlan" id="hp03" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month03.Disable value="@m.Month03.Plan" name="Month03.Plan" id="im03" />
+                                <input type="hidden" value="@m.Month03.HasPlan" name="Month03.HasPlan" id="hd03" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" title="Planned activities for the month" @m.Month03.Disable id="ta03" name="Month03.PlanText">@m.Month03.PlanText</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        Quarter III
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">Tir (Jan)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class="" asp-for="@m.Month07.HasPlan" name="Month07.HasPlan" id="hp07" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month07.Disable value="@m.Month07.Plan" name="Month07.Plan" id="im07" />
+                                <input type="hidden" value="@m.Month07.HasPlan" name="Month07.HasPlan" id="hd07" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" title="Planned activity" @m.Month07.Disable id="ta07" name="Month07.PlanText">@m.Month07.PlanText</textarea>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                            <div class="col-md-3">Yekatit (Feb)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class="" asp-for="@m.Month08.HasPlan" name="Month08.HasPlan" id="hp08" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month08.Disable value="@m.Month08.Plan" name="Month08.Plan" id="im08" />
+                                <input type="hidden" value="@m.Month08.HasPlan" name="Month08.HasPlan" id="hd08" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" @m.Month08.Disable id="ta08" name="Month08.PlanText">@m.Month08.PlanText</textarea>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                            <div class="col-md-3">Megabit (Mar)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class="" asp-for="@m.Month09.HasPlan" name="Month09.HasPlan" id="hp09" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month09.Disable value="@m.Month09.Plan" name="Month09.Plan" id="im09" />
+                                <input type="hidden" value="@m.Month09.HasPlan" name="Month09.HasPlan" id="hd09" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class='form-control' @m.Month09.Disable id="ta09" name="Month09.PlanText">@m.Month09.PlanText</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        Quarter II
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">Tikimt (Oct)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class=" " asp-for="@m.Month04.HasPlan" name="Month04.HasPlan" id="hp04" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month04.Disable value="@m.Month04.Plan" name="Month04.Plan" id="im04" />
+                                <input type="hidden" value="@m.Month04.HasPlan" name="Month04.HasPlan" id="hd04" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" title="Planned activities for the month" @m.Month04.Disable id="ta04" name="Month04.PlanText">@m.Month04.PlanText</textarea>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                            <div class="col-md-3">Hidar (Nov)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class=" baselinetxt" asp-for="@m.Month05.HasPlan" name="Month05.HasPlan" id="hp05" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month05.Disable value="@m.Month05.Plan" name="Month05.Plan" id="im05" />
+                                <input type="hidden" value="@m.Month05.HasPlan" name="Month05.HasPlan" id="hd05" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" title="Planned activities for the month" @m.Month05.Disable id="ta05" name="Month05.PlanText">@m.Month05.PlanText</textarea>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                            <div class="col-md-3">Tahisas (Dec)</div>
+                            <div class="col-md-1 p-0 ">
+                                <input type="checkbox" class="" asp-for="@m.Month06.HasPlan" name="Month06.HasPlan" id="hp06" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month06.Disable value="@m.Month06.Plan" name="Month06.Plan" id="im06" />
+                                <input type="hidden" value="@m.Month06.HasPlan" name="Month06.HasPlan" id="hd06" />
+                            </div>
+                            <div class="col-md-5 p-0">
+                                <textarea class="form-control" title="Planned activities for the month" @m.Month06.Disable id="ta06" name="Month06.PlanText">@m.Month06.PlanText</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        Quarter IV
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">Miazia (Apr)</div>
+                             <div class="col-md-1 p-0">
+                                <input type="checkbox" class=" baselinetxt" asp-for="@m.Month10.HasPlan" name="Month10.HasPlan" id="hp10" onchange="hasPlanChanged(this);" />
+                            </div>
+                             <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month10.Disable value="@m.Month10.Plan" name="Month10.Plan" id="im10" />
+                                <input type="hidden" value="@m.Month10.HasPlan" name="Month10.HasPlan" id="hd10" />
+                            </div>
+                             <div class="col-md-5 p-0">
+
+                                <textarea class='form-control' title="Planned activities for the month" @m.Month10.Disable id="ta10" name="Month10.PlanText">@m.Month10.PlanText</textarea>
+                            </div>
+                            
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                           <div class="col-md-3">Ginbot (May)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class="" asp-for="@m.Month11.HasPlan" name="Month11.HasPlan" id="hp11" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month11.Disable value="@m.Month11.Plan" name="Month11.Plan" id="im11" />
+                                <input type="hidden" value="@m.Month11.HasPlan" name="Month11.HasPlan" id="hd11" />
+                            </div>
+                             <div class="col-md-5 p-0">
+
+                                <textarea  class='form-control'  title="Planned activities for the month" @m.Month11.Disable id="ta11" name="Month11.PlanText">@m.Month11.PlanText</textarea>
+                            </div>
+                           
+                        </div>
+                        <hr class="p-0 m-1" />
+                        <div class="row">
+                           <div class="col-md-3">Sene (Jun)</div>
+                            <div class="col-md-1 p-0">
+                                <input type="checkbox" class="" asp-for="@m.Month12.HasPlan" name="Month12.HasPlan" id="hp12" onchange="hasPlanChanged(this);" />
+                            </div>
+                            <div class="col-md-3 p-0 pr-1">
+                                <input type="number" class="form-control" @m.Month12.Disable value="@m.Month12.Plan" name="Month12.Plan" id="im12" />
+                                <input type="hidden" value="@m.Month12.HasPlan" name="Month12.HasPlan" id="hd12" />
+                            </div>
+                            <div class="col-md-5 p-0">
+
+                                <textarea class='form-control' title="Planned activities for the month" @m.Month12.Disable id="ta12" name="Month12.PlanText">@m.Month12.PlanText</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (Model.RoleLevel == RoleLevelEnum.Admin)
+{
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="planModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Plan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                          asp-action="SaveMainPlan" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id"/>
+                        <input type="hidden" name="PlanYear" value="@Model.PlanYear"/>
+                        <input type="hidden" name="subSystem" value="@Model.CurrentSubsystem"/>
+                        <input type="hidden" name="ParentId" value="@Model.TheModel.ParentId"/>
+                        
+                        
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                #
+                            </label>
+                            <input type="text" maxlength="20" name="Code" asp-for="TheModel.Code" class="form-control col-sm-5 col-md-5" required />
+                        </div>
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" maxlength="250" asp-for="TheModel.Name" name="name" class="form-control col-sm-8 col-md-9" required/>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Target
+                            </label>
+                            <input type="number" min="1" name="PlanAmount" asp-for="TheModel.PlanAmount" class="form-control col-sm-4 col-md-4" required/>
+                            <select name="Unit" asp-for="TheModel.Unit"
+                                    class="form-control col-sm-4 col-md-5" required>
+                                <option></option>
+                                <option value="3">Percent(%)</option>
+                                <option value="2">Count</option>
+                                <option value="1">Money</option>
+                            </select>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Expected Result
+                            </label>
+                            <input type="text" maxlength="250" asp-for="TheModel.ExpectedResult" name="ExpectedResult" class="form-control col-sm-8 col-md-9" required/>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Estimated Budget
+                            </label>
+                            <div class="input-group-append  col-sm-8 col-md-5" style="padding-left: 0px;">
+                            <input type="number" min="0" asp-for="TheModel.EstimatedBudget" name="EstimatedBudget" class="form-control" required/>
+                            
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Donor / Chamber
+                            </label>
+                            <div class="input-group-append  col-sm-8 col-md-5" style="padding-left: 0px;">
+                            <input type="number" min="0" asp-for="TheModel.FromDonor" name="FromDonor" class="form-control" required />
+                            <input type="number" min="0" asp-for="TheModel.FromChamber" name="FromChamber" class="form-control " required/>
+                            
+                                <span class="input-group-text" id="basic-addon2">Birr</span>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+
+
+@section script {
+
+
+    <script>
+        @if(!editable)
+        {
+            <text>
+            $("input").prop("disabled", true);
+            $("textarea").prop("disabled", true);
+            </text>
+        }
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function() {
+                        form.submit();
+                    },
+                    no: function() {
+                    }
+                }
+            });
+            return false;
+        }
+
+
+        function confirmAction(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Change Status ?',
+                buttons: {
+                    yes: function() {
+                        form.submit();
+                    },
+                    no: function() {
+                    }
+                }
+            });
+            return false;
+        }
+
+        function hasPlanChanged(e) {
+            console.log(e);
+            const id = e.id.replace('hp', 'im');
+            const input = document.getElementById(e.id.replace('hp', 'im'));
+            const hidden = document.getElementById(e.id.replace('hp', 'hd'));
+            const planText = document.getElementById(e.id.replace('hp', 'ta'));
+            const checked = Boolean(e.checked);
+            input.disabled = !checked;
+            hidden.value = checked;
+            planText.disabled = input.disabled;
+        }
+
+
+
+        function validatePlan() {
+            const m1 = Number(document.getElementById('im01').value);
+            const m2 = Number(document.getElementById('im02').value);
+            const m3 = Number(document.getElementById('im03').value);
+            const m4 = Number(document.getElementById('im04').value);
+            const m5 = Number(document.getElementById('im05').value);
+            const m6 = Number(document.getElementById('im06').value);
+
+            const m7 = Number(document.getElementById('im07').value);
+            const m8 = Number(document.getElementById('im08').value);
+            const m9 = Number(document.getElementById('im09').value);
+            const m10 = Number(document.getElementById('im10').value);
+            const m11 = Number(document.getElementById('im11').value);
+            const m12 = Number(document.getElementById('im12').value);
+            const planAmount = Number(@m.PlanAmount);
+            const totalPlan = m1 + m2 + m3 + m4 + m5 + m6 + m7 + m8 + m9 + m10 + m11 + m12;
+            const isValid = planAmount === totalPlan;
+            const messageDiv = document.getElementById('labeldiv');
+            messageDiv.innerHTML = "";
+            if (!isValid) {
+                messageDiv.innerHTML = `Monthly Plan ${totalPlan} !=  Annual Plan ${planAmount}`;
+            }
+            return isValid;
+        }
+
+    </script>
+}

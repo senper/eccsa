@@ -1,0 +1,222 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Advocacy.Model.ResearchViewModel
+
+@{
+    ViewData["Title"] = "Research";
+    Layout = "~/Views/Shared/_AdvocacyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.Title  </h4>
+                        </div>
+                        <div class="col-sm-1">
+                            <button data-toggle="modal"
+                                    data-target="#theModal"
+                                    title="Edit"
+                                    class=" float-right btn btn-outline-success btn-sm">
+                                <i class="fa fa-pen "></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Description:
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Description
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Conducted By
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.ConductedBy
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Target
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Target
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Stage
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Stage
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Finding
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Finding
+                                </div>
+                            </div>
+                           
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Remark
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Remark
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Status
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Status
+                                </div>
+                            </div>
+                            <br />
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Research</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" asp-for="TheModel.Id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" asp-for="TheModel.Title" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                  
+                    <div class="row form-group">
+
+                        <label class="col-sm-5 col-md-4 col-form-label">
+                            Stage
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" asp-for="TheModel.Stage"
+                                asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.Model.Common.ResearchStageEnum>())"
+                                name="Stage" required>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" asp-for="TheModel.Description" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <textarea rows="4" name="Remark" asp-for="TheModel.Remark" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Conducted By
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="ConductedBy" asp-for="TheModel.ConductedBy" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Target
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="Target" asp-for="TheModel.Target" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Finding
+                        </label>
+                        <textarea rows="4" name="Finding" asp-for="TheModel.Finding" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                   
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" asp-for="TheModel.Status" name="Status" required>
+                            <option value="1">Active</option>
+                            <option value="0">In-active</option>
+                        </select>
+                    </div>
+
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+    <script>
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

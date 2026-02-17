@@ -1,0 +1,6 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=0C50164E_002D89C6_002D4F33_002DA43F_002D9A4D50ADA125_002Fd_003AGraphQL_002Fd_003AMutations_002Ff_003AMutation_002Ecs/@EntryIndexedValue">ExplicitlyExcluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=20C4FF11_002D9C4F_002D4938_002DA85F_002DF091C721FF4B_002Fd_003ADTO_002Fd_003ATrade_002Ff_003AExchangeRateInput_002Ecs/@EntryIndexedValue">ExplicitlyExcluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=20C4FF11_002D9C4F_002D4938_002DA85F_002DF091C721FF4B_002Fd_003ARepositories_002Fd_003ATrade_002Ff_003AExchangeRateRepository_002Ecs/@EntryIndexedValue">ExplicitlyExcluded</s:String>
+	
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=ECCSA/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

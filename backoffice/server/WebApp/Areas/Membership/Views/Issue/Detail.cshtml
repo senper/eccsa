@@ -1,0 +1,364 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IssueViewModel
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = Model.LayoutPage;
+}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Index",Model.Controller,new { Area =Model.Area, module = Model.CurrentModule})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-sm-9">
+
+                            <h4>  @Model.TheModel.CompanyName  <small>@(Model.TheModel.IssueType?.NameEng)</small> </h4>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <h5>The Issue</h5>
+                            <div class="card card-body">
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Details:
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.DetailsOfOccurrence
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Type:
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.IssueType.NameEng @Model.TheModel.IssueType.NameLocal
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Measure Code:
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.MeasureCode
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Date
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.IssueDate.ToString("yyyy-MM-dd")
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Date of Occurrence
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.DateOfOccurrence.ToString("yyyy-MM-dd")
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Place of Occurrence:
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.PlaceOfOccurrence
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Country or Region:
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.CountryRegion
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Location of Incident:
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.LocationType,  @(Model.TheModel.Location?.Name ?? Model.TheModel.OtherLocation)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Description
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.Description
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Affected Products
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.AffectedProducts
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Description of Products
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.DescriptionOfProducts
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Product Value
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.ProductValueAmount  @Model.TheModel.ProductValueCurrency
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Preferred Gov. Org
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.PreferredHandler
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            @if (Model.TheModel.Attachments != null)
+                            {
+                                <h5>Attachments</h5>
+                                <div class="card ">
+                                    @foreach (var item in Model.TheModel.Attachments)
+                                    {
+                                        <a id="filename" asp-action="DownLoadFile" asp-route-id="@item.Id" style="margin: 2px 0 2px 10px"
+                                         asp-route-extention="@(item.Extension)"
+                                   asp-route-fileName="@(item.Title+item.Extension)">
+                                            @item.Title
+                                        </a>
+                                    }
+                                </div>
+                            }
+                            <br />
+                            <h5>Action Taken</h5>
+                            <div class="card card-body">
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Assigned To
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @if ((int)Model.TheModel.ActionOwner == 0)
+                                        {
+                                            <button class="col-md-3 edit  btn btn-sm btn-outline-primary shadow-sm"
+                                                data-toggle="modal"
+                                                data-target="#setIssueOwnerModal"
+                                                title="Assign issue to...">
+                                                Assign To
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            @Model.TheModel.AssignedTo
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Remark
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.TheModel.Remark &nbsp;&nbsp;
+                                        @if (Model.TheModel.Status != ECCSA.BackOffice.Server.Model.Common.IssueStatus.Resolved)
+                                        {
+
+                                            <button class="col-md-2 btn btn-sm btn-outline-info shadow-sm"
+                                                data-toggle="modal"
+                                                data-target="#remarkModal"
+                                                title="Update Remark">
+                                                Update Remark
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Status
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @if (Model.TheModel.Status == ECCSA.BackOffice.Server.Model.Common.IssueStatus.Resolved)
+                                        {
+                                            <strong>Resolved</strong>
+                                        }
+                                        else
+                                        {
+                                            <a data-toggle="modal"
+                                           data-target="#closeIssueModal"
+                                           class="col-md-2 btn btn-sm btn-outline-warning">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Close Issue
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+
+</div>
+
+@if ((int)Model.TheModel.ActionOwner == 0)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="setIssueOwnerModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Issue to...</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post"
+                      asp-action="AssignIssue" asp-antiforgery="true">
+                        <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                        <input type="hidden" name="module" value="@Model.CurrentModule" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Assigned To
+                            </label>
+
+                            <select class="custom-select col-sm-7 col-md-8"
+                                name="Owner" required>
+                                <option value=""></option>
+                                <option value="16">Arbitration</option>
+                                <option value="8">Chamber Academy</option>
+                                <option value="2">Communication & PR </option>
+                                <option value="4">Trade Promotion</option>
+                                <option value="64">Trade Facilitation</option>
+                                <option value="1">Membership</option>
+                                <option value="32">Research & Adocacy</option>
+                            </select>
+
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-3 col-md-3 col-form-label">
+                                Remark
+                            </label>
+
+                            <textarea class="col-sm-9 col-md-9" name="remark" rows="4" maxlength="600" required>@Model.TheModel.Remark</textarea>
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save" class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="remarkModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Update Remark</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="UpdateIssueRemark" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="module" value="@Model.CurrentModule" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-2 col-md-2 col-form-label">
+                            Remark
+                        </label>
+                        <textarea class="col-sm-10 col-md-10" name="remark" rows="5" maxlength="600" required>@Model.TheModel.Remark</textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="closeIssueModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Close Issue</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="CloseIssue" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="module" value="@Model.CurrentModule" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-2 col-md-2 col-form-label">
+                            Remark
+                        </label>
+                        <textarea class="col-sm-10 col-md-10" name="remark" rows="5" maxlength="600" required>@Model.TheModel.Remark</textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Close" class="btn btn-warning">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script {
+
+<script>
+
+</script>
+}

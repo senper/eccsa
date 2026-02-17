@@ -1,0 +1,8 @@
+.main{
+   
+    height: 25%;
+    color: darkgreen;
+}
+.calendar-body {
+    grid-auto-rows: minmax(20px, auto);
+}

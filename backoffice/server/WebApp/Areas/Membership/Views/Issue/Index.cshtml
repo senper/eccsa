@@ -1,0 +1,197 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Membership.Model.IssueViewModel
+@using ECCSA.BackOffice.Server.Model.Common;
+@{
+    ViewData["Title"] = "Index";
+    Layout = Model.LayoutPage;
+}
+<div class="container-fluid">
+    <div class="row d-sm-flex align-items-center justify-content-between" style="margin-left:15px;margin-bottom:2px;">
+        <div class="col-md-8" style="margin-left:15px;margin-bottom:2px;">
+            <form method="get" asp-action="Index">
+                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                <div class="btn-group pull-left" role="group" aria-label="Basic example">
+                    Search&nbsp;&nbsp;
+                    <select class="custom-select col-sm-9 col-md-9"
+                            name="issueTypeId"
+                            asp-for="@Model.IssueTypeId"
+                             asp-items="@(new SelectList(@Model.IssueTypes, "Id","Name"))">
+                        @if(Model.CurrentModule != ECCSAModuleFlag.TradePromotion)
+                        {
+                            <option></option>
+                        }
+                    </select>
+                    <select class="custom-select col-sm-3 col-md-3"
+                            name="status"
+                            asp-for="@Model.Status"
+                             asp-items="@(Html.GetEnumSelectList<IssueStatus>()
+.Where(s => Model.CurrentModule == ECCSAModuleFlag.TradePromotion || s.Value != ((int)IssueStatus.New).ToString()))">
+
+                             </select>
+                    
+                    <button onclick="this.form.submit()" class=" d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+        <div class="col-md-2">
+            <a href="@Url.Action("Report",Model.Controller,new { Area =Model.Area, module=@Model.CurrentModule})" class="btn btn-outline-info">Report</a>
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+
+                                    <tr>
+                                        <td>
+                                            <a asp-controller="@Model.Controller" asp-action="Detail" asp-route-module="@Model.CurrentModule" asp-route-id="@i.Id" class="title ">@Html.DisplayFor(modelItem => i.CompanyName)</a>
+                                        </td>
+
+                                        <td>
+                                            @i.IssueType.NameEng
+                                        </td>
+                                        <td>@i.IssueDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@i.Status.GetDisplayName()</td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="Detail" asp-route-module="@Model.CurrentModule" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">New Issue</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Guid.Empty" />
+                    <div class="row form-group">
+
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Type
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" id="statusId"
+                                asp-items="@(new SelectList(Model.IssueTypes,"Id", "Name"))"
+                                name="TypeId" required>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title" id="nameId" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Date
+                        </label>
+                        <input type="date" class="form-control col-sm-8 col-md-9" name="IssueDate" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" maxlength="600" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Name
+                        </label>
+                        <input type="text" name="ContactPersonName" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" name="ContactEmail" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Phone
+                        </label>
+                        <input type="text" name="ContactPhone" maxlength="100" class="form-control col-sm-8 col-md-9" />
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section script {
+
+    <script>
+
+    </script>
+}

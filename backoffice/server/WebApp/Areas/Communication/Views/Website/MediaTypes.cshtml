@@ -1,0 +1,225 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.MediaTypeViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Website Management";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @if (Model.IsUserOrAdmin)
+        {
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-toggle="modal"
+                    data-target="#theModal"
+                    title="New Media Type"
+                    onclick="editMediaType(this)"
+                    data-name=""
+                    data-namelocal=""
+                    data-id="0"
+                    data-menuid="-1"
+                    data-moduleid="2"
+                    data-linkid="-1">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+            </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th> Name</th>
+                                    <th> Menu</th>
+                                    <th>Quick Link</th>
+                                    <th>Assigned To</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th> Name</th>
+                                    <th> Menu</th>
+                                    <th>Quick Link</th>
+                                    <th>Assigned To</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var r in Model.TheList.OrderBy(m => m.Name))
+                                {
+
+
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => r.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => r.MenuName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => r.LinkName)
+                                        </td>
+                                        <td>
+                                            @r.MediaAuthor.GetDisplayName()
+                                        </td>
+                                        <td>
+                                            <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                <a onclick="return confirmDelete($('#deleteMediaType@(r.Id)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteMediaType@(r.Id)"
+                                                  asp-action="DeleteMediaType" asp-antiforgery="true">
+                                                    <input type="hidden" name="id" value="@r.Id" />
+                                                </form>
+                                            </div>
+
+                                            <div class="col-sm-2 btn-group" role="group" aria-label="Basic example">
+                                                <button class="btn btn-sm btn-outline-success"
+                                                    data-toggle="modal"
+                                                    data-target="#theModal"
+                                                    title="Edit Media Type"
+                                                    onclick="editMediaType(this)"
+                                                    data-name="@r.Name"
+                                                    data-namelocal="@r.NameLocal"
+                                                    data-id="@r.Id"
+                                                    data-menuid="@r.MenuId"
+                                                    data-moduleid="@((int)r.MediaAuthor)"
+                                                    data-linkid="@r.QuickLinkId">
+                                                    <i class="fa fa-pen" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1"
+     role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Media Type </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SaveMediaType" asp-antiforgery="true">
+                        <input type="hidden" name="Id" id="id" />
+
+
+                        <div class="row form-group" style="margin-bottom:1px;">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Name
+                            </label>
+                            <input type="text" name="Name" maxlength="100" id="name" class="form-control col-sm-9 col-md-8" required placeholder="Name  "/>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+
+                            </label>
+                            <input type="text" name="NameLocal" id="nameLocal" maxlength="100" class="form-control col-sm-9 col-md-8" required placeholder="ስም  " />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Menu
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" id="menuId"
+                                asp-items="@(new SelectList(Model.Menus,"Id", "TitleFull",null,"ParentTitleFull"))"
+                                name="MenuId">
+                            </select>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Q. Link
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" id="linkId"
+                                asp-items="@(new SelectList(Model.Links,"Id", "TitleFull", null,"HeaderName"))"
+                                name="QuickLinkId">
+                            </select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Assigned To
+                            </label>
+                            <select class="custom-select col-sm-7 col-md-8" id="mediaAuthorId"
+                                asp-items="@(Html.GetEnumSelectList<ECCSAModuleEnum>())"
+                                name="MediaAuthor">
+                            </select>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+    <script>
+        function editMediaType(e) {
+
+            const id = document.getElementById('id');
+            const nameEng = document.getElementById('name');
+            const nameLocal = document.getElementById('nameLocal');
+
+
+
+            const idVal = $(e).attr('data-id');
+            const nameVal = $(e).attr('data-name');
+            const nameLocalVal = $(e).attr('data-namelocal');
+            const menuVal = Number($(e).attr('data-menuid'));
+            const linkVal = Number($(e).attr('data-linkid'));
+            const authorVal = Number($(e).attr('data-moduleid'));
+
+            id.value = idVal;
+            nameEng.value = nameVal;
+            nameLocal.value = nameLocalVal;
+
+            $('#menuId').val(menuVal).change();
+            $('#linkId').val(linkVal).change();
+            $('#mediaAuthorId').val(authorVal).change();
+        }
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

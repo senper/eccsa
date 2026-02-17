@@ -1,0 +1,249 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.MediaCoverageViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Media Coverage";
+    Layout = "~/Views/Shared/_CommunicationLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        @if (Model.IsUserOrAdmin)
+        {
+            <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Media Agency"
+                data-id="@Guid.Empty"
+                data-name=""
+                data-mediatype="0"
+                data-ownership="0"
+                data-repname=""
+                data-pername=""
+                data-email=""
+                data-mobile=""
+                data-telephone=""
+                data-url=""
+                data-descr=""
+                data-remark=""
+                data-status="@((int)StatusEnum.Active)">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+        </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>About</th>
+                                    <th>Media Agency</th>
+                                    <th>Duration</th>
+                                    <th>Frequency</th>
+                                    <th>Start Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>About</th>
+                                    <th>Media Agency</th>
+                                    <th>Duration</th>
+                                    <th>Frequency</th>
+                                    <th>Start Date</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+                                    
+
+                                    <tr >
+                                        <td>
+                                            <a asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id" class="title">@Html.DisplayFor(modelItem => i.About)</a>
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.MediaAgency.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.DurationMinutes)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Frequency)
+                                        </td>
+                                        <td>
+                                            @(i.StartDate.ToLongDateString())
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                               
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin)
+{
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Media Coverage</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form data-parsley-validate novalidate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true" onsubmit="return valideCoverage()">
+                        <input type="hidden" name="Id" value="@Guid.Empty" />
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Media Agency
+                            </label>
+                            <select name="MediaAgencyId" class="custom-select col-sm-8 col-md-9" asp-for="TheModel.MediaAgencyId"
+                                asp-items="@(new SelectList(Model.Agencies,"Id", "Name"))" required></select>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Start Date
+                            </label>
+                            <input type="date" class="form-control col-sm-8 col-md-9" name="startDate" id="startDateId" required />
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                End Date
+                            </label>
+                            <input type="date" class="form-control col-sm-8 col-md-9" name="endDate" id="endDateId" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Duration
+                            </label>
+                            <div class="input-group-append  col-sm-8 col-md-5" style="padding-left: 0px;">
+                                <input type="number" min="0" title="Duration in minutes. For broadcast media. 0 for the others" max="3600" name="DurationMinutes"  class="form-control col-sm-8 col-md-9" required />
+
+                                <span class="input-group-text" id="basic-addon2">Min.</span>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Frequency
+                            </label>
+                            <input type="text" name="Frequency" title="Number of times during the specified period. E.g. Once per day, "  maxlength="50" class="form-control col-sm-8 col-md-9" required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Covered In
+                            </label>
+                            <input type="text" name="CoveredIn" maxlength="50" class="form-control col-sm-8 col-md-9" title="Website, news, documentary, blog,..." required />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                About
+                            </label>
+                            <textarea name="About" title="write the content that was covered" rows="4" maxlength="300" class="form-control col-sm-8 col-md-9" required ></textarea>
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">Material</label>
+                            <input accept="*/*" type="file"  name="Material" class="form-control-file form-control col-sm-8 col-md-8" />
+                        </div>
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Remark
+                            </label>
+                            <textarea rows="2" name="Remark" id="remarkId" maxlength="300" class="form-control col-sm-8 col-md-9" required></textarea>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section script {
+    <script src="~/js/validation.js"></script>
+    <script src="~/js/mediaAgencyValidation.js"></script>
+    <script src="/js/comboTreePlugin.js" type="text/javascript"></script>
+
+    <script>
+
+        function loadLocation() {
+            const id = document.getElementById('hdnlocationSelected').value;
+            let selectedV = '';
+            let url = `individual/getlocation`;
+            jQuery.get(url, { parentId: id }, function (data) {
+                $('#locationSelectorId')
+                    .empty();
+                $.each(data, function (index, value) {
+                    selectedV = '';
+                    if (id == value.id) {
+                        selectedV = `selected="selected"`;
+                    }
+                    const option = `<option  ${selectedV} value="${value.id}">${value.name}</option>`;
+                    $('#locationSelectorId').append(option);
+                });
+            });
+
+        }
+        $('.edit').on('click', function () {
+
+            var url = $(this).attr('data-url');
+            $($(this).attr('data-target')).find(".modal-content").html("");
+
+            $($(this).attr('data-target')).find(".modal-content").each(function (index, item) {
+                $(item).html("");
+
+                if (url && url.length > 0) {
+                    $(item).load(url);
+                }
+            });
+        });
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+    </script>
+}

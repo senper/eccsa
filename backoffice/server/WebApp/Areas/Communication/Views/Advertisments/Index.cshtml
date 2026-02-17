@@ -1,0 +1,233 @@
+﻿@model ECCSA.BackOffice.Server.WebApp.Areas.Communication.Model.AdvertViewModel
+@using ECCSA.BackOffice.Server.Model.Common
+@{
+    ViewData["Title"] = "Advertizement";
+    Layout = Model.LayoutPage;
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+         @if (Model.IsUserOrAdmin)
+            {
+        <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Adv"
+                data-id="@Guid.Empty"
+                data-status="@((int)StatusEnum.Active)"
+                onclick="addEdit(this)">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+        </button>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+              
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Company</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Section</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Company</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Section</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+
+
+                                    <tr>
+                                        <td>
+                                            <a id="filename" 
+                                                asp-action="Detail" 
+                                                asp-controller="Advertisments" 
+                                                asp-area="Communication" 
+                                                asp-route-id="@i.Id" 
+                                                class="title">
+                                            @Html.DisplayFor(modelItem => i.FullName)
+                                            </a>
+                                           
+                                        </td>
+                                        <td>@i.CompanyName</td>
+                                        <td>@i.Email</td>
+                                        <td>@i.PhoneNumber</td>
+                                        <td>@i.Section.GetDisplayName()</td>
+                                        <td>@i.StartDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@i.EndDate.ToString("yyyy-MM-dd")</td>
+
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+
+
+                                                <a onclick="return confirmDelete($('#deleteResource@(i.Id)')[0]);"
+                                               class=" btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </a>
+                                                <form data-parsley-validate novalidate method="post" id="deleteResource@(i.Id)"
+                                                  asp-action="Delete" asp-antiforgery="true" asp-route-id="@i.Id">
+                                                    <input type="hidden" name="id" value="@i.Id" />
+                                                </form>
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.IsUserOrAdmin)
+    {
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Advertizement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="Save" asp-antiforgery="true" onsubmit="return validate()">
+                    <input type="hidden" name="Id" value="@Guid.Empty" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            FullName
+                        </label>
+                        <input type="text" name="FullName" id="fullName" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    
+
+                     <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Company Name
+                        </label>
+                        <input type="text" name="CompanyName" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                     <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Email
+                        </label>
+                        <input type="email" name="Email" id="email" maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                     <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Phone
+                        </label>
+                        <input type="text" name="PhoneNumber" maxlength="50" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Section
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" id="statusId" name="Section"
+                                asp-items="@(Html.GetEnumSelectList<AdvertisementSectionEnum>())"
+                                name="Section" required>
+                        </select>
+                    </div>
+
+                    
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input type="date" name="StartDate" class="form-control col-sm-8 col-md-9" id="startDateId" required />
+                    </div>
+                     <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" name="EndDate" class="form-control col-sm-8 col-md-9" id="startDateId" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Ad
+                        </label>
+                        <input type="file" name="upload" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                     <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+}
+                   
+
+
+                   
+@section script {
+    <script src="~/js/validation.js"></script>
+
+<script>
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+       function validate() {
+
+    const email = Number(document.getElementById("email").value);
+
+    const isEmailValid = is_validate_email("email");
+    const isValidName = is_validate_name("fullName");
+   
+    return isValidName && isEmailValid;
+
+}
+</script>
+}

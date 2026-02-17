@@ -1,0 +1,145 @@
+import React from "react";
+import { Card, Col, Row, Table } from "react-bootstrap";
+
+export default function IssueFormAttachments({
+  attachments,
+  setAttachments,
+  showNotification,
+  setErrorMsg,
+  getLocal,
+}) {
+  const title = React.useRef("");
+  const file = React.useRef("");
+  const AddAttachment = () => {
+    if (!title.current.value || title.current.value.trim() == "") {
+      setErrorMsg(getLocal("Title is required"));
+      showNotification("tr");
+      return;
+    }
+    if (attachments.findIndex((a) => a.title == title.current.value) >= 0) {
+      setErrorMsg(getLocal("Title already use for other attachment"));
+      showNotification("tr");
+      return;
+    }
+    if (!file.current.files || !file.current.files[0]) {
+      setErrorMsg(getLocal("File is required"));
+      showNotification("tr");
+      return;
+    }
+    const newList = [...attachments];
+    newList.push({
+      title: title.current.value,
+      file: file.current.files[0],
+    });
+    setAttachments(newList);
+    title.current.value = "";
+    file.current.value = "";
+  };
+  const RemoveAttachment = (att) => {
+    const newList = attachments.filter((a) => a.title != att.title);
+    setAttachments([...newList]);
+  };
+  return (
+    <>
+      <>
+        <strong>{getLocal("Attachments")}</strong> &nbsp;&nbsp;&nbsp;
+        <Row>
+          <Col md="6">
+            {getLocal("Title")}:{" "}
+            <input
+              type="text"
+              name={"attachmentTitle"}
+              ref={title}
+              className="form-control"
+            />{" "}
+          </Col>
+          <Col md="4">
+            {" "}
+            {getLocal("File")}:{" "}
+            <input
+              type="file"
+              name={"addAttachment"}
+              ref={file}
+              className="form-control"
+            />
+          </Col>
+          <Col md="2">
+            <button
+              type="button"
+              className="btn-sm btn btn-outline-success"
+              style={{ float: "none" }}
+              onClick={(e) => AddAttachment()}
+            >
+              {getLocal("Add")}
+            </button>
+          </Col>{" "}
+        </Row>
+      </>
+      <div id="showOnLargeScreen">
+        <Table striped bordered hover size="sm" className="three-dtbl">
+          <thead>
+            <tr>
+              <th>{getLocal("Attachments")}</th>
+              <th>{getLocal("File")}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {attachments.length > 0 ? (
+              attachments.map((att, index) => (
+                <tr key={index}>
+                  <td>{att.title}</td>
+                  <td>{att.file ? att.file.name : ""}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn-sm btn btn-warning "
+                      style={{ float: "none", margin: "0" }}
+                      onClick={() => RemoveAttachment(att)}
+                    >
+                      {getLocal("Remove")}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={2} className="text-center">
+                  <strong>{getLocal("No Attachments to show")}</strong>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      </div>
+      <div id="showOnSmallScreen">
+        {attachments && attachments.length > 0 ? (
+          attachments.map((att, i) => (
+            <Card key={i} className="card__margin-bottom">
+              <Card.Header>{att.title}</Card.Header>
+              <Card.Body>
+                <Row>
+                  <Col>{att.file ? att.file.name : ""}</Col>
+                  <Col>
+                    <button
+                      type="button"
+                      className="btn-sm btn btn-warning "
+                      style={{ float: "none", margin: "0" }}
+                      onClick={() => RemoveAttachment(att)}
+                    >
+                      {getLocal("Remove")}
+                    </button>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          ))
+        ) : (
+          <Card  className="card__margin-bottom">
+            <strong>{getLocal("No Attachments to show")}</strong>
+          </Card>
+        )}
+      </div>
+    </>
+  );
+}

@@ -1,0 +1,641 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Surveying.Model.SurveyViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+    Layout = Model.LayoutPage;
+
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <a href="@Url.Action("Detail","Setting",new { Area ="Surveying", id = Model.TheModel.SettingId})" class="btn btn-outline-info"><i class="fa fa-angle-double-left" aria-hidden="true"></i>back</a>
+    </div>
+    <div class="row">
+        <input type="hidden" value="@Model.ChoiceJson" id="settingAllChoices" />
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <h4>  @Model.TheModel.Title </h4>
+                        </div>
+                        <div class="col-sm-1">
+
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button data-toggle="modal"
+                                        data-target="#editSurveyModal"
+                                        title="Edit"
+                                        class=" float-right edit btn btn-outline-success btn-sm">
+                                    <i class="fa fa-pen "></i>
+                                </button>
+                                @if (Model.TheModel.Responses?.Any() != true &&
+                                Model.TheModel.Attachments?.Any() != true)
+                                {
+                                    <a onclick="return confirmDelete($('#deleteSurvey')[0]);"
+                                   class=" btn btn-sm btn-outline-danger">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                    <form data-parsley-validate novalidate method="post" id="deleteSurvey"
+                                      asp-action="DeleteSurvey" asp-antiforgery="true" asp-route-id="@Model.TheModel.Id">
+                                        <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                        <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Title
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Title
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Period
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.StartDate.ToString("yyyy-MM-dd") - @Model.TheModel.EndDate.ToString("yyyy-MM-dd")
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    Description
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.Description
+                                </div>
+                            </div>
+                            @if (Model.TheModel.Setting.PublishThrough == MediaOutletFlag.Telegram)
+                            {
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Telegram Publish Date
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @(Model.TheModel.TelegramPublishDate?.ToString("yyyy-MM-dd HH:mm") ?? "NOT Yet Published")
+                                        @{
+                                            var disabled = Model.TheModel.Setting.Questions.Any(s => (s.QuestionType != QuestionType.MultipleChoice &&
+                                            s.QuestionType != QuestionType.SingleChoice) || !s.Choices.Any()) ? "disable" : "";
+                                        }
+                                        @if (Model.TheModel.TelegramPublishDate == null)
+                                        {
+                                            <a onclick="return confirmation($('#telegramPublish')[0], 'Publish Survey To Telegram');"
+                                       class=" btn btn-sm btn-outline-warning" @disabled>
+                                                Publish
+                                            </a>
+                                            <form data-parsley-validate novalidate method="post" id="telegramPublish"
+                                          asp-action="TelegramPublish" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <div class="col-sm-4">
+                                    Telegram Group Id
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.TheModel.GroupId
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="nav-tabs-boxed">
+                        <ul class="nav nav-tabs" role="tablist">
+                            @if (!string.IsNullOrEmpty(Model.TheModel.GroupId) || Model.TheModel.Setting.PublishThrough != MediaOutletFlag.Telegram)
+                            {
+                                <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#questionsTab" role="tab" aria-controls="Responses">Responses</a></li>
+                            }
+                            @if (Model.TheModel.Setting.PublishThrough == MediaOutletFlag.Telegram)
+                            {
+                                <li class="nav-item"><a class="nav-link @(string.IsNullOrEmpty(Model.TheModel.GroupId) ? "active" : "") " data-toggle="tab" href="#votesTab" role="tab" aria-controls="Votes">Votes</a></li>
+                            }
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#surveyTab" role="tab" aria-controls="Attachments">Attachments</a></li>
+
+                        </ul>
+                        <div class="tab-content">
+                            @if (!string.IsNullOrEmpty(Model.TheModel.GroupId) || Model.TheModel.Setting.PublishThrough != MediaOutletFlag.Telegram)
+                            {
+                                <div class="tab-pane active" id="questionsTab" role="tabpanel">
+                                    @if (Model.TheModel.Setting.PublishThrough == MediaOutletFlag.Telegram)
+                                    {
+                                        <div class="row p-2">
+                                            <div class="col-md-12">
+                                                <a asp-action="ExportSurvey"
+                                           asp-route-Id="@Model.TheModel.Id"
+        title="Download Template File"
+        class="btn btn-sm btn-outline-success float-right">Export Survey</a>
+                                                <a onclick="$('#telegramUpdate')[0].submit()"
+                                                class=" btn btn-sm btn-outline-success float-left">
+                                                    Update Responses
+                                                </a>
+                                            </div>
+                                            <form data-parsley-validate novalidate method="post" id="telegramUpdate"
+                                          asp-action="UpdateTelegramResponses" asp-antiforgery="true">
+                                                <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                            </form>
+                                        </div>
+                                    }
+                                    <div class="row">
+
+                                        <div class="col-md-12 ">
+                                            <table class="table table-bordered table-striped dataTable" id="datatblquestion" style="margin-top: 5px; margin-left: 5px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Question </th>
+                                                        <th>Respondent</th>
+                                                        <th>Response</th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var q in Model.TheModel.Setting.Questions.OrderBy(o => o.OrderNo))
+                                                    {
+                                                        foreach (var r in Model.TheModel.Responses.Where(r => r.QuestionId == q.Id))
+                                                        {
+
+
+                                                            <tr>
+                                                                <td>@q.OrderNo </td>
+                                                                <td> @q.Question  </td>
+                                                                <td>@(r.Respondent?.UserCode ?? r.RespondentName)</td>
+                                                                <td>@r.Response(q.QuestionType) </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.TheModel.Setting.PublishThrough == MediaOutletFlag.Telegram)
+                            {
+                                <div class="tab-pane @(string.IsNullOrEmpty(Model.TheModel.GroupId) ? "active" : "")" id="votesTab" role="tabpanel">
+                                    <div class="row p-2">
+                                        <div class="col-md-12">
+                                            <a asp-action="ExportSurveyVotes"
+                                           asp-route-Id="@Model.TheModel.Id"
+                                           title="Download Template File"
+                                           class="btn btn-sm btn-outline-success float-right">Export Survey</a>
+                                            <a onclick="$('#telegramUpdate')[0].submit()"
+                                           class=" btn btn-sm btn-outline-success float-left">
+                                                Update Responses
+                                            </a>
+                                        </div>
+                                        <form data-parsley-validate novalidate method="post" id="telegramUpdate"
+                                          asp-action="UpdateTelegramResponses" asp-antiforgery="true">
+                                            <input type="hidden" name="id" value="@Model.TheModel.Id" />
+                                            <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                        </form>
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-12 ">
+                                            <table class="table table-bordered table-striped dataTable" id="datatblquestion" style="margin-top: 5px; margin-left: 5px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Question </th>
+                                                        <th>Choice</th>
+                                                        <th>Votes</th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var q in Model.TheModel.Setting.Questions.OrderBy(o => o.OrderNo))
+                                                    {
+                                                        foreach (var r in q.Choices.OrderBy(r => r.OrderNo))
+                                                        {
+                                                            <tr>
+                                                                <td>@q.OrderNo </td>
+                                                                <td> @q.Question  </td>
+                                                                <td>@(r.OrderNo). @(r.ChoiceText)</td>
+                                                                <td>@(Model.TheModel.Votes.FirstOrDefault(v => v.ChoiceId == r.Id && v.QuestionId == r.QuestionId)?.Votes ?? 0) </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="tab-pane" id="surveyTab" role="tabpanel">
+                                <br />
+                                <div class="row">
+
+                                    <div class="col-md-12 ">
+                                        <table class="table table-bordered table-striped dataTable" id="datatablesurvey" style="margin-top: 5px; margin-left: 5px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Description</th>
+                                                    <th>
+                                                        <button class="card-header-action btn btn-outline-success btn-sm float-right"
+                                                                id="newbtn"
+                                                                data-toggle="modal"
+                                                                data-target="#editAttachmentModal"
+                                                                title="Create Attachment">
+                                                            New
+                                                        </button>
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var s in Model.TheModel.Attachments)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @if (s.Extension != string.Empty)
+                                                            {
+                                                                <a id="filename" asp-action="DownLoadFile"
+                                                           asp-route-module="@Model.CurrentModule"
+                                                           asp-route-id="@s.Id" asp-route-type="survye_attachment"
+                                                           asp-route-fileName="@(s.Title + "_Attachment" + s.Extension)">
+                                                                    @s.Title
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                @s.Title
+                                                            }
+                                                        </td>
+                                                        <td>@s.Description</td>
+                                                        <td>
+                                                            <a onclick="return confirmDelete($('#deleteAttachment')[0]);"
+                                                           class=" btn btn-sm btn-outline-danger float-right">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </a>
+                                                            <form data-parsley-validate novalidate method="post" id="deleteAttachment"
+                                                              asp-action="DeleteAttachment" asp-antiforgery="true">
+                                                                <input type="hidden" name="surveyId" value="@Model.TheModel.Id" />
+                                                                <input type="hidden" name="Id" value="@s.Id" />
+                                                                <input type="hidden" name="module" value="@Model.CurrentModule" />
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editAttachmentModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionTitle"> Attachments </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post" enctype="multipart/form-data"
+                      asp-action="SaveAttachment" asp-antiforgery="true">
+                    <input type="hidden" name="SurveyId" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="Id" id="attachmentId" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" name="Title" id="attachmentTitle" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <input type="text" maxlength="800" name="Description" id="attachmentDescription" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">Attachment</label>
+                        <input type="file" name="File" class="form-control-file form-control col-sm-8 col-md-8" />
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="editSurveyModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title"> Edit Survey</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" value="@Model.TheModel.Id" />
+                    <input type="hidden" name="SettingId" value="@Model.TheModel.SettingId" />
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" maxlength="100" name="Title" value="@Model.TheModel.Title" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Start Date
+                        </label>
+                        <input type="date" name="StartDate" value="@Model.TheModel.StartDate" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            End Date
+                        </label>
+                        <input type="date" name="EndDate" value="@Model.TheModel.EndDate" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" maxlength="800" name="Description" class="form-control col-sm-8 col-md-9" required>@Model.TheModel.Description </textarea>
+                    </div>
+                    @if (Model.TheModel.Setting.PublishThrough == MediaOutletFlag.Telegram && Model.TheModel.TelegramPublishDate == null)
+                    {
+                        <div class="row form-group">
+                            <label class="col-sm-4 col-md-3 col-form-label">
+                                Telegram Group Id
+                            </label>
+                            <input type="text" maxlength="100" name="GroupId" value="@Model.TheModel.GroupId" class="form-control col-sm-8 col-md-9" />
+                        </div>
+                    }
+                    else
+                    {
+
+                        <input type="hidden" name="GroupId" value="@Model.TheModel.GroupId" />
+                    }
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save" class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section script {
+
+
+    $("#datatblquestion").treetable({ expandable: false });
+<script>
+
+    function showHideAnswers(e) {
+        const ank = $(e);
+        let show = true;
+        for (let i = 0; i < ank[0].children.length; i++) {
+            const child = ank[0].children[i];
+            if (child.localName == 'i') {
+                if (child.classList.contains('fa-angle-right')) {
+                    show = true;
+                    child.classList.remove('fa-angle-right');
+                    child.classList.add('fa-angle-down');
+                } else {
+                    show = false;
+                    child.classList.add('fa-angle-right');
+                    child.classList.remove('fa-angle-down');
+                }
+            }
+        }
+        const className = ank.attr('data-tt');
+
+        const rows = document.getElementsByClassName(className);
+        for (let i = 0; i < rows.length; i++) {
+            if (show) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+
+    }
+
+    function confirmDelete(form) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to Delete ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function confirmation(form, text) {
+        $.confirm({
+            icon: 'fa fa-exclamation-triangle',
+            title: 'Confirm!',
+            content: 'Are you sure want to ' + text + ' ?',
+            buttons: {
+                yes: function () {
+                    form.submit();
+                },
+                no: function () {
+                }
+            }
+        });
+        return false;
+    }
+
+    function adjustOpenDays(e) {
+        const frequency = Number($(e).children("option:selected").val());
+        $('#settingOpenDays').attr('max', 366);
+        if (frequency === 1) {
+            $('#settingOpenDays').attr('max', 6);
+        } else if (frequency === 2) {
+            $('#settingOpenDays').attr('max', 20);
+        } else if (frequency === 3) {
+            $('#settingOpenDays').attr('max', 80);
+        } else if (frequency === 4) {
+            $('#settingOpenDays').attr('max', 366);
+        }
+        const max = Number($('#settingOpenDays').attr('max'));
+        const value = Number($('#settingOpenDays').val());
+        if (max < value) {
+            $('#settingOpenDays').val(max);
+        }
+    }
+
+    function editChoice(e) {
+        const id = document.getElementById('choiceId');
+        const title = document.getElementById('choiceTitle');
+        const qid = document.getElementById('choiceQuestionId');
+        const orderNo = document.getElementById('choiceOrderNo');
+        const choiceText = document.getElementById('choiceText');
+
+        const idVal = $(e).attr('data-id');
+        const qidVal = $(e).attr('data-qid');
+        const orderVal = $(e).attr('data-orderno');
+        const choiceVal = $(e).attr('data-choice');
+        const titleVal = $(e).attr('data-title');
+
+        id.value = idVal;
+        qid.value = qidVal;
+        orderNo.value = orderVal;
+        choiceText.value = choiceVal;
+        title.innerHTML = titleVal;
+
+
+    }
+
+    function questionTypeChanged(e) {
+        const val = Number(e.value);
+
+        const rangeDiv = document.getElementById('rangeDiv');
+        if (val === 3) {
+            rangeDiv.style.display = '';
+        } else {
+            rangeDiv.style.display = 'none';
+        }
+    }
+
+    function showParent(e) {
+        const checked = Boolean(e.checked);
+        showHideParent(checked);
+
+    }
+
+    function showHideParent(checked) {
+        const parentChoiceDiv = document.getElementById('parentChoiceDiv');
+        if (checked) {
+            parentChoiceDiv.style.display = '';
+        } else {
+            parentChoiceDiv.style.display = 'none';
+        }
+        const parentOpt = document.getElementById('parentChoice');
+        const qId = document.getElementById('questionId').value;
+        const val = document.getElementById('settingAllChoices').value;
+
+        const choices = JSON.parse(val);
+        console.log(choices);
+        $("#parentChoice").empty();
+        for (let i = 0; i < choices.length; i++) {
+            let item = choices[i];
+
+            if (item != null && item.SimpleChoices != null && item.Id != qId) {
+                var optGrp = document.createElement("optgroup");
+                optGrp.label = `${item.OrderNo} ${item.Question}`
+                for (let j = 0; j < item.SimpleChoices.length; j++) {
+                    let itm = item.SimpleChoices[j];
+                    var opt = document.createElement("option");
+                    opt.value = itm.Id;
+                    opt.innerHTML = itm.ChoiceText;
+                    optGrp.appendChild(opt);
+                }
+                parentOpt.appendChild(optGrp);
+            }
+
+        }
+
+    }
+
+    function editQuestion(e) {
+        const id = document.getElementById('questionId');
+        const title = document.getElementById('questionTitle');
+        const orderNo = document.getElementById('questionOrderNo');
+        const questionText = document.getElementById('settingQuestion');
+        const minRange = document.getElementById('questionMinRange');
+        const maxRange = document.getElementById('questionMaxRange');
+        const cascade = document.getElementById('cascadedQuestion');
+
+        const idVal = $(e).attr('data-id');
+        const orderVal = $(e).attr('data-orderno');
+        const questionVal = $(e).attr('data-question');
+        const titleVal = $(e).attr('data-title');
+
+        const typeVal = Number($(e).attr('data-type'));
+        const minVal = $(e).attr('data-min');
+        const maxVal = $(e).attr('data-max');
+        const cascadeVal = Boolean($(e).attr('data-cascade') == 'True');
+        const parentVal = $(e).attr('data-parent');
+
+        id.value = idVal;
+        orderNo.value = orderVal;
+        questionText.value = questionVal;
+        title.innerHTML = titleVal;
+        cascade.checked = cascadeVal;
+        showHideParent(cascadeVal);
+        if (cascadeVal) {
+            $('#parentChoice').val(parentVal).change();
+        }
+        $('#questionType').val(typeVal).change();
+
+        const rangeDiv = document.getElementById('rangeDiv');
+        if (typeVal === 3) {
+            rangeDiv.style.display = '';
+            minRange.value = minVal;
+            maxRange.value = maxVal;
+        } else {
+            rangeDiv.style.display = 'none';
+        }
+
+    }
+</script>
+}

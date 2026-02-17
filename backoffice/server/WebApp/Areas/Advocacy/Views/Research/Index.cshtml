@@ -1,0 +1,213 @@
+﻿@using ECCSA.BackOffice.Server.Model.Common
+@model ECCSA.BackOffice.Server.WebApp.Areas.Advocacy.Model.ResearchViewModel
+
+@{
+    ViewData["Title"] = "Research";
+    Layout = "~/Views/Shared/_AdvocacyLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 edit">
+        <button class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                data-toggle="modal"
+                data-target="#theModal"
+                title="Add New Media Agency"
+                data-id="@Guid.Empty"
+                data-name=""
+                data-mediatype="0"
+                data-ownership="0"
+                data-repname=""
+                data-pername=""
+                data-email=""
+                data-mobile=""
+                data-telephone=""
+                data-url=""
+                data-description=""
+                data-remark=""
+                data-status="@((int)StatusEnum.Active)"
+                onclick="addEdit(this)">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Create New
+        </button>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card shadow mb-4">
+                @*<div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                    </div>*@
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Conducted By</th>
+                                    <th>Target</th>
+                                    <th>Stage</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Conducted By</th>
+                                    <th>Target</th>
+                                    <th>Stage</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                @foreach (var i in Model.TheList)
+                                {
+                                    var statusClass = (i.Status == 0 ? "danger" : "");
+
+                                    <tr class="@statusClass">
+                                        <td>
+                                            <a asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id" class="title @statusClass">@Html.DisplayFor(modelItem => i.Title)</a>
+                                        </td>
+                                        
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.ConductedBy)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Target)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => i.Stage)
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                               
+                                                <a class=" btn btn-sm  btn-outline-info" asp-controller="@Model.Controller" asp-action="Detail" asp-route-id="@i.Id">
+                                                    <i class="fa fa-info" aria-hidden="true"></i>
+                                                </a>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="theModal">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Create Research</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-parsley-validate novalidate method="post"
+                      asp-action="Save" asp-antiforgery="true">
+                    <input type="hidden" name="Id" id="id" />
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Title
+                        </label>
+                        <input type="text" name="Title"  maxlength="100" class="form-control col-sm-8 col-md-9" required />
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Description
+                        </label>
+                        <textarea rows="4" name="Description" id="descriptionId" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Conducted By
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="ConductedBy" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Target
+                        </label>
+                        <input type="text" maxlength="100" class="form-control col-sm-8 col-md-9" name="Target" required />
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Finding
+                        </label>
+                        <textarea rows="4" name="Finding"  maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+
+                        <label class="col-sm-5 col-md-4 col-form-label">
+                            Stage
+                        </label>
+                        <select class="custom-select col-sm-7 col-md-8" id="statusId"
+                                asp-items="@(Html.GetEnumSelectList<ECCSA.BackOffice.Server.Model.Common.ResearchStageEnum>())"
+                                name="Stage" required>
+                        </select>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Remark
+                        </label>
+                        <textarea rows="4" name="Remark" id="remarkId" maxlength="800" class="form-control col-sm-8 col-md-9" required></textarea>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-sm-4 col-md-3 col-form-label">
+                            Status
+                        </label>
+                        <select class="custom-select col-sm-8 col-md-9" id="statusId" name="Status" required>
+                            <option value="1">Active</option>
+                            <option value="0">In-active</option>
+                        </select>
+                    </div>
+
+
+
+
+
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <input type="submit" value="Save"
+                                   class="btn btn-primary">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script {
+    <script>
+
+        function confirmDelete(form) {
+            $.confirm({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Confirm!',
+                content: 'Are you sure want to Delete ?',
+                buttons: {
+                    yes: function () {
+                        form.submit();
+                    },
+                    no: function () {
+                    }
+                }
+            });
+            return false;
+        }
+
+        
+    </script>
+}

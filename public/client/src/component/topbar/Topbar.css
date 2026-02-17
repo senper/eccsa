@@ -1,0 +1,11 @@
+.TopbarItems {
+    /* background: linear-gradient(90deg,rgb(36, 16, 211) 0%,rgb(18, 11, 139) 100%,); */
+    background-color:#ffffff;
+    height: 1px;
+    display: flex;
+    justify-content: right;
+    align-items: right;
+    font-size: 1.0rem;
+    color: rgb(50, 138, 226);
+    padding: 5px;
+}

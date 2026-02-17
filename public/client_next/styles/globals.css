@@ -1,0 +1,238 @@
+* {
+  font-size: medium;
+  font-family: 'Source Sans Pro', sans-serif;
+  margin: 0;
+}
+
+.btn,
+.btn-outline-success {
+  border-color: #ffa700 !important;
+  background: #c82b36;
+}
+
+.navitems {
+  /* color: darkgreen; */
+  /* font-size: medium; */
+  font-size: 2.8em;
+  /* color: blue; */
+  margin-top: 5px;
+  display: flex;
+}
+.searchform {
+  padding-left: 0px;
+  color: #fff;
+}
+
+.force-opaque::placeholder {
+  opacity: 1;
+}
+
+.btn {
+  float: right;
+  margin: 25px;
+  background-color: #0d8523;
+  color: #fff;
+}
+
+.row1 {
+  padding: 2px;
+  width: 100%;
+}
+
+.dark2 {
+  color: #ffffff;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color: #057019;
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .show > .nav-link {
+  color: var(--bs-navbar-active-color);
+}
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #198754;
+}
+.navigation {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2em;
+  font-weight: 400;
+  color: #ffffff;
+  list-style: none;
+  display: inline-block;
+}
+
+.main1 {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2em;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+.selected {
+  background-color: rgb(17, 102, 9);
+  color: red;
+  cursor: not-allowed;
+}
+
+.card-header {
+  background-color: #198754;
+  color: #ffffff;
+}
+
+.text-green {
+  text-decoration: none;
+  padding: '20px';
+  font-size: 1rem;
+  text-anchor: middle;
+  border: 10px;
+}
+
+.bg {
+  /* padding: 4px 0px 4px 0px; */
+  background-color: #b6e6f4;
+  color: green;
+  border-radius: 18px 18px 18px 18px;
+  padding: 6px;
+  width: 50%;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  align-items: center;
+  text-align: center;
+  font-size: 25px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+pre {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: medium !important;
+  text-align: justify !important;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+@media screen and (max-width: 800px) {
+  .paddedMainDiv {
+    margin-top: 170px;
+    margin-left: 10px;
+  }
+}
+@media screen and (min-width: 801px) {
+  .paddedMainDiv {
+    margin-left: 100px;
+  }
+}
+
+.paddedMainDiv {
+  padding: 10px;
+}
+
+.links {
+  text-decoration: none;
+  margin: 15px;
+  /* text-shadow: 1px 1px 1px #ccc; */
+  font-size: 1.1em;
+  text-align: center;
+  color: #198754;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.three-dtbl thead {
+  border: 3px;
+  border-radius: 3px;
+  background-color: lightgray;
+  box-shadow: 3px 1px 1px -2px rgba(0, 0, 0, 0.42),
+    0 3px 20px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.three-dtbl th {
+  box-shadow: 3px 5px 10px -6px rgba(0, 0, 0, 0.42),
+    0 3px 20px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2) !important;
+}
+.three-dtbl {
+  box-shadow: 7px 1px 1px -2px rgba(0, 0, 0, 0.42),
+    11px 3px 20px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.row {
+  margin-bottom: 7px;
+}
+
+.btn {
+  background-color: #0d8523;
+  color: #fff;
+}
+a {
+  cursor: pointer;
+}
+
+.li-links {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 270px;
+}
+
+.directory_img {
+  float: right;
+  max-height: 150px;
+  max-width: 150px;
+  margin-top: -30px;
+  border: solid 1px #000;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.directory_img:hover {
+  border: solid 2px #f00;
+}
+
+.grid {
+  width: 100%;
+  margin: 15px;
+  padding: 1px;
+  background: #fff;
+}
+.card__margin-bottom {
+  margin-bottom: 1rem;
+}
+.slider-caption {
+  background-color: white;
+  /* text-align: left; */
+  padding: 10px;
+  color: #000;
+}
+
+.image-carousel-container {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.image-carousel-wrapper {
+  display: flex;
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .image-carousel-container {
+    width: 100%;
+  }
+}
+.image-width {
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 871px;
+  /* height: 84px; */
+}
+/* @media (max-width: 768px) {
+  .carousel-inner {
+    height: 60vh;
+  }
+  .carousel-item {
+    height: 60vh;
+  }
+} */

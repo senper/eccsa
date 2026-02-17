@@ -1,0 +1,343 @@
+﻿@using ECCSA.BackOffice.Server.WebApp.Models
+@using ECCSA.BackOffice.Server.Model.Common
+
+@model ECCSA.BackOffice.Server.WebApp.Models.BaseViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ECCSA Academy @ViewData["Title"]</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Custom styles for this page -->
+    <link href="~/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="~/css/jquery-confirm.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+   
+
+    <style>
+        /* Responsive Text area */
+        .comment {
+            float: left;
+            width: 100%;
+            height: auto;
+        }
+
+        .commenter {
+            float: left;
+        }
+
+        .commenter img {
+            width: 35px;
+            height: 35px;
+        }
+
+        .comment-text-area {
+            float: left;
+            width: 100%;
+            height: auto;
+        }
+
+        .textinput {
+            float: left;
+            width: 100%;
+            min-height: 75px;
+            outline: none;
+            resize: none;
+            border: 1px solid grey;
+        }
+    </style>
+  
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav academy sidebar  sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <img src="~/img/favicon.png" style="width:50px;" />
+                </div>
+                <div class="sidebar-brand-text mx-3">eccsa</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <partial name="_UserMenuPartial" />
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Nav Item - Charts -->
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.AcademyDashboard)' id="navDashboard">
+                <a class="nav-link" href="@Url.Action("Index","Dashboard",new { Area ="Academy"})">
+                    <i class="fas fa-chart-area"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Tables -->
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.AcademySponsors)' id="navAssociation">
+
+                <a class="nav-link active" href="@Url.Action("SponsorsList","AcademySettings",new { Area ="Academy"})">
+                    <i class="fa fa-bars"></i>
+                    <span>Sponsors</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Tables -->
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.AcademySettingVariables)' id="navAssociation">
+
+                <a class="nav-link active" href="@Url.Action("SettingVariablesList","AcademySettings",new { Area ="Academy"})">
+                    <i class="fa fa-bars"></i>
+                    <span>Setting Variables</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Tables -->
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.AcademyTopicCategory)' id="navAssociation">
+
+                <a class="nav-link active" href="@Url.Action("Index","Category",new { Area ="Academy"})">
+                    <i class="fa fa-bars"></i>
+                    <span>Topic Categories</span>
+                </a>
+            </li>
+
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.AcademyTopic)' id="navAssociation">
+
+                <a class="nav-link active" href="@Url.Action("Index","Topic",new { Area ="Academy"})">
+                    <i class="fas fa-book"></i>
+                    <span>Topic</span>
+                </a>
+            </li>
+
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.AcademyTraining)' id="navAssociation">
+
+                <a class="nav-link active" href="@Url.Action("Index","Training",new { Area ="Academy"})">
+                    <i class="fa fa-book-reader"></i>
+                    <span>Trainings</span>
+                </a>
+            </li>
+
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.ServiceType)' id="navIndividual">
+                <a class="nav-link" href="@Url.Action("Index","ServiceType",new { Area ="Service", module=@ECCSAModuleFlag.Academy})">
+                    <i class="far fa-address-book"></i>
+                    <span>Service Types</span>
+                </a>
+            </li>
+
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.Services)' id="navApplicant">
+                <a class="nav-link" href="@Url.Action("Index","ServiceRequest",new { Area ="Service", module=@ECCSAModuleFlag.Academy})">
+                    <i class="fas fa-address-card"></i>
+                    <span>Requests</span>
+                </a>
+            </li>
+               <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.Issue)' id="navIssues">
+                <a class="nav-link" href="@Url.Action("Index","Issue",new { Area ="Membership", module=@ECCSAModuleFlag.Academy})">
+                    <i class="far fa-fw fa-check-square"></i>
+                    <span>Issues</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.SurveySetting)' id="navSurveySettingMembership">
+                <a class="nav-link" href="@Url.Action("Index","Setting",new { Area ="Surveying", module = @ECCSAModuleFlag.Academy})">
+                    <i class="fas fa-poll-h"></i>
+                    <span>Survey Setting</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.Events)' id="navEvent">
+                <a class="nav-link" href="@Url.Action("Index","Event",new { Area ="Events", module=@ECCSAModuleFlag.Academy})">
+                    <i class="fas fa-address-card"></i>
+                    <span>Events</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.EmailMessage)' id="navEvent">
+                <a class="nav-link" href="@Url.Action("Index","Email",new { Area ="Notification", module=@ECCSAModuleFlag.Academy})">
+                    <i class="fas fa-mail-bulk"></i>
+                    <span>Email Message</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.RecipientSource)' id="navEvent">
+                <a class="nav-link" href="@Url.Action("Index","Recipient",new { Area ="Notification", module=@ECCSAModuleFlag.Academy})">
+                    <i class="fas fa-envelope"></i>
+                    <span>Recipient Source</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.Plan)' id="navPlan">
+                <a class="nav-link" href="@Url.Action("Index","Planning",new { Area ="MandE", subSystem=@ECCSAModuleEnum.Academy})">
+                    <i class="fas fa-tasks"></i>
+                    <span>Plan</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.Progress)' id="navProgress">
+                <a class="nav-link" href="@Url.Action("Index","Progress",new { Area ="MandE", subSystem=@ECCSAModuleEnum.Academy})">
+                    <i class="fas fa-spinner"></i>
+                    <span>Plan Progress</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.ProgressReport)' id="navProgress">
+                <a class="nav-link" href="@Url.Action("Report","Progress",new { Area ="MandE", subSystem=@ECCSAModuleEnum.Academy})">
+                    <i class="fas fa-spinner"></i>
+                    <span>Progress Report</span>
+                </a>
+            </li>
+
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.AggregateReport)' id="navProgress">
+                <a class="nav-link" href="@Url.Action("AggregateReport","Progress",new { Area ="MandE", subSystem=@ECCSAModuleEnum.Academy})">
+                    <i class="fas fa-spinner"></i>
+                    <span>Aggregate Report</span>
+                </a>
+            </li>
+            <li class='nav-item @Model.GetMenuItemStatus(MenuItemEnum.DownloadReport)' id="navEvent">
+                <a class="nav-link" href="@Url.Action("Index","Report",new { Area ="Reports", module=@ECCSAModuleFlag.Academy})">
+                    <i class="fas fa-flag"></i>
+                    <span>Report</span>
+                </a>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+
+
+        </ul>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light academy topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <div class="ApplicationTitle">Academy \ <span style="font-size:medium">@Model.CurrentPage \ </span><span style="font-size:small">@Model.CurrentOperation</span>  </div>
+
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                                 aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                               placeholder="Search for..." aria-label="Search"
+                                               aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+
+
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <partial name="_ModuleMenusPartial" />
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+                <!-- Begin Page Content -->
+                @RenderBody()
+
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; ECCSA 2021</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <partial name="_LogoutModalPartial" />
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/js/sb-admin-2.min.js"></script>
+
+    <script src="~/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <script src="~/js/demo/datatables-demo.js"></script>
+    <script src="~/js/jquery-confirm.min.js"></script>
+    @RenderSection("script", required: false)
+
+    @if (TempData["CommandStatus"] != null)
+    {
+        <script type="text/javascript">
+            $.alert({
+                    icon: 'fa fa-bell',
+                    title: 'Information!',
+                    content: '@(TempData["CommandStatus"])'
+                });
+        </script>
+    }
+</body>
+
+</html>
